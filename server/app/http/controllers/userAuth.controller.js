@@ -135,7 +135,7 @@ class userAuthController extends Controller {
     const updatedUser = await UserModel.findOneAndUpdate(
       { _id: user._id },
       { $set: { name, email, isActive: true, role } },
-      { new: true }
+      { returnDocument: "after" }
     );
     // await setAuthCookie(res, updatedUser);
     await setAccessToken(res, updatedUser);

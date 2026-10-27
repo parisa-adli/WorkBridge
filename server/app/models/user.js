@@ -10,7 +10,7 @@ const UserSchema = new mongoose.Schema(
     phoneNumber: { type: String, trim: true },
     password: { type: String },
     otp: {
-      code: { type: Number, defaul: 0 },
+      code: { type: Number, default: 0 },
       expiresIn: { type: Date, default: 0 },
     },
     resetLink: { type: String, default: null },
@@ -50,7 +50,6 @@ UserSchema.index({
   name: "text",
   email: "text",
   phoneNumber: "text",
-  username: "text",
 });
 
 module.exports = {

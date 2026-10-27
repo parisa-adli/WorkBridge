@@ -57,7 +57,7 @@ async function createUser(app, { phoneNumber, role, status = 2 }) {
   const user = await UserModel.findOneAndUpdate(
     { phoneNumber },
     { $set: { role, status } },
-    { new: true }
+    { returnDocument: "after" }
   );
   return { agent, user };
 }

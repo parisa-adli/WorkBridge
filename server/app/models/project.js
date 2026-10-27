@@ -15,7 +15,7 @@ const ProjectSchema = new mongoose.Schema(
     category: { type: ObjectId, ref: "Category", required: true },
     budget: { type: Number, required: true },
     tags: [{ type: String }],
-    proposals: { type: [ObjectId], ref: "PROPOSAL", default: [] },
+    proposals: { type: [ObjectId], ref: "Proposal", default: [] },
     deadline: { type: Date, required: true },
     owner: { type: ObjectId, required: true, ref: "User" },
     freelancer: { type: ObjectId, default: null, ref: "User" },

@@ -45,10 +45,9 @@ class Application {
     this.#app.listen(port, () => console.log(`listening on port ${port}`));
   }
   async connectToDB() {
-    await mongoose.connect(process.env.APP_DB, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    // Keep unknown filter keys in queries (Mongoose 7+ default) so they match nothing instead of being dropped.
+    mongoose.set("strictQuery", false);
+    await mongoose.connect(process.env.APP_DB);
     console.log("MongoDB connected!!");
   }
   configServer() {
