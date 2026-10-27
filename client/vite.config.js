@@ -10,5 +10,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: './src/test/setup.js',
+    // react-loader-spinner's ESM build default-imports CJS styled-components; Node interop breaks it unless Vite transforms it
+    server: { deps: { inline: ['react-loader-spinner'] } },
   },
 })

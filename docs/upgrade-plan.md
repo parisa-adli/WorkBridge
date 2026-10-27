@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**24 of 47 phases done** (Parts A and B, Phases 15–20). Next: Phase 21 (React 19 + client in-major bumps).
+**25 of 47 phases done** (Parts A and B, Phases 15–21). Next: Phase 22 (Vite 8).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -37,7 +37,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 |---|---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
-| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 6/11 |
+| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 7/11 |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
@@ -330,13 +330,13 @@ Files: `server/app/http/validators/user.schema.ts`, a `validate(schema)` middlew
 
 Verify: each auth form shows the same Persian messages as before; e2e OTP flow passes.
 
-### Phase 21: React 19 + client in-major bumps + dependency smoke test ⬜
+### Phase 21: React 19 + client in-major bumps + dependency smoke test ✅
 **Goal:** client on React 19 and the latest 7.x/5.x/7.x of Router/Query/RHF (PRD R6).
 
 Files: `client/package.json`, any component broken by React 19
 
-- [ ] Upgrade `react`, `react-dom`, `@types/react*`, `react-router-dom`, `@tanstack/*`, `react-hook-form`, `axios`, `react-hot-toast`, `@headlessui/react`, `react-icons`, `react-loader-spinner`.
-- [ ] Smoke-test `react-multi-date-picker`, `react-otp-input`, `react-tag-input-component` in the app (RTL). Record the result in the PR. If one fails, stop and pick a replacement as its own phase before continuing.
+- [x] Upgrade `react`, `react-dom`, `@types/react*`, `react-router-dom`, `@tanstack/*`, `react-hook-form`, `axios`, `react-hot-toast`, `@headlessui/react`, `react-icons`, `react-loader-spinner`.
+- [x] Smoke-test `react-multi-date-picker`, `react-otp-input`, `react-tag-input-component` in the app (RTL). Record the result in the PR. If one fails, stop and pick a replacement as its own phase before continuing.
 
 Verify: all client tests and e2e pass; manual check of OTP input, tag input and the Persian date picker.
 
