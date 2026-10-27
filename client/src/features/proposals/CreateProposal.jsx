@@ -10,7 +10,7 @@ function CreateProposal({ onClose, projectId }) {
     formState: { errors },
   } = useForm();
 
-  // TODO(phase 13): use isCreating for the loading state below
+  // TODO(phase 13): isCreating is never read, so nothing blocks a double submit (duplicate proposals).
   // eslint-disable-next-line no-unused-vars
   const { isCreating, createProposal } = useCreateProposal();
 
@@ -80,7 +80,7 @@ function CreateProposal({ onClose, projectId }) {
           errors={errors}
         />
         <div className="!mt-8">
-          {/* TODO(phase 13): show loading while creating */}
+          {/* TODO(phase 13): `0` means the button always renders; use isCreating to show Loading and block resubmits. */}
           {/* eslint-disable-next-line no-constant-condition */}
           {0 ? (
             <Loading />

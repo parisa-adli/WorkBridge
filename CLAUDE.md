@@ -10,7 +10,7 @@ Install: `npm install && npm install --prefix client && npm install --prefix ser
 
 - `npm run dev` (root): runs server (nodemon, port 5000) and client (Vite, port 3000 per `client/vite.config.js`) together via `concurrently`
 - `npm run build --prefix client`: production build
-- `npm run lint --prefix client`: currently broken. ESLint 9 is installed but the config is legacy `client/.eslintrc.cjs`, so ESLint asks for a flat config. Either migrate it to `eslint.config.js` or run with `ESLINT_USE_FLAT_CONFIG=false`.
+- `npm run lint --prefix client`: flat ESLint config (`client/eslint.config.js`). Known client bugs are disabled line by line with `TODO(phase 13)`.
 - `npm run lint --prefix server`: flat ESLint config (`server/eslint.config.js`). `no-undef` is disabled on the known `createError` bugs with `TODO(phase 12)`.
 - `npm test --prefix server`: Vitest + Supertest behavior tests (`server/tests/`) against an in-memory MongoDB (the first run downloads a ~600MB mongod binary). They pin current behavior, including the bugs listed in `docs/known-bugs.md`.
 - `npm test --prefix client`: Vitest + Testing Library (jsdom) characterization tests next to the code (`*.test.js(x)`), pinning current behavior, including the extra-writes bug in `useLocalStorageState`.

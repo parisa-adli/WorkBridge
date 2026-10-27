@@ -11,9 +11,4 @@ Object.assign(process.env, {
   SERVER_URL: "http://localhost:5000",
 });
 
-// The app currently prints the OTP instead of sending SMS; this stub makes sure no real SMS goes out if that changes.
-vi.mock("kavenegar", () => ({
-  KavenegarApi: vi.fn(() => ({ Send: vi.fn(), VerifyLookup: vi.fn() })),
-}));
-
 vi.spyOn(console, "log").mockImplementation(() => {});
