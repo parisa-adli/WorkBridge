@@ -28,3 +28,7 @@ describe("toLocalDateShort", () => {
     expect(toLocalDateShort("2024-12-25T12:00:00Z")).toBe("۱۴۰۳/۱۰/۵");
   });
 });
+
+test("CI red check: deliberately failing (throwaway branch)", () => {
+  expect(1).toBe(2);
+});
