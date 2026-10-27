@@ -12,8 +12,8 @@ Object.assign(process.env, {
 });
 
 // The app currently prints the OTP instead of sending SMS; this stub makes sure no real SMS goes out if that changes.
-jest.mock("kavenegar", () => ({
-  KavenegarApi: jest.fn(() => ({ Send: jest.fn(), VerifyLookup: jest.fn() })),
+vi.mock("kavenegar", () => ({
+  KavenegarApi: vi.fn(() => ({ Send: vi.fn(), VerifyLookup: vi.fn() })),
 }));
 
-jest.spyOn(console, "log").mockImplementation(() => {});
+vi.spyOn(console, "log").mockImplementation(() => {});

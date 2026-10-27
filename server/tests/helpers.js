@@ -13,7 +13,7 @@ async function startApp() {
 
   // Application listens in its constructor and keeps the express app private: capture it instead of opening a port.
   let app;
-  jest.spyOn(express.application, "listen").mockImplementation(function () {
+  vi.spyOn(express.application, "listen").mockImplementation(function () {
     app = this;
   });
   const Application = require("../app/server");
