@@ -132,9 +132,9 @@ Verify: open a PR; all jobs are green. Break a test on a throwaway branch and se
 
 ---
 
-## Part B: Security & bug fixes (current stack)
+## Part B: Security & bug fixes (current stack) ✅
 
-### Phase 8: Remove dead code, unused deps, renames
+### Phase 8: Remove dead code, unused deps, renames ✅
 **Goal:** less surface area before the fixes and upgrades. No behavior changes.
 
 Files: `server/utils/functions.js`, `server/app/http/middlewares/user.middleware.js`, `server/utils/constants.js`, `server/package.json`, `client/package.json`, `client/src/features/projects/ProjectTable-v1.jsx`, `client/src/services/proposalServis.js` (+ importers), `server/app/http/validators/category.shcema.js` (+ importers), `README.md`
@@ -145,7 +145,7 @@ Files: `server/utils/functions.js`, `server/app/http/middlewares/user.middleware
 
 Verify: grep finds no references to removed names; all checks green.
 
-### Phase 9: Server hardening
+### Phase 9: Server hardening ✅
 **Goal:** close §6.1 items 4 and 10.
 
 Files: `server/app/server.js`, `server/package.json`, `server/tests/security.test.js` (new)
@@ -156,7 +156,7 @@ Files: `server/app/server.js`, `server/package.json`, `server/tests/security.tes
 
 Verify: the new tests pass; the app still loads (helmet doesn't break CORS with credentials).
 
-### Phase 10: OTP fixes
+### Phase 10: OTP fixes ✅
 **Goal:** close §6.1 items 1, 7, 8, 11 and bugs #4, #5, #6, #12.
 
 Files: `server/app/http/controllers/userAuth.controller.js`, `server/app/models/user.js`, `server/app/router/userAuth.js`, `server/tests/auth.test.js`
@@ -172,7 +172,7 @@ Files: `server/app/http/controllers/userAuth.controller.js`, `server/app/models/
 
 Verify: tests pass; the e2e OTP flow still passes.
 
-### Phase 11: Ownership checks and proposal integrity
+### Phase 11: Ownership checks and proposal integrity ✅
 **Goal:** close §6.1 items 2, 3, 9 and bugs #2, #7, #8.
 
 Files: `server/app/http/controllers/project.controller.js`, `proposal.controller.js`, `server/app/models/proposal.js`, `server/tests/project.test.js`, `proposal.test.js`
@@ -184,7 +184,7 @@ Files: `server/app/http/controllers/project.controller.js`, `proposal.controller
 
 Verify: tests pass; e2e still passes.
 
-### Phase 12a: Shared server helpers
+### Phase 12a: Shared server helpers ✅
 **Goal:** prefactor so 12b and 12c change one place. No behavior change except removing `sort=popular`.
 
 Files: `server/utils/functions.js`, `project.controller.js`, `proposal.controller.js`, `category.controller.js`, `admin/user.controller.js`, `userAuth.controller.js`, tests
@@ -194,7 +194,7 @@ Files: `server/utils/functions.js`, `project.controller.js`, `proposal.controlle
 
 Verify: tests pass unchanged, apart from the `sort=popular` case.
 
-### Phase 12b: Input safety and validation
+### Phase 12b: Input safety and validation ✅
 **Goal:** close §6.1 items 5, 6 and bugs #1, #3, #9, #10, #13.
 
 Files: `category.controller.js`, `admin/user.controller.js`, `project.controller.js`, `userAuth.controller.js`, `server/app/http/validators/*`, tests for each
@@ -206,7 +206,7 @@ Files: `category.controller.js`, `admin/user.controller.js`, `project.controller
 
 Verify: tests pass, with the pinned tests flipped and new ones for the whitelist and escaping.
 
-### Phase 12c: Server error handling and startup
+### Phase 12c: Server error handling and startup ✅
 **Goal:** close the §6.4 server items and bug #11.
 
 Files: `category.controller.js`, `project.controller.js`, `server/app/models/project.js`, `server/app/server.js`, `server/index.js`, tests for each
@@ -217,7 +217,7 @@ Files: `category.controller.js`, `project.controller.js`, `server/app/models/pro
 
 Verify: tests pass, including new ones for each fix.
 
-### Phase 13a: Route guarding and network errors
+### Phase 13a: Route guarding and network errors ✅
 **Goal:** the auth-related items of the §7 "Broken client behavior" list.
 
 Files: `ui/ProtectedRoute.jsx`, `App.jsx`, `features/authentication/UserAvatar.jsx`, `services/httpService.js`
@@ -229,7 +229,7 @@ Files: `ui/ProtectedRoute.jsx`, `App.jsx`, `features/authentication/UserAvatar.j
 
 Verify: client tests pass; manual check of each fix; e2e passes.
 
-### Phase 13b: Client display, form and cache fixes
+### Phase 13b: Client display, form and cache fixes ✅
 **Goal:** close the rest of the §7 list and the client §6.4 items.
 
 Files: `hooks/useLocalStorageState.js`, `features/proposals/CreateProposal.jsx`, `features/owner/Stats.jsx`, `pages/CompleteProfile.jsx`, `features/projects/CreateProjectForm.jsx`, mutation hooks in `features/*/use*.js`, row components with `statusStyle`
@@ -241,7 +241,7 @@ Files: `hooks/useLocalStorageState.js`, `features/proposals/CreateProposal.jsx`,
 
 Verify: client tests pass; manual check of each listed fix; e2e passes.
 
-### Phase 14: Single-source constants and shared client helpers
+### Phase 14: Single-source constants and shared client helpers ✅
 **Goal:** remove the duplication in §6.3 so later phases change one place.
 
 Files: `client/src/constants/` (new: roles, statuses, limits), `server/utils/constants.js`, `ui/StatusBadge.jsx`, `ui/StatusSelect.jsx`, `hooks/useAppMutation.js`, `utils/redirectByRole.js` (all new), every current copy listed in §6.3
