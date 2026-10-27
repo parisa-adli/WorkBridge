@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import CompleteProfile from "./pages/CompleteProfile";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import NotAccess from "./pages/NotAccess";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import Projects from "./pages/Projects";
 import Project from "./pages/Project";
@@ -72,6 +73,7 @@ function App() {
             <Route path="projects" element={<SubmittedProjects />} />
           </Route>
           <Route path="/" element={<Home />} />
+          <Route path="/not-access" element={<NotAccess />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </QueryClientProvider>

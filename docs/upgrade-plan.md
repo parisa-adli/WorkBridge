@@ -222,10 +222,10 @@ Verify: tests pass, including new ones for each fix.
 
 Files: `ui/ProtectedRoute.jsx`, `App.jsx`, `features/authentication/UserAvatar.jsx`, `services/httpService.js`
 
-- [ ] Add the `/not-access` route; fix `ProtectedRoute` effect dependencies and the misleading toast for unauthenticated users.
-- [ ] `UserAvatar` doesn't crash when logged out.
-- [ ] Interceptor handles a missing `err.response`.
-- [ ] Tests for the interceptor network-error case and `ProtectedRoute` redirect.
+- [x] Add the `/not-access` route; fix `ProtectedRoute` effect dependencies and the misleading toast for unauthenticated users.
+- [x] `UserAvatar` doesn't crash when logged out.
+- [x] Interceptor handles a missing `err.response`.
+- [x] Tests for the interceptor network-error case and `ProtectedRoute` redirect.
 
 Verify: client tests pass; manual check of each fix; e2e passes.
 

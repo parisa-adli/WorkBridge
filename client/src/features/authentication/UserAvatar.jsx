@@ -5,6 +5,8 @@ function UserAvatar() {
   const { user } = useUser();
   const pickUser = usePickUser();
 
+  if (!user) return null;
+
   return (
     <div
       onClick={() => pickUser(user.role)}
@@ -15,7 +17,7 @@ function UserAvatar() {
         src="/user.jpg"
         alt="user-account"
       />
-      <span>{user?.name}</span>
+      <span>{user.name}</span>
     </div>
   );
 }
