@@ -1,6 +1,7 @@
 import useCategories from "../../../hooks/useCategories";
 import Filter from "../../../ui/Filter";
 import FilterDropDown from "../../../ui/FilterDropDown";
+import { PROJECT_STATUS_BADGES } from "../../../constants";
 
 const sortOptions = [
   {
@@ -18,14 +19,10 @@ const statusOptions = [
     label: "همه",
     value: "ALL",
   },
-  {
-    label: "باز",
-    value: "OPEN",
-  },
-  {
-    label: "بسته",
-    value: "CLOSED",
-  },
+  ...Object.entries(PROJECT_STATUS_BADGES).map(([value, { label }]) => ({
+    label,
+    value,
+  })),
 ];
 
 function ProjectsHeader() {

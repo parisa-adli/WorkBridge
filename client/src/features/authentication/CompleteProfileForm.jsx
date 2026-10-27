@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import RadioInputGroup from "../../ui/RadioInputGroup";
+import { ROLES, STATUS } from "../../constants";
+import redirectByRole from "../../utils/redirectByRole";
 
 function CompleteProfileForm() {
   const {
@@ -28,13 +30,12 @@ function CompleteProfileForm() {
       const { user, message } = await mutateAsync(data);
       toast.success(message);
 
-      if (+user.status !== 2) {
+      if (+user.status !== STATUS.ACCEPTED) {
         navigate("/");
         toast("پروفایل شما در انتظار تایید است", { icon: "💫" });
         return;
       }
-      if (user.role === "OWNER") return navigate("/owner");
-      if (user.role === "FREELANCER") return navigate("/freelancer");
+      redirectByRole(navigate, user.role);
     } catch (error) {
       toast.error(error?.response?.data?.message);
     }
@@ -79,11 +80,11 @@ function CompleteProfileForm() {
               },
               options: [
                 {
-                  value: "OWNER",
+                  value: ROLES.OWNER,
                   label: "کارفرما",
                 },
                 {
-                  value: "FREELANCER",
+                  value: ROLES.FREELANCER,
                   label: "فریلنسر",
                 },
               ],

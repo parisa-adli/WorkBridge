@@ -10,7 +10,7 @@ const {
   findByIdOr404,
   createdAtSort,
 } = require("../../../utils/functions");
-const { ROLES } = require("../../../utils/constants");
+const { ROLES, STATUS, PROJECT_STATUS } = require("../../../utils/constants");
 
 const findProposal = (id) =>
   findByIdOr404(ProposalModel, id, "پیشنهاد یافت نشد.");
@@ -22,7 +22,7 @@ class ProposalController extends Controller {
     const { description, price, duration, projectId } = req.body;
 
     const project = await findByIdOr404(ProjectModel, projectId, "پروژه یافت نشد.");
-    if (project.status !== "OPEN")
+    if (project.status !== PROJECT_STATUS.OPEN)
       throw createHttpError.BadRequest("پروژه بسته است");
     // shortcut: check-then-create can race on double submit; add a unique {project, user} index if that shows up.
     if (await ProposalModel.exists({ project: projectId, user: userId }))
@@ -93,12 +93,12 @@ class ProposalController extends Controller {
 
     await ProposalModel.updateOne(
       { _id: id },
-      { $set: { status } } // 0, 1, 2
+      { $set: { status } }
     );
 
     let freelancer = copyObject(proposal).user;
 
-    if (status !== 2) freelancer = null;
+    if (status !== STATUS.ACCEPTED) freelancer = null;
 
     await ProjectModel.updateOne(
       { _id: project._id },
@@ -106,8 +106,9 @@ class ProposalController extends Controller {
     );
 
     let message = "وضعیت پروپوزال تایید شد";
-    if (status === 0) message = "وضعیت پروپوزال به حالت رد شده تغییر یافت";
-    if (status === 1)
+    if (status === STATUS.REJECTED)
+      message = "وضعیت پروپوزال به حالت رد شده تغییر یافت";
+    if (status === STATUS.PENDING)
       message = "وضعیت پروپوزال به حالت در انتظار تایید تغییر یافت";
 
     return res.status(HttpStatus.OK).json({

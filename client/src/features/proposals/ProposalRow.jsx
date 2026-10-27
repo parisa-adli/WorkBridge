@@ -4,27 +4,10 @@ import {
   toPersianNumbersWithComma,
 } from "../../utils/toPersianNumber";
 import truncateText from "../../utils/truncateText";
-
-const statusStyle = [
-  {
-    label: "رد شده",
-    className: "badge--danger",
-  },
-  {
-    label: "در انتظار تایید",
-    className: "badge--secondary",
-  },
-  {
-    label: "تایید شده",
-    className: "badge--success",
-  },
-];
-
-const unknownStatus = { label: "نامشخص", className: "badge--secondary" };
+import StatusBadge from "../../ui/StatusBadge";
 
 function ProposalRow({ proposal, index }) {
   const { description, duration, price, status } = proposal;
-  const badge = statusStyle[status] ?? unknownStatus;
   return (
     <Table.Row>
       <td>{index + 1}</td>
@@ -32,9 +15,7 @@ function ProposalRow({ proposal, index }) {
       <td>{toPersianNumbers(duration)} روز</td>
       <td>{toPersianNumbersWithComma(price)}</td>
       <td>
-        <span className={`badge ${badge.className}`}>
-          {badge.label}
-        </span>
+        <StatusBadge status={status} />
       </td>
     </Table.Row>
   );

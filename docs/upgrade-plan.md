@@ -246,9 +246,9 @@ Verify: client tests pass; manual check of each listed fix; e2e passes.
 
 Files: `client/src/constants/` (new: roles, statuses, limits), `server/utils/constants.js`, `ui/StatusBadge.jsx`, `ui/StatusSelect.jsx`, `hooks/useAppMutation.js`, `utils/redirectByRole.js` (all new), every current copy listed in §6.3
 
-- [ ] Roles, status codes with labels and badge styles, and validation limits (title 10–30, budget ≥ 100,000) in one module per package; align client and server limits.
-- [ ] `useAppMutation` (toast + invalidate), `redirectByRole`, `StatusBadge`, `StatusSelect`; replace all copies.
-- [ ] A test in each package asserts the constant values (PRD R8).
+- [x] Roles, status codes with labels and badge styles, and validation limits (title 10–30, budget ≥ 100,000) in one module per package; align client and server limits.
+- [x] `useAppMutation` (toast + invalidate), `redirectByRole`, `StatusBadge`, `StatusSelect`; replace all copies.
+- [x] A test in each package asserts the constant values (PRD R8).
 
 Verify: tests pass; grep finds no leftover `statusStyle` arrays or role string literals outside the constants modules.
 

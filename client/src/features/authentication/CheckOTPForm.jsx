@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { HiArrowRight } from "react-icons/hi";
 import { FiEdit } from "react-icons/fi";
 import Loading from "../../ui/Loading";
+import { STATUS } from "../../constants";
+import redirectByRole from "../../utils/redirectByRole";
 
 const RESEND_TIME = 90;
 
@@ -25,15 +27,12 @@ function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }) {
       const { user, message } = await mutateAsync({ phoneNumber, otp });
       toast.success(message);
       if (!user.isActive) return navigate("/complete-profile");
-      if (+user.status !== 2) {
+      if (+user.status !== STATUS.ACCEPTED) {
         navigate("/");
         toast("پروفایل شما در انتظار تایید است", { icon: "💫" });
         return;
       }
-      if (user.role === "OWNER") return navigate("/owner");
-      if (user.role === "FREELANCER") return navigate("/freelancer");
-      if (user.role === "ADMIN") return navigate("/admin");
-
+      redirectByRole(navigate, user.role);
     } catch (error) {
       toast.error(error?.response?.data?.message);
     }

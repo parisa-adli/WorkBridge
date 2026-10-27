@@ -1,19 +1,9 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import useAppMutation from "../../hooks/useAppMutation";
 import { changeProposalStatusApi } from "../../services/proposalService";
-import toast from "react-hot-toast";
 
 export default function useChangeProposalStatus() {
-  const queryClient = useQueryClient();
-
+  // ["project"] covers every project page; accepting assigns the freelancer shown in the owner's project list
   const { isPending: isUpdating, mutate: changeProposalStatuscode } =
-    useMutation({
-      mutationFn: changeProposalStatusApi,
-      onSuccess: (data) => {
-        toast.success(data.message);
-        // accepting assigns the freelancer shown in the owner's project list
-        queryClient.invalidateQueries({ queryKey: ["owner-projects"] });
-      },
-      onError: (err) => toast.error(err?.response?.data?.message),
-    });
+    useAppMutation(changeProposalStatusApi, [["project"], ["owner-projects"]]);
   return { isUpdating, changeProposalStatuscode };
 }

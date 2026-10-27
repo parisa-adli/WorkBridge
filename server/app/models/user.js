@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ROLES, STATUS } = require("../../utils/constants");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -15,8 +16,13 @@ const UserSchema = new mongoose.Schema(
     resetLink: { type: String, default: null },
     isVerifiedPhoneNumber: { type: Boolean, default: false },
     isActive: { type: Boolean, default: false },
-    status: { type: Number, required: true, default: 1, enum: [0, 1, 2] }, // 0, 1, 2
-    role: { type: String, default: "OWNER" }, // default role is OWNER
+    status: {
+      type: Number,
+      required: true,
+      default: STATUS.PENDING,
+      enum: Object.values(STATUS),
+    },
+    role: { type: String, default: ROLES.OWNER },
   },
   {
     timestamps: true,

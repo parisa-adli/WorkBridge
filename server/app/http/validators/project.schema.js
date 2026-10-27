@@ -1,12 +1,16 @@
 const createError = require("http-errors");
 const Joi = require("joi");
-const { MongoIDPattern } = require("../../../utils/constants");
+const {
+  MongoIDPattern,
+  LIMITS,
+  PROJECT_STATUS,
+} = require("../../../utils/constants");
 
 const addProjectSchema = Joi.object({
   title: Joi.string()
     .required()
-    .min(3)
-    .max(30)
+    .min(LIMITS.PROJECT_TITLE_MIN)
+    .max(LIMITS.PROJECT_TITLE_MAX)
     .error(createError.BadRequest("عنوان محصول صحیح نمیباشد")),
   description: Joi.string()
     .required()
@@ -21,6 +25,8 @@ const addProjectSchema = Joi.object({
     .error(createError.BadRequest("دسته بندی مورد نظر  صحیح نمی باشد")),
   budget: Joi.number()
     .required()
+    .min(LIMITS.PROJECT_BUDGET_MIN)
+    .max(LIMITS.PROJECT_BUDGET_MAX)
     .error(createError.BadRequest("قیمت وارد شده صحیح نمیباشد")),
   deadline: Joi.date()
     .required()
@@ -30,7 +36,7 @@ const addProjectSchema = Joi.object({
 const changeProjectStatusSchema = Joi.object({
   status: Joi.string()
     .required()
-    .valid("OPEN", "CLOSED")
+    .valid(...Object.values(PROJECT_STATUS))
     .error(createError.BadRequest("وضعیت پروژه صحیح نمیباشد")),
 });
 

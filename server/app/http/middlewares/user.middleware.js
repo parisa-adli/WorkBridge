@@ -2,6 +2,7 @@ const cookieParser = require("cookie-parser");
 const createHttpError = require("http-errors");
 const JWT = require("jsonwebtoken");
 const { UserModel } = require("../../models/user");
+const { STATUS } = require("../../../utils/constants");
 
 async function verifyAccessToken(req, res, next) {
   try {
@@ -40,10 +41,10 @@ async function verifyAccessToken(req, res, next) {
 async function isVerifiedUser(req, res, next) {
   try {
     const user = req.user;
-    if (user.status === 1) {
+    if (user.status === STATUS.PENDING) {
       throw createHttpError.Forbidden("پروفایل شما در انتظار بررسی است.");
     }
-    if (user.status !== 2) {
+    if (user.status !== STATUS.ACCEPTED) {
       throw createHttpError.Forbidden(
         "پروفایل شما مورد تایید قرار نگرفته است."
       );

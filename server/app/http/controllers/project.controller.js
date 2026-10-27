@@ -7,7 +7,7 @@ const {
   addProjectSchema,
   changeProjectStatusSchema,
 } = require("../validators/project.schema");
-const { ROLES } = require("../../../utils/constants");
+const { ROLES, PROJECT_STATUS } = require("../../../utils/constants");
 const {
   findByIdOr404,
   buildProjectQuery,
@@ -136,14 +136,14 @@ class ProjectController extends Controller {
 
     const updateResult = await ProjectModel.updateOne(
       { _id: id },
-      { $set: { status } } // 0, 1, 2
+      { $set: { status } }
     );
 
     if (updateResult.modifiedCount === 0)
       throw createHttpError.InternalServerError(" وضعیت پروپوزال آپدیت نشد");
 
     let message = "پروژه بسته شد";
-    if (status === "OPEN") message = "وضعیت پروژه به حالت باز تغییر یافت";
+    if (status === PROJECT_STATUS.OPEN) message = "وضعیت پروژه به حالت باز تغییر یافت";
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,

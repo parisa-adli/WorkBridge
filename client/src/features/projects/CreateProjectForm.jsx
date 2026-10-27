@@ -9,6 +9,7 @@ import useCreateProject from "./useCreateProject";
 import Loading from "../../ui/Loading";
 import useEditProject from "./useEditProject";
 import toast from "react-hot-toast";
+import { LIMITS } from "../../constants";
 
 function CreateProjectForm({ onClose, projectToEdit = {} }) {
   const { _id: editId } = projectToEdit;
@@ -84,8 +85,12 @@ function CreateProjectForm({ onClose, projectToEdit = {} }) {
         validationSchema={{
           required: "عنوان ضروری است",
           minLength: {
-            value: 10,
-            message: "حداقل 10 کاراکتر را وارد کنید",
+            value: LIMITS.PROJECT_TITLE_MIN,
+            message: `حداقل ${LIMITS.PROJECT_TITLE_MIN} کاراکتر را وارد کنید`,
+          },
+          maxLength: {
+            value: LIMITS.PROJECT_TITLE_MAX,
+            message: `حداکثر ${LIMITS.PROJECT_TITLE_MAX} کاراکتر مجاز است`,
           },
         }}
         errors={errors}
@@ -113,11 +118,11 @@ function CreateProjectForm({ onClose, projectToEdit = {} }) {
         validationSchema={{
           required: "بودجه ضروری است",
           min: {
-            value: 100000,
+            value: LIMITS.PROJECT_BUDGET_MIN,
             message: "مبلغ وارد شده نامعتبر است",
           },
           max: {
-            value: 1000000000,
+            value: LIMITS.PROJECT_BUDGET_MAX,
             message: "مبلغ وارد شده نامعتبر است",
           },
         }}

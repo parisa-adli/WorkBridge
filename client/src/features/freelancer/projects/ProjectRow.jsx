@@ -6,23 +6,11 @@ import { MdAssignmentAdd } from "react-icons/md";
 import Modal from "../../../ui/Modal";
 import { useState } from "react";
 import CreateProposal from "../../proposals/CreateProposal";
-
-const projectStatus = {
-  OPEN: {
-    label: "باز",
-    className: "badge--success",
-  },
-  CLOSED: {
-    label: "بسته",
-    className: "badge--danger",
-  },
-};
-
-const unknownStatus = { label: "نامشخص", className: "badge--secondary" };
+import StatusBadge from "../../../ui/StatusBadge";
+import { PROJECT_STATUS_BADGES } from "../../../constants";
 
 function ProjectRow({ project, index }) {
   const { title, budget, deadline, status } = project;
-  const badge = projectStatus[status] ?? unknownStatus;
   const [open, setOpen] = useState(false);
   return (
     <Table.Row>
@@ -32,9 +20,7 @@ function ProjectRow({ project, index }) {
       <td>{toPersianNumbersWithComma(budget)}</td>
       <td>{toLocalDateShort(deadline)}</td>
       <td>
-        <span className={`badge ${badge.className}`}>
-          {badge.label}
-        </span>
+        <StatusBadge status={status} badges={PROJECT_STATUS_BADGES} />
       </td>
       <td>
         <Modal

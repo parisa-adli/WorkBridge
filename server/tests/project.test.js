@@ -56,6 +56,18 @@ describe("POST /api/project/add", () => {
     expect(res.body.message).toBe("عنوان محصول صحیح نمیباشد");
   });
 
+  it("rejects a title shorter than 10 characters", async () => {
+    const res = await owner.agent.post("/api/project/add").send({ ...projectBody(), title: "x".repeat(9) });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("عنوان محصول صحیح نمیباشد");
+  });
+
+  it.each([99999, 1000000001])("rejects a budget of %d", async (budget) => {
+    const res = await owner.agent.post("/api/project/add").send({ ...projectBody(), budget });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("قیمت وارد شده صحیح نمیباشد");
+  });
+
   it("rejects a project without budget with 400", async () => {
     const { budget, ...body } = projectBody();
     const res = await owner.agent.post("/api/project/add").send(body);
@@ -97,7 +109,7 @@ describe("GET project lists", () => {
   });
 
   it("/list?search treats regex characters literally", async () => {
-    const match = await addProject(owner.agent, { ...projectBody(), title: "C++ (v2)" });
+    const match = await addProject(owner.agent, { ...projectBody(), title: "C++ (v2) app" });
     await addProject();
 
     const res = await freelancer.agent.get(`/api/project/list?search=${encodeURIComponent("++ (")}`);
@@ -147,11 +159,11 @@ describe("PATCH /api/project/update/:id", () => {
     const project = await addProject();
     const res = await owner.agent
       .patch(`/api/project/update/${project._id}`)
-      .send({ ...projectBody(), title: "New title" });
+      .send({ ...projectBody(), title: "New project title" });
 
     expect(res.status).toBe(200);
     expect(res.body.data.message).toBe("به روز رسانی با موفقیت انجام شد");
-    expect((await ProjectModel.findById(project._id)).title).toBe("New title");
+    expect((await ProjectModel.findById(project._id)).title).toBe("New project title");
   });
 
   it("succeeds when nothing changed (timestamps bump updatedAt, so modifiedCount is never 0)", async () => {
@@ -177,7 +189,7 @@ describe("PATCH /api/project/update/:id", () => {
     const project = await addProject();
     const res = await otherOwner.agent
       .patch(`/api/project/update/${project._id}`)
-      .send({ ...projectBody(), title: "Hijacked" });
+      .send({ ...projectBody(), title: "Hijacked title" });
     expect(res.status).toBe(403);
     expect((await ProjectModel.findById(project._id)).title).toBe("Landing page");
   });
@@ -186,9 +198,9 @@ describe("PATCH /api/project/update/:id", () => {
     const project = await addProject();
     const res = await admin.agent
       .patch(`/api/project/update/${project._id}`)
-      .send({ ...projectBody(), title: "By admin" });
+      .send({ ...projectBody(), title: "Edited by admin" });
     expect(res.status).toBe(200);
-    expect((await ProjectModel.findById(project._id)).title).toBe("By admin");
+    expect((await ProjectModel.findById(project._id)).title).toBe("Edited by admin");
   });
 });
 

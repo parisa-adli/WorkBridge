@@ -6,6 +6,7 @@ const { ProjectModel } = require("../../../models/project");
 const { ProposalModel } = require("../../../models/proposal");
 const { escapeRegex } = require("../../../../utils/functions");
 const { verifyUserSchema } = require("../../validators/user.schema");
+const { STATUS } = require("../../../../utils/constants");
 
 class UserController extends Controller {
   // ADMIN ROUTES :
@@ -64,8 +65,9 @@ class UserController extends Controller {
       throw createHttpError.InternalServerError(" وضعیت کاربر آپدیت نشد");
 
     let message = "وضعیت کاربر تایید شد";
-    if (status === 0) message = "وضعیت کاربر به حالت رد شده تغییر یافت";
-    if (status === 1)
+    if (status === STATUS.REJECTED)
+      message = "وضعیت کاربر به حالت رد شده تغییر یافت";
+    if (status === STATUS.PENDING)
       message = "وضعیت کاربر به حالت در انتظار تایید تغییر یافت";
 
     return res.status(HttpStatus.OK).json({
