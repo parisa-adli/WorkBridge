@@ -24,7 +24,7 @@ The server needs `server/.env`; copy `server/.env.example`.
 
 The data flow is layered, and each feature follows it:
 
-1. `services/*Service.js`: thin API functions on the shared `http` axios instance. They return `data.data`, the server's payload envelope. (The proposals file is spelled `proposalServis.js`.)
+1. `services/*Service.js`: thin API functions on the shared `http` axios instance. They return `data.data`, the server's payload envelope.
 2. `features/<domain>/use*.js`: TanStack Query hooks wrapping those services. Queries use string keys (`["owner-projects"]`, `["projects", queryObject]`, `["project", id]`, ...). Mutations show `toast.success(data.message)` / `toast.error(err?.response?.data?.message)` and call `invalidateQueries` on the affected keys. When you add a mutation, invalidate every key that lists the changed entity.
 3. `features/<domain>/*.jsx`: domain components. `pages/` holds thin route components. `ui/` holds shared building blocks (`Table`, `Modal`, `RHFSelect`, `Textfield`, `Filter`, ...). Forms use React Hook Form.
 
@@ -40,7 +40,7 @@ Dark mode lives in `context/DarkModeContext.jsx` and is stored via `useLocalStor
 
 - `app/router/router.js` mounts `/user`, `/category`, `/project`, `/proposal` and `/admin`. Project, proposal and admin routes require `verifyAccessToken` + `isVerifiedUser` (user `status`: 0 rejected, 1 pending, 2 verified). Per-route role checks use `authorize(...ROLES)` from `permission.guard.js`. Roles are in `utils/constants.js`.
 - Controllers (`app/http/controllers`) are classes extending `Controller` and wrapped in `express-async-handler`. They validate with Joi schemas from `app/http/validators`, throw `http-errors`, and reply with `{ statusCode, data: { message, ... } }`. The client relies on this `data` envelope.
-- Mongoose models: `user`, `project` (status `OPEN`/`CLOSED`), `proposal`, `category`. SMS OTP goes through Kavenegar.
+- Mongoose models: `user`, `project` (status `OPEN`/`CLOSED`), `proposal`, `category`. No SMS is sent: `sendOTP` only logs the code.
 
 ## Upgrade progress
 

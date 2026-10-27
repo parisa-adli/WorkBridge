@@ -139,9 +139,9 @@ Verify: open a PR; all jobs are green. Break a test on a throwaway branch and se
 
 Files: `server/utils/functions.js`, `server/app/http/middlewares/user.middleware.js`, `server/utils/constants.js`, `server/package.json`, `client/package.json`, `client/src/features/projects/ProjectTable-v1.jsx`, `client/src/services/proposalServis.js` (+ importers), `server/app/http/validators/category.shcema.js` (+ importers), `README.md`
 
-- [ ] Delete `getUserCartDetail`, `checkProductExist`, `invoiceNumberGenerator`, `deleteInvalidPropertyInObject`, `secretKeyGenerator`, `decideAuthMiddleware`, `ROLES.USER`, `ProjectTable-v1.jsx`, `ZARINPAL_CALLBACK_URL`.
-- [ ] Uninstall `kavenegar`, `axios`, `moment-jalali` (server), `react-icon`, `query-string` (client). Remove the kavenegar mock from `tests/setup.js`. Run `npm prune` on the server for the extraneous packages.
-- [ ] Rename `proposalServis` → `proposalService`, `category.shcema` → `category.schema`, server package → `workbridge-server`. Update CLAUDE.md.
+- [x] Delete `getUserCartDetail`, `checkProductExist`, `invoiceNumberGenerator`, `deleteInvalidPropertyInObject`, `secretKeyGenerator`, `decideAuthMiddleware`, `ROLES.USER`, `ProjectTable-v1.jsx`, `ZARINPAL_CALLBACK_URL`.
+- [x] Uninstall `kavenegar`, `axios`, `moment-jalali` (server), `react-icon`, `query-string` (client). Remove the kavenegar mock from `tests/setup.js`. Run `npm prune` on the server for the extraneous packages.
+- [x] Rename `proposalServis` → `proposalService`, `category.shcema` → `category.schema`, server package → `workbridge-server`. Update CLAUDE.md.
 
 Verify: grep finds no references to removed names; all checks green.
 

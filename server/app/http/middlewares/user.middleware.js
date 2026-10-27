@@ -54,17 +54,7 @@ async function isVerifiedUser(req, res, next) {
   }
 }
 
-function decideAuthMiddleware(req, res, next) {
-  const accessToken = req.signedCookies["accessToken"];
-  if (accessToken) {
-    return verifyAccessToken(req, res, next);
-  }
-  // skip this middleware
-  next();
-}
-
 module.exports = {
   verifyAccessToken,
-  decideAuthMiddleware,
   isVerifiedUser,
 };

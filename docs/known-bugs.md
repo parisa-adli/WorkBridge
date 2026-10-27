@@ -24,5 +24,5 @@ Found while writing the behavior tests in `server/tests/`. Nothing here is fixed
 
 ## Notes on the test setup
 
-- The `kavenegar` package isn't called anywhere: `sendOTP` only `console.log`s the code. `tests/setup.js` still mocks it so that wiring SMS back in can't send real messages from tests. The tests read the OTP from the database.
+- No SMS is sent: `sendOTP` only `console.log`s the code. The tests read the OTP from the database.
 - `Application` calls `listen()` in its constructor and keeps the express app private. `tests/helpers.js` stubs `express.application.listen` to capture the app without opening a port, so no source change was needed.

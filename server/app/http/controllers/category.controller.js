@@ -4,7 +4,7 @@ const createHttpError = require("http-errors");
 const {
   addCategorySchema,
   updateCategorySchema,
-} = require("../validators/category.shcema");
+} = require("../validators/category.schema");
 const { CategoryModel } = require("../../models/category");
 
 class CategoryController extends Controller {

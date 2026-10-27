@@ -6,7 +6,6 @@ Object.assign(process.env, {
   REFRESH_TOKEN_SECRET_KEY: "test-refresh-secret",
   COOKIE_PARSER_SECRET_KEY: "test-cookie-secret",
   TOKEN_SECRET_KEY: "test-token-secret",
-  KAVENEGAR_API_KEY: "test-kavenegar-key",
   ALLOW_CORS_ORIGIN: "http://localhost:3000",
   SERVER_URL: "http://localhost:5000",
 });

@@ -85,7 +85,6 @@ class userAuthController extends Controller {
     return await UserModel.create({
       phoneNumber,
       otp,
-      // role: ROLES.USER,
     });
   }
   async checkUserExist(phoneNumber) {

@@ -239,3 +239,4 @@ One row per completed phase of `docs/upgrade-plan.md` (its checkboxes are ticked
 | Phase | Completed | Commit / PR | Evidence |
 |---|---|---|---|
 | 1. Client flat ESLint config | 2026-10-27 | `f0c156b`, PR #9 | `client/eslint.config.js` in place, `.eslintrc.cjs` removed; `npm run lint --prefix client` 0 errors; 6 `TODO(phase 13)` disables |
+| 8. Remove dead code, unused deps, renames | 2026-10-27 | branch `upgrade/part-b`, closes #11 | Dead helpers, `ROLES.USER`, `ProjectTable-v1.jsx`, `ZARINPAL_CALLBACK_URL`/`KAVENEGAR_API_KEY` removed; 5 deps uninstalled, `npm ls` shows no extraneous server packages; `proposalService.js`, `category.schema.js`, `workbridge-server`; grep outside docs finds no old name; server 56/56, client 22/22, e2e 2/2, both lints 0 errors, client build OK |
