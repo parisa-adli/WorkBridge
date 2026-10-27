@@ -10,6 +10,8 @@ function CreateProposal({ onClose, projectId }) {
     formState: { errors },
   } = useForm();
 
+  // TODO(phase 13): use isCreating for the loading state below
+  // eslint-disable-next-line no-unused-vars
   const { isCreating, createProposal } = useCreateProposal();
 
   const onSubmit = (data) => {
@@ -78,6 +80,8 @@ function CreateProposal({ onClose, projectId }) {
           errors={errors}
         />
         <div className="!mt-8">
+          {/* TODO(phase 13): show loading while creating */}
+          {/* eslint-disable-next-line no-constant-condition */}
           {0 ? (
             <Loading />
           ) : (

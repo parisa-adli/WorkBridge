@@ -3,7 +3,6 @@ import CustomNavLink from "../../ui/CustomNavLink";
 import Sidebar from "../../ui/Sidebar";
 import { IoIosApps } from "react-icons/io";
 import { MdOutlinePostAdd } from "react-icons/md";
-import { GoHomeFill } from "react-icons/go";
 import { FaUser } from "react-icons/fa6";
 import { AiFillDashboard } from "react-icons/ai";
 

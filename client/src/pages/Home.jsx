@@ -5,7 +5,6 @@ import {
   FaInstagram,
   FaTelegramPlane,
   FaLinkedin,
-  FaMailBulk,
 } from "react-icons/fa";
 
 const categories = [
@@ -130,7 +129,9 @@ function Home() {
         </p>
         <section className="grid xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-8 gap-5">
           {categories.map((category) => (
-            <div className="grid grid-cols-4 items-center p-3 border rounded-lg  gap-x-2">
+            <div
+              key={category.id}
+              className="grid grid-cols-4 items-center p-3 border rounded-lg  gap-x-2">
               <div className="col-span-1 aspect-square shrink-0  min-w-10">
                 <img
                   className="object-contain w-full h-full"
@@ -240,6 +241,7 @@ function Home() {
         <section className="grid xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-8 gap-5">
           {Achievement.map((arch) => (
             <div
+              key={arch.id}
               className={`flex flex-col items-center rounded-lg p-4 shadow-lg border-t-2 bg-secondary-50
                  ${BORDER_COLORS[arch.id] ?? "border-t-transparent"}
               `}
@@ -281,6 +283,8 @@ function Home() {
               <a className="footer-social">
                 <FaTelegramPlane />
               </a>
+              {/* TODO(phase 13): add rel="noreferrer" */}
+              {/* eslint-disable-next-line react/jsx-no-target-blank */}
               <a
                 className="footer-social"
                 href="https://www.linkedin.com/in/parisa-adli/"

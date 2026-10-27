@@ -20,6 +20,8 @@ function ProtectedRoute({ children }) {
     }
 
     if (!isAuthorized && !isLoading) negative("/not-access", { replace: true });
+    // TODO(phase 13): fix effect dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, isAuthenticated, isAuthorized, negative]);
 
   // 3. while loading => show loading

@@ -1,5 +1,4 @@
 import AuthContainer from "../features/authentication/AuthContainer";
-import SendOTPForm from "../features/authentication/SendOTPForm";
 // import CheckOTPForm from "../features/authentication/CheckOTPForm";
 
 function Auth() {
