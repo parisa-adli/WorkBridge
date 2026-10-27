@@ -14,6 +14,7 @@ Install: `npm install && npm install --prefix client && npm install --prefix ser
 - `npm run lint --prefix server`: flat ESLint config (`server/eslint.config.js`). `no-undef` is disabled on the known `createError` bugs with `TODO(phase 12)`.
 - `npm test --prefix server`: Vitest + Supertest behavior tests (`server/tests/`) against an in-memory MongoDB (the first run downloads a ~600MB mongod binary). They pin current behavior, including the bugs listed in `docs/known-bugs.md`.
 - `npm test --prefix client`: Vitest + Testing Library (jsdom) characterization tests next to the code (`*.test.js(x)`), pinning current behavior, including the extra-writes bug in `useLocalStorageState`.
+- `npm run e2e` (root): Playwright suite in `e2e/`. Global setup starts an in-memory MongoDB (seeded with one category), the server and the Vite dev server on free ports, so nothing needs to be running. First run: `npx playwright install chromium`.
 
 The server needs `server/.env`; copy `server/.env.example`.
 
