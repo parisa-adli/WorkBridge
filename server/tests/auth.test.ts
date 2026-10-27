@@ -3,6 +3,7 @@ import request from "supertest";
 import { startApp, stopApp, clearDb, login } from "./helpers";
 import { UserModel } from "../app/models/user";
 import { cookieOptions } from "../utils/functions";
+import { ERROR_CODES, SUCCESS_CODES } from "../utils/errorCodes";
 
 const PHONE = "09120000001";
 let app: Express;
@@ -58,10 +59,11 @@ describe("POST /api/user/get-otp", () => {
     expect(await UserModel.countDocuments({ phoneNumber: "abc" })).toBe(0);
   });
 
-  it("returns the code outside production", async () => {
+  it("returns the OTP as `otp` outside production, next to the message code", async () => {
     const res = await request(app).post("/api/user/get-otp").send({ phoneNumber: PHONE });
     const user = await findUser();
-    expect(res.body.data.code).toBe(user.otp!.code);
+    expect(res.body.data.otp).toBe(user.otp!.code);
+    expect(res.body.data.code).toBe(SUCCESS_CODES.OTP_SENT);
   });
 
   it("does not return the code in production", async () => {
@@ -69,7 +71,7 @@ describe("POST /api/user/get-otp", () => {
     try {
       const res = await request(app).post("/api/user/get-otp").send({ phoneNumber: PHONE });
       expect(res.status).toBe(200);
-      expect(res.body.data.code).toBeUndefined();
+      expect(res.body.data.otp).toBeUndefined();
     } finally {
       process.env.NODE_ENV = "development";
     }
@@ -82,7 +84,7 @@ describe("POST /api/user/get-otp", () => {
     );
     for (const [i, phoneNumber] of phones.entries()) {
       const user = await findUser(phoneNumber);
-      expect(responses[i].body.data.code).toBe(user.otp!.code);
+      expect(responses[i].body.data.otp).toBe(user.otp!.code);
     }
   });
 });
@@ -156,19 +158,29 @@ describe("session", () => {
     expect(res.body.data.user.otp).toBeUndefined();
   });
 
-  it("GET /refresh-token returns the user under a capitalized StatusCode key", async () => {
+  it("GET /refresh-token returns the user in the standard envelope", async () => {
     const agent = await login(app, PHONE);
     const res = await agent.get("/api/user/refresh-token");
     expect(res.status).toBe(200);
-    expect(res.body.StatusCode).toBe(200);
+    expect(res.body.statusCode).toBe(200);
+    expect(res.body.StatusCode).toBeUndefined();
     expect(res.body.data.user.phoneNumber).toBe(PHONE);
     expect(res.body.data.user.otp).toBeUndefined();
   });
 
-  it("POST /logout returns a body without the data envelope", async () => {
+  it("GET /refresh-token without the cookie is a 401 with a code", async () => {
+    const res = await request(app).get("/api/user/refresh-token");
+    expect(res.status).toBe(401);
+    expect(res.body.code).toBe(ERROR_CODES.LOGIN_REQUIRED);
+  });
+
+  it("POST /logout returns the standard envelope", async () => {
     const res = await request(app).post("/api/user/logout");
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ StatusCode: 200, roles: null, auth: false });
+    expect(res.body).toEqual({
+      statusCode: 200,
+      data: { message: "از حساب کاربری خود خارج شدید", code: SUCCESS_CODES.LOGGED_OUT },
+    });
   });
 
   it("POST /logout cookies are not secure in development, like the login cookies", async () => {

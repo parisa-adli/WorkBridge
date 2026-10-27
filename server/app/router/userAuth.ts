@@ -3,6 +3,7 @@ import { rateLimit } from "express-rate-limit";
 // const { uploadFile } = require("../../utils/multer");
 import { verifyAccessToken } from "../http/middlewares/user.middleware";
 import { UserAuthController } from "../http/controllers/userAuth.controller";
+import { ERROR_CODES } from "../../utils/errorCodes";
 
 const router = Router();
 
@@ -13,6 +14,7 @@ const otpLimiter = () =>
     limit: Number(process.env.OTP_RATE_LIMIT) || 10,
     message: {
       statusCode: 429,
+      code: ERROR_CODES.RATE_LIMITED,
       message: "تعداد درخواست‌ها زیاد است، لطفا چند دقیقه دیگر دوباره تلاش کنید",
     },
   });

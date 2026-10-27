@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**22 of 47 phases done** (Parts A and B, Phases 15–18). Next: Phase 19 (Typed envelope and error codes).
+**23 of 47 phases done** (Parts A and B, Phases 15–19). Next: Phase 20 (Zod for auth and profile).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -37,7 +37,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 |---|---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
-| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 4/11 |
+| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 5/11 |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
@@ -306,15 +306,15 @@ Files: `server/app/http/controllers/**`, `server/app/router/**`, `server/app/htt
 
 Verify: typecheck passes with `allowJs: false`; tests pass.
 
-### Phase 19: Typed envelope and error codes (server + client) ⬜
+### Phase 19: Typed envelope and error codes (server + client) ✅
 **Goal:** every response is `ApiResponse<T>`; errors are `{ statusCode, code, message }`; the client reads the new shapes.
 
 Files: `server/utils/apiResponse.ts`, `server/utils/errorCodes.ts` (new), `server/app/server.ts` error handler, all controllers, `client/src/services/authService.js` (logout and refresh-token callers), `client/src/services/httpService.js`, tests on both sides
 
-- [ ] Server: fix `logout` and `refresh-token` (no capitalized `StatusCode`, use `data`).
-- [ ] Server: every thrown error and success payload carries a stable `code`; `message` stays Persian.
-- [ ] Client: update the logout/refresh callers and the interceptor to the new shapes.
-- [ ] Tests: every route's error responses include a `code` from `errorCodes`; client interceptor test updated.
+- [x] Server: fix `logout` and `refresh-token` (no capitalized `StatusCode`, use `data`).
+- [x] Server: every thrown error and success payload carries a stable `code`; `message` stays Persian.
+- [x] Client: update the logout/refresh callers and the interceptor to the new shapes.
+- [x] Tests: every route's error responses include a `code` from `errorCodes`; client interceptor test updated.
 
 Verify: tests and e2e pass; client still shows Persian toasts (it reads `message` until Phase 27).
 

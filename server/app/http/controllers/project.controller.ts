@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
 import { StatusCodes as HttpStatus } from "http-status-codes";
-import createHttpError from "http-errors";
 import Controller from "./controller";
 import { ProjectModel } from "../../models/project";
 import { ProposalModel } from "../../models/proposal";
@@ -11,10 +10,12 @@ import {
 } from "../validators/project.schema";
 import { ROLES, PROJECT_STATUS } from "../../../utils/constants";
 import { findByIdOr404, buildProjectQuery } from "../../../utils/functions";
+import { apiError, sendData } from "../../../utils/apiResponse";
+import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
 
 export function assertProjectOwner(project: { owner: unknown }, user: UserDocument) {
   if (user.role !== ROLES.ADMIN && String(project.owner) !== String(user._id))
-    throw createHttpError.Forbidden("شما به این قسمت دسترسی ندارید");
+    throw apiError(403, ERROR_CODES.ACCESS_DENIED, "شما به این قسمت دسترسی ندارید");
 }
 
 // Project routes run after verifyAccessToken, which sets req.user.
@@ -35,14 +36,12 @@ class ProjectController extends Controller {
     });
 
     if (!project?._id)
-      throw createHttpError.InternalServerError("پروژه ثبت نشد");
+      throw apiError(500, ERROR_CODES.PROJECT_NOT_CREATED, "پروژه ثبت نشد");
 
-    return res.status(HttpStatus.CREATED).json({
-      statusCode: HttpStatus.CREATED,
-      data: {
-        message: "پروژه با موفقیت ایجاد شد",
-        project,
-      },
+    return sendData(res, HttpStatus.CREATED, {
+      message: "پروژه با موفقیت ایجاد شد",
+      code: SUCCESS_CODES.PROJECT_CREATED,
+      project,
     });
   }
   async getListOfProjects(req: Request, res: Response) {
@@ -57,12 +56,7 @@ class ProjectController extends Controller {
       .populate([{ path: "category", select: { title: 1, englishTitle: 1 } }])
       .sort(sort);
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        projects,
-      },
-    });
+    return sendData(res, HttpStatus.OK, { projects });
   }
   async getListOfOwnerProjects(req: Request, res: Response) {
     const { filter, sort } = await buildProjectQuery(req.query);
@@ -75,12 +69,7 @@ class ProjectController extends Controller {
       ])
       .sort(sort);
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        projects,
-      },
-    });
+    return sendData(res, HttpStatus.OK, { projects });
   }
   async getProjectById(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
@@ -117,15 +106,15 @@ class ProjectController extends Controller {
       },
     ]);
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        project,
-      },
-    });
+    return sendData(res, HttpStatus.OK, { project });
   }
   async findOwnProject(id: string, user: UserDocument) {
-    const project = await findByIdOr404(ProjectModel, id, "پروژه یافت نشد.");
+    const project = await findByIdOr404(
+      ProjectModel,
+      id,
+      ERROR_CODES.PROJECT_NOT_FOUND,
+      "پروژه یافت نشد."
+    );
     assertProjectOwner(project, user);
     return project;
   }
@@ -140,33 +129,29 @@ class ProjectController extends Controller {
     );
 
     if (updateResult.modifiedCount === 0)
-      throw createHttpError.InternalServerError(" وضعیت پروپوزال آپدیت نشد");
+      throw apiError(500, ERROR_CODES.PROJECT_STATUS_NOT_UPDATED, " وضعیت پروپوزال آپدیت نشد");
 
-    let message = "پروژه بسته شد";
-    if (status === PROJECT_STATUS.OPEN) message = "وضعیت پروژه به حالت باز تغییر یافت";
+    const result =
+      status === PROJECT_STATUS.OPEN
+        ? { message: "وضعیت پروژه به حالت باز تغییر یافت", code: SUCCESS_CODES.PROJECT_OPENED }
+        : { message: "پروژه بسته شد", code: SUCCESS_CODES.PROJECT_CLOSED };
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        message,
-      },
-    });
+    return sendData(res, HttpStatus.OK, result);
   }
   async deleteProject(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
     const project = await this.findOwnProject(id, req.user!);
 
     if (project.freelancer)
-      throw createHttpError.BadRequest("پروژه قابل حذف نیست");
+      throw apiError(400, ERROR_CODES.PROJECT_NOT_DELETABLE, "پروژه قابل حذف نیست");
 
     const result = await ProjectModel.deleteOne({ _id: id });
-    if (!result.deletedCount) throw createHttpError.NotFound("پروژه یافت نشد.");
+    if (!result.deletedCount)
+      throw apiError(404, ERROR_CODES.PROJECT_NOT_FOUND, "پروژه یافت نشد.");
     await ProposalModel.deleteMany({ project: id });
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        message: "پروژه با موفقیت حذف شد",
-      },
+    return sendData(res, HttpStatus.OK, {
+      message: "پروژه با موفقیت حذف شد",
+      code: SUCCESS_CODES.PROJECT_DELETED,
     });
   }
   async updateProject(req: Request<{ id: string }>, res: Response) {
@@ -182,12 +167,10 @@ class ProjectController extends Controller {
       }
     );
     if (updateResult.modifiedCount == 0)
-      throw createHttpError.InternalServerError("به روزرسانی انجام نشد");
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        message: "به روز رسانی با موفقیت انجام شد",
-      },
+      throw apiError(500, ERROR_CODES.PROJECT_NOT_UPDATED, "به روزرسانی انجام نشد");
+    return sendData(res, HttpStatus.OK, {
+      message: "به روز رسانی با موفقیت انجام شد",
+      code: SUCCESS_CODES.PROJECT_UPDATED,
     });
   }
 }

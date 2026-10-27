@@ -36,14 +36,14 @@ describe("AuthContainer", () => {
   });
 
   it("shows the returned code in the send-OTP toast", async () => {
-    getOtp.mockResolvedValue({ message: "sent", code: 123456 });
+    getOtp.mockResolvedValue({ message: "sent", code: "OTP_SENT", otp: 123456 });
     renderAuth();
     await sendOtp();
     expect(toast.success).toHaveBeenCalledWith("sent - کد تایید: 123456");
   });
 
   it("shows only the message when no code is returned", async () => {
-    getOtp.mockResolvedValue({ message: "sent" });
+    getOtp.mockResolvedValue({ message: "sent", code: "OTP_SENT" });
     renderAuth();
     await sendOtp();
     expect(toast.success).toHaveBeenCalledWith("sent");
@@ -52,7 +52,10 @@ describe("AuthContainer", () => {
   it("shows the rate-limit message from check-otp", async () => {
     getOtp.mockResolvedValue({ message: "sent" });
     checkOtp.mockRejectedValue({
-      response: { status: 429, data: { message: "too many requests" } },
+      response: {
+        status: 429,
+        data: { statusCode: 429, code: "RATE_LIMITED", message: "too many requests" },
+      },
     });
     renderAuth();
     await sendOtp();

@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
 import { StatusCodes as HttpStatus } from "http-status-codes";
-import createHttpError from "http-errors";
 import Controller from "./controller";
 import { ProposalModel } from "../../models/proposal";
 import { addProposalSchema } from "../validators/proposal.schema";
@@ -12,9 +11,13 @@ import {
   createdAtSort,
 } from "../../../utils/functions";
 import { ROLES, STATUS, PROJECT_STATUS } from "../../../utils/constants";
+import { apiError, sendData } from "../../../utils/apiResponse";
+import { ERROR_CODES, SUCCESS_CODES, type SuccessCode } from "../../../utils/errorCodes";
 
 const findProposal = (id: unknown) =>
-  findByIdOr404(ProposalModel, id, "پیشنهاد یافت نشد.");
+  findByIdOr404(ProposalModel, id, ERROR_CODES.PROPOSAL_NOT_FOUND, "پیشنهاد یافت نشد.");
+const findProject = (id: unknown) =>
+  findByIdOr404(ProjectModel, id, ERROR_CODES.PROJECT_NOT_FOUND, "پروژه یافت نشد.");
 
 // Proposal routes run after verifyAccessToken, which sets req.user.
 class ProposalController extends Controller {
@@ -23,12 +26,12 @@ class ProposalController extends Controller {
     await addProposalSchema.validateAsync(req.body);
     const { description, price, duration, projectId } = req.body;
 
-    const project = await findByIdOr404(ProjectModel, projectId, "پروژه یافت نشد.");
+    const project = await findProject(projectId);
     if (project.status !== PROJECT_STATUS.OPEN)
-      throw createHttpError.BadRequest("پروژه بسته است");
+      throw apiError(400, ERROR_CODES.PROJECT_NOT_OPEN, "پروژه بسته است");
     // shortcut: check-then-create can race on double submit; add a unique {project, user} index if that shows up.
     if (await ProposalModel.exists({ project: projectId, user: userId }))
-      throw createHttpError.Conflict("برای این پروژه قبلا پیشنهاد ثبت کرده اید");
+      throw apiError(409, ERROR_CODES.DUPLICATE_PROPOSAL, "برای این پروژه قبلا پیشنهاد ثبت کرده اید");
 
     const proposal = await ProposalModel.create({
       description,
@@ -42,13 +45,11 @@ class ProposalController extends Controller {
       { $push: { proposals: proposal._id } }
     );
     if (!proposal?._id)
-      throw createHttpError.InternalServerError("پیشنهاد ثبت نشد");
+      throw apiError(500, ERROR_CODES.PROPOSAL_NOT_CREATED, "پیشنهاد ثبت نشد");
 
-    return res.status(HttpStatus.CREATED).json({
-      statusCode: HttpStatus.CREATED,
-      data: {
-        message: "پیشنهاد با موفقیت ایجاد شد",
-      },
+    return sendData(res, HttpStatus.CREATED, {
+      message: "پیشنهاد با موفقیت ایجاد شد",
+      code: SUCCESS_CODES.PROPOSAL_CREATED,
     });
   }
   async getListOfProposals(req: Request, res: Response) {
@@ -63,33 +64,19 @@ class ProposalController extends Controller {
       createdAtSort(req.query.sort)
     );
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        proposals,
-      },
-    });
+    return sendData(res, HttpStatus.OK, { proposals });
   }
   async getProposalById(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
     const proposal = await findProposal(id);
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        proposal,
-      },
-    });
+    return sendData(res, HttpStatus.OK, { proposal });
   }
   async changeProposalStatus(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
     const status = Number(req.body.status);
 
     const proposal = await findProposal(id);
-    const project = await findByIdOr404(
-      ProjectModel,
-      proposal.project,
-      "پروژه یافت نشد."
-    );
+    const project = await findProject(proposal.project);
     assertProjectOwner(project, req.user!);
 
     await ProposalModel.updateOne(
@@ -104,18 +91,19 @@ class ProposalController extends Controller {
       { $set: { freelancer } }
     );
 
-    let message = "وضعیت پروپوزال تایید شد";
+    let result: { message: string; code: SuccessCode } = { message: "وضعیت پروپوزال تایید شد", code: SUCCESS_CODES.PROPOSAL_ACCEPTED };
     if (status === STATUS.REJECTED)
-      message = "وضعیت پروپوزال به حالت رد شده تغییر یافت";
+      result = {
+        message: "وضعیت پروپوزال به حالت رد شده تغییر یافت",
+        code: SUCCESS_CODES.PROPOSAL_REJECTED,
+      };
     if (status === STATUS.PENDING)
-      message = "وضعیت پروپوزال به حالت در انتظار تایید تغییر یافت";
+      result = {
+        message: "وضعیت پروپوزال به حالت در انتظار تایید تغییر یافت",
+        code: SUCCESS_CODES.PROPOSAL_PENDING,
+      };
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        message,
-      },
-    });
+    return sendData(res, HttpStatus.OK, result);
   }
 }
 

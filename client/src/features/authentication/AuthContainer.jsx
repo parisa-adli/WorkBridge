@@ -28,10 +28,10 @@ function AuthContainer() {
 
   const sendOtpHandler = async (data) => {
     try {
-      const { message, code } = await mutateAsync(data);
+      const { message, otp } = await mutateAsync(data);
       setStep(2);
       // the server returns the code only outside production, where no SMS is sent
-      toast.success(code ? `${message} - کد تایید: ${code}` : message);
+      toast.success(otp ? `${message} - کد تایید: ${otp}` : message);
     } catch (error) {
       toast.error(error?.response?.data?.message);
     }

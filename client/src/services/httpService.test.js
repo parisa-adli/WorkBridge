@@ -13,11 +13,15 @@ beforeAll(async () => {
   http =(await import("./httpService")).default;
 });
 
-const ok = async (config) => ({ data: { data: "ok" }, status: 200, statusText: "OK", headers: {}, config });
+const response = async (config, data) => ({ data, status: 200, statusText: "OK", headers: {}, config });
+const ok = (config) => response(config, { statusCode: 200, data: "ok" });
+// the server's refresh-token body: the standard envelope with the user
+const refreshed = (config) =>
+  response(config, { statusCode: 200, data: { user: { _id: "u1" } } });
 const unauthorized = (config) =>
   Promise.reject(
     new AxiosError("Unauthorized", "ERR_BAD_REQUEST", config, null, {
-      data: {},
+      data: { statusCode: 401, code: "INVALID_TOKEN", message: "توکن نامعتبر است" },
       status: 401,
       statusText: "Unauthorized",
       headers: {},
@@ -35,7 +39,7 @@ describe("httpService 401 handling", () => {
   it("refreshes once and replays the original request once", async () => {
     adapter
       .mockImplementationOnce(unauthorized)
-      .mockImplementationOnce(ok)
+      .mockImplementationOnce(refreshed)
       .mockImplementationOnce(ok);
 
     const res = await http.get("/project/list");
@@ -45,6 +49,20 @@ describe("httpService 401 handling", () => {
       "/project/list",
       "http://localhost:5000/api/user/refresh-token",
       "/project/list",
+    ]);
+  });
+
+  it("rejects with the original 401 (code and Persian message) when refresh returns no user", async () => {
+    adapter
+      .mockImplementationOnce(unauthorized)
+      .mockImplementationOnce((config) => response(config, { statusCode: 200, data: { user: null } }));
+
+    await expect(http.get("/project/list")).rejects.toMatchObject({
+      response: { status: 401, data: { code: "INVALID_TOKEN", message: "توکن نامعتبر است" } },
+    });
+    expect(calledUrls()).toEqual([
+      "/project/list",
+      "http://localhost:5000/api/user/refresh-token",
     ]);
   });
 
@@ -61,7 +79,7 @@ describe("httpService 401 handling", () => {
 
   it("does not loop when the replay gets a second 401", async () => {
     adapter.mockImplementation((config) =>
-      config.url.endsWith("/user/refresh-token") ? ok(config) : unauthorized(config)
+      config.url.endsWith("/user/refresh-token") ? refreshed(config) : unauthorized(config)
     );
 
     await expect(http.get("/project/list")).rejects.toMatchObject({

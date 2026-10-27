@@ -1,4 +1,5 @@
-import createError from "http-errors";
+import { apiError } from "./apiResponse";
+import { ERROR_CODES, type ErrorCode } from "./errorCodes";
 import JWT, { type JwtPayload, type SignOptions } from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
@@ -45,12 +46,13 @@ export async function setRefreshToken(res: Response, user: TokenUser) {
 export async function findByIdOr404<T>(
   Model: mongoose.Model<T>,
   id: unknown,
+  notFoundCode: ErrorCode,
   notFoundMessage: string
 ) {
   if (!mongoose.isValidObjectId(id))
-    throw createError.BadRequest("شناسه ارسال شده صحیح نمیباشد");
+    throw apiError(400, ERROR_CODES.INVALID_ID, "شناسه ارسال شده صحیح نمیباشد");
   const doc = await Model.findById(id);
-  if (!doc) throw createError.NotFound(notFoundMessage);
+  if (!doc) throw apiError(404, notFoundCode, notFoundMessage);
   return doc;
 }
 
@@ -72,14 +74,14 @@ export async function buildProjectQuery({ search, category, sort, status }: Proj
   if ((Object.values(PROJECT_STATUS) as unknown[]).includes(status)) filter.status = { $eq: status };
   if (category) {
     if (typeof category !== "string")
-      throw createError.BadRequest("دسته بندی مورد نظر صحیح نمی باشد");
+      throw apiError(400, ERROR_CODES.INVALID_CATEGORY, "دسته بندی مورد نظر صحیح نمی باشد");
     if (!category.includes("ALL")) {
       const titles = category.split(",");
       const categories = await CategoryModel.find({
         englishTitle: { $in: titles },
       });
       if (titles.some((t) => !categories.some((c) => c.englishTitle === t)))
-        throw createError.BadRequest("دسته بندی مورد نظر یافت نشد");
+        throw apiError(400, ERROR_CODES.CATEGORY_NOT_FOUND, "دسته بندی مورد نظر یافت نشد");
       filter.category = { $in: categories.map((c) => c._id) };
     }
   }
@@ -102,7 +104,7 @@ function generateToken(user: TokenUser, expiresIn: SignOptions["expiresIn"], sec
       secret || process.env.TOKEN_SECRET_KEY || "",
       options,
       (err, token) => {
-        if (err) reject(createError.InternalServerError("خطای سروری"));
+        if (err) reject(apiError(500, ERROR_CODES.TOKEN_NOT_CREATED, "خطای سروری"));
         resolve(token);
       }
     );
@@ -111,7 +113,7 @@ function generateToken(user: TokenUser, expiresIn: SignOptions["expiresIn"], sec
 export function verifyRefreshToken(req: Request) {
   const refreshToken = req.signedCookies["refreshToken"];
   if (!refreshToken) {
-    throw createError.Unauthorized("لطفا وارد حساب کاربری خود شوید.");
+    throw apiError(401, ERROR_CODES.LOGIN_REQUIRED, "لطفا وارد حساب کاربری خود شوید.");
   }
   const token = cookieParser.signedCookie(
     refreshToken,
@@ -124,17 +126,17 @@ export function verifyRefreshToken(req: Request) {
       async (err, payload) => {
         try {
           if (err)
-            reject(createError.Unauthorized("لطفا حساب کاربری خود شوید"));
+            reject(apiError(401, ERROR_CODES.LOGIN_REQUIRED, "لطفا حساب کاربری خود شوید"));
           const { _id } = payload as JwtPayload;
           const user = await UserModel.findById(_id, {
             password: 0,
             otp: 0,
             resetLink: 0,
           });
-          if (!user) reject(createError.Unauthorized("حساب کاربری یافت نشد"));
+          if (!user) reject(apiError(401, ERROR_CODES.ACCOUNT_NOT_FOUND, "حساب کاربری یافت نشد"));
           return resolve(_id);
         } catch {
-          reject(createError.Unauthorized("حساب کاربری یافت نشد"));
+          reject(apiError(401, ERROR_CODES.ACCOUNT_NOT_FOUND, "حساب کاربری یافت نشد"));
         }
       }
     );

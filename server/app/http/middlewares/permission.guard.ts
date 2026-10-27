@@ -1,4 +1,5 @@
-import createError from "http-errors";
+import { apiError } from "../../../utils/apiResponse";
+import { ERROR_CODES } from "../../../utils/errorCodes";
 import type { RequestHandler } from "express";
 import { UserModel } from "../../models/user";
 
@@ -10,7 +11,7 @@ export function authorize(...allowedRoles: string[]): RequestHandler {
       const user = await UserModel.findById(userId);
       if (allowedRoles.length === 0 || allowedRoles.includes(user!.role))
         return next();
-      throw createError.Forbidden("شما به این قسمت دسترسی ندارید");
+      throw apiError(403, ERROR_CODES.ACCESS_DENIED, "شما به این قسمت دسترسی ندارید");
     } catch (error) {
       next(error);
     }

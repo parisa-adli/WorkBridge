@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
 import { StatusCodes as HttpStatus } from "http-status-codes";
-import createHttpError from "http-errors";
 import Controller from "./controller";
 import {
   addCategorySchema,
@@ -8,6 +7,8 @@ import {
 } from "../validators/category.schema";
 import { CategoryModel } from "../../models/category";
 import { findByIdOr404 } from "../../../utils/functions";
+import { apiError, sendData } from "../../../utils/apiResponse";
+import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
 
 class CategoryController extends Controller {
   async getListOfCategories(req: Request, res: Response) {
@@ -19,14 +20,9 @@ class CategoryController extends Controller {
     }
     const categories = await CategoryModel.find(query);
     if (!categories)
-      throw createHttpError.ServiceUnavailable("دسته بندی ها یافت نشد");
+      throw apiError(503, ERROR_CODES.CATEGORY_NOT_FOUND, "دسته بندی ها یافت نشد");
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        categories,
-      },
-    });
+    return sendData(res, HttpStatus.OK, { categories });
   }
   async addNewCategory(req: Request, res: Response) {
     console.log(req.body);
@@ -41,21 +37,20 @@ class CategoryController extends Controller {
       type,
     });
 
-    if (!category) throw createHttpError.InternalServerError("خطای داخلی");
-    return res.status(HttpStatus.CREATED).json({
-      statusCode: HttpStatus.CREATED,
-      data: {
-        message: "دسته بندی با موفقیت افزوده شد",
-      },
+    if (!category)
+      throw apiError(500, ERROR_CODES.CATEGORY_NOT_CREATED, "خطای داخلی");
+    return sendData(res, HttpStatus.CREATED, {
+      message: "دسته بندی با موفقیت افزوده شد",
+      code: SUCCESS_CODES.CATEGORY_CREATED,
     });
   }
   async findCategoryWithTitle(englishTitle: string) {
     const category = await CategoryModel.findOne({ englishTitle });
     if (category)
-      throw createHttpError.BadRequest("دسته بندی با این عنوان وجود دارد.");
+      throw apiError(400, ERROR_CODES.DUPLICATE_CATEGORY, "دسته بندی با این عنوان وجود دارد.");
   }
   checkExistCategory(id: string) {
-    return findByIdOr404(CategoryModel, id, "دسته بندی یافت نشد.");
+    return findByIdOr404(CategoryModel, id, ERROR_CODES.CATEGORY_NOT_FOUND, "دسته بندی یافت نشد.");
   }
   async updateCategory(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
@@ -69,12 +64,10 @@ class CategoryController extends Controller {
       }
     );
     if (updateResult.modifiedCount == 0)
-      throw createHttpError.InternalServerError("به روزرسانی انجام نشد");
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        message: "به روز رسانی با موفقیت انجام شد",
-      },
+      throw apiError(500, ERROR_CODES.CATEGORY_NOT_UPDATED, "به روزرسانی انجام نشد");
+    return sendData(res, HttpStatus.OK, {
+      message: "به روز رسانی با موفقیت انجام شد",
+      code: SUCCESS_CODES.CATEGORY_UPDATED,
     });
   }
   async removeCategory(req: Request<{ id: string }>, res: Response) {
@@ -84,23 +77,16 @@ class CategoryController extends Controller {
       $or: [{ _id: category._id }, { parentId: category._id }],
     });
     if (deleteResult.deletedCount == 0)
-      throw createHttpError.InternalServerError("حدف دسته بندی انجام نشد");
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        message: "حذف دسته بندی با موفقیت انجام شد",
-      },
+      throw apiError(500, ERROR_CODES.CATEGORY_NOT_DELETED, "حدف دسته بندی انجام نشد");
+    return sendData(res, HttpStatus.OK, {
+      message: "حذف دسته بندی با موفقیت انجام شد",
+      code: SUCCESS_CODES.CATEGORY_DELETED,
     });
   }
   async getCategoryById(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
     const category = await this.checkExistCategory(id);
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        category,
-      },
-    });
+    return sendData(res, HttpStatus.OK, { category });
   }
 }
 

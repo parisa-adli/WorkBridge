@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import request from "supertest";
 import { startApp, stopApp } from "./helpers";
+import { ERROR_CODES } from "../utils/errorCodes";
 
 // Hoisted above the imports: runs after setup.ts and before the app (and its limiters) load.
 vi.hoisted(() => {
@@ -24,6 +25,7 @@ describe.each(["get-otp", "check-otp"])("POST /api/user/%s rate limit", (route) 
     expect(res.status).toBe(429);
     expect(res.body).toEqual({
       statusCode: 429,
+      code: ERROR_CODES.RATE_LIMITED,
       message: "تعداد درخواست‌ها زیاد است، لطفا چند دقیقه دیگر دوباره تلاش کنید",
     });
   });

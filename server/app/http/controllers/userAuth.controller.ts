@@ -1,6 +1,5 @@
 import crypto from "crypto";
 import type { Request, Response } from "express";
-import createError from "http-errors";
 import { StatusCodes as HttpStatus } from "http-status-codes";
 import Controller from "./controller";
 import {
@@ -10,6 +9,8 @@ import {
   verifyRefreshToken,
   cookieOptions,
 } from "../../../utils/functions";
+import { apiError, sendData } from "../../../utils/apiResponse";
+import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
 import { UserModel } from "../../models/user";
 import {
   completeProfileSchema,
@@ -26,14 +27,14 @@ class userAuthController extends Controller {
     let { phoneNumber } = req.body;
 
     if (!phoneNumber)
-      throw createError.BadRequest("شماره موبایل معتبر را وارد کنید");
+      throw apiError(400, ERROR_CODES.PHONE_REQUIRED, "شماره موبایل معتبر را وارد کنید");
 
     phoneNumber = String(phoneNumber).trim();
     await getOtpSchema.validateAsync({ phoneNumber });
     const code = crypto.randomInt(100000, 1000000);
 
     const result = await this.saveUser(phoneNumber, code);
-    if (!result) throw createError.Unauthorized("ورود شما انجام نشد.");
+    if (!result) throw apiError(401, ERROR_CODES.LOGIN_FAILED, "ورود شما انجام نشد.");
 
     // send OTP
     this.sendOTP(phoneNumber, code, res);
@@ -47,13 +48,13 @@ class userAuthController extends Controller {
       { password: 0, refreshToken: 0, accessToken: 0 }
     );
 
-    if (!user) throw createError.NotFound("کاربری با این مشخصات یافت نشد");
+    if (!user) throw apiError(404, ERROR_CODES.USER_NOT_FOUND, "کاربری با این مشخصات یافت نشد");
 
     if (!user.otp?.code || String(user.otp.code) !== code)
-      throw createError.BadRequest("کد ارسال شده صحیح نمیباشد");
+      throw apiError(400, ERROR_CODES.INVALID_OTP, "کد ارسال شده صحیح نمیباشد");
 
     if (new Date(`${user.otp.expiresIn}`).getTime() < Date.now())
-      throw createError.BadRequest("کد اعتبار سنجی منقضی شده است");
+      throw apiError(400, ERROR_CODES.OTP_EXPIRED, "کد اعتبار سنجی منقضی شده است");
 
     user.isVerifiedPhoneNumber = true;
     user.set("otp.code", null); // single use
@@ -62,17 +63,14 @@ class userAuthController extends Controller {
     // await setAuthCookie(res, user); // set httpOnly cookie
     await setAccessToken(res, user);
     await setRefreshToken(res, user);
-    let WELLCOME_MESSAGE = `کد تایید شد، به سایت freelancer خوش آمدید`;
-    if (!user.isActive)
-      WELLCOME_MESSAGE = `کد تایید شد، لطفا اطلاعات خود را تکمیل کنید`;
+    const welcome = user.isActive
+      ? { message: `کد تایید شد، به سایت freelancer خوش آمدید`, code: SUCCESS_CODES.OTP_VERIFIED }
+      : {
+          message: `کد تایید شد، لطفا اطلاعات خود را تکمیل کنید`,
+          code: SUCCESS_CODES.OTP_VERIFIED_COMPLETE_PROFILE,
+        };
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        message: WELLCOME_MESSAGE,
-        user,
-      },
-    });
+    return sendData(res, HttpStatus.OK, { ...welcome, user });
   }
   async saveUser(phoneNumber: string, code: number) {
     const otp = {
@@ -106,16 +104,15 @@ class userAuthController extends Controller {
   sendOTP(phoneNumber: string, code: number, res: Response) {
     // no SMS provider: outside production, print the code and return it so login still works (PRD R1)
     if (showOtp()) console.log(`OTP for ${phoneNumber}: ${code}`);
-    return res.status(HttpStatus.OK).send({
-      statusCode: HttpStatus.OK,
-      data: {
-        message: `کد تائید برای شماره موبایل ${toPersianDigits(
-          phoneNumber
-        )} ارسال گردید`,
-        expiresIn: CODE_EXPIRES,
-        phoneNumber,
-        ...(showOtp() && { code }),
-      },
+    return sendData(res, HttpStatus.OK, {
+      message: `کد تائید برای شماره موبایل ${toPersianDigits(
+        phoneNumber
+      )} ارسال گردید`,
+      code: SUCCESS_CODES.OTP_SENT,
+      expiresIn: CODE_EXPIRES,
+      phoneNumber,
+      // the OTP itself, named so it can't clash with the message `code`
+      ...(showOtp() && { otp: code }),
     });
   }
   async completeProfile(req: Request, res: Response) {
@@ -125,12 +122,14 @@ class userAuthController extends Controller {
     const { name, email, role } = req.body;
 
     if (!user.isVerifiedPhoneNumber)
-      throw createError.Forbidden("شماره موبایل خود را تایید کنید.");
+      throw apiError(403, ERROR_CODES.PHONE_NOT_VERIFIED, "شماره موبایل خود را تایید کنید.");
 
     const duplicateUser =
       email && (await UserModel.findOne({ email, _id: { $ne: user._id } }));
     if (duplicateUser)
-      throw createError.BadRequest(
+      throw apiError(
+        400,
+        ERROR_CODES.DUPLICATE_EMAIL,
         "کاربری با این ایمیل قبلا ثبت نام کرده است."
       );
 
@@ -143,12 +142,10 @@ class userAuthController extends Controller {
     await setAccessToken(res, updatedUser!);
     await setRefreshToken(res, updatedUser!);
 
-    return res.status(HttpStatus.OK).send({
-      statusCode: HttpStatus.OK,
-      data: {
-        message: "اطلاعات شما با موفقیت تکمیل شد",
-        user: updatedUser,
-      },
+    return sendData(res, HttpStatus.OK, {
+      message: "اطلاعات شما با موفقیت تکمیل شد",
+      code: SUCCESS_CODES.PROFILE_COMPLETED,
+      user: updatedUser,
     });
   }
   async updateProfile(req: Request, res: Response) {
@@ -164,11 +161,9 @@ class userAuthController extends Controller {
         $set: { name, email, biography, phoneNumber },
       }
     );
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        message: "اطلاعات با موفقیت آپدیت شد",
-      },
+    return sendData(res, HttpStatus.OK, {
+      message: "اطلاعات با موفقیت آپدیت شد",
+      code: SUCCESS_CODES.PROFILE_UPDATED,
     });
   }
   async refreshToken(req: Request, res: Response) {
@@ -177,24 +172,14 @@ class userAuthController extends Controller {
     // verifyRefreshToken rejects when the user is gone; a null here still throws, as it did in JS
     await setAccessToken(res, user!);
     await setRefreshToken(res, user!);
-    return res.status(HttpStatus.OK).json({
-      StatusCode: HttpStatus.OK,
-      data: {
-        user,
-      },
-    });
+    return sendData(res, HttpStatus.OK, { user });
   }
   async getUserProfile(req: Request, res: Response) {
     // the route runs verifyAccessToken first, which sets req.user
     const { _id: userId } = req.user!;
     const user = await UserModel.findById(userId, { otp: 0 });
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        user,
-      },
-    });
+    return sendData(res, HttpStatus.OK, { user });
   }
   logout(req: Request, res: Response) {
     const options = {
@@ -206,10 +191,9 @@ class userAuthController extends Controller {
     res.cookie("accessToken", null, options);
     res.cookie("refreshToken", null, options);
 
-    return res.status(HttpStatus.OK).json({
-      StatusCode: HttpStatus.OK,
-      roles: null,
-      auth: false,
+    return sendData(res, HttpStatus.OK, {
+      message: "از حساب کاربری خود خارج شدید",
+      code: SUCCESS_CODES.LOGGED_OUT,
     });
   }
 }

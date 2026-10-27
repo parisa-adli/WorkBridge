@@ -25,7 +25,8 @@ app.interceptors.response.use(
           withCredentials: true,
         });
 
-        if (data) return app(originalConfig);
+        // refresh-token answers { statusCode, data: { user } }; replay only when it found the user
+        if (data?.data?.user) return app(originalConfig);
       } catch (error) {
         return Promise.reject(error);
       }

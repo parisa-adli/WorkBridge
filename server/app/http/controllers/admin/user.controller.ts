@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import createHttpError from "http-errors";
 import { StatusCodes as HttpStatus } from "http-status-codes";
 import { UserModel } from "../../../models/user";
 import Controller from "../controller";
@@ -8,6 +7,8 @@ import { ProposalModel } from "../../../models/proposal";
 import { escapeRegex } from "../../../../utils/functions";
 import { verifyUserSchema } from "../../validators/user.schema";
 import { STATUS } from "../../../../utils/constants";
+import { apiError, sendData } from "../../../../utils/apiResponse";
+import { ERROR_CODES, SUCCESS_CODES, type SuccessCode } from "../../../../utils/errorCodes";
 
 class UserController extends Controller {
   // ADMIN ROUTES :
@@ -29,12 +30,7 @@ class UserController extends Controller {
       .sort({
         createdAt: -1,
       });
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        users,
-      },
-    });
+    return sendData(res, HttpStatus.OK, { users });
   }
   async userProfile(req: Request<{ userId: string }>, res: Response) {
     const { userId } = req.params;
@@ -43,14 +39,11 @@ class UserController extends Controller {
     const completedProjects = await ProjectModel.find({ freelancer: userId });
     const proposals = await ProposalModel.find({ user: userId });
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        user,
-        createdProjects,
-        completedProjects,
-        proposals,
-      },
+    return sendData(res, HttpStatus.OK, {
+      user,
+      createdProjects,
+      completedProjects,
+      proposals,
     });
   }
   async verifyUser(req: Request<{ userId: string }>, res: Response) {
@@ -62,20 +55,24 @@ class UserController extends Controller {
     );
 
     if (updateResult.modifiedCount === 0)
-      throw createHttpError.InternalServerError(" وضعیت کاربر آپدیت نشد");
+      throw apiError(500, ERROR_CODES.USER_STATUS_NOT_UPDATED, " وضعیت کاربر آپدیت نشد");
 
-    let message = "وضعیت کاربر تایید شد";
+    let result: { message: string; code: SuccessCode } = {
+      message: "وضعیت کاربر تایید شد",
+      code: SUCCESS_CODES.USER_ACCEPTED,
+    };
     if (status === STATUS.REJECTED)
-      message = "وضعیت کاربر به حالت رد شده تغییر یافت";
+      result = {
+        message: "وضعیت کاربر به حالت رد شده تغییر یافت",
+        code: SUCCESS_CODES.USER_REJECTED,
+      };
     if (status === STATUS.PENDING)
-      message = "وضعیت کاربر به حالت در انتظار تایید تغییر یافت";
+      result = {
+        message: "وضعیت کاربر به حالت در انتظار تایید تغییر یافت",
+        code: SUCCESS_CODES.USER_PENDING,
+      };
 
-    return res.status(HttpStatus.OK).json({
-      statusCode: HttpStatus.OK,
-      data: {
-        message,
-      },
-    });
+    return sendData(res, HttpStatus.OK, result);
   }
 }
 

@@ -7,6 +7,8 @@ import mongoose from "mongoose";
 import createError from "http-errors";
 import path from "path";
 import { allRoutes } from "./router/router";
+import { apiError, type ApiErrorResponse } from "../utils/apiResponse";
+import { ERROR_CODES, type ErrorCode } from "../utils/errorCodes";
 dotenv.config();
 
 const REQUIRED_ENV = [
@@ -73,19 +75,23 @@ class Application {
   }
   errorHandling() {
     this.#app.use((req, res, next) => {
-      next(createError.NotFound("آدرس مورد نظر یافت نشد"));
+      next(apiError(404, ERROR_CODES.ROUTE_NOT_FOUND, "آدرس مورد نظر یافت نشد"));
     });
     // Express treats a handler as an error handler only when it takes 4 args.
     this.#app.use(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      (error: { status?: number; message?: string }, req: Request, res: Response, next: NextFunction) => {
+      (error: { status?: number; message?: string; code?: unknown }, req: Request, res: Response, next: NextFunction) => {
         const serverError = createError.InternalServerError();
         const statusCode = error.status || serverError.status;
         const message = error.message || serverError.message;
-        return res.status(statusCode).json({
-          statusCode,
-          message,
-        });
+        // Errors from outside our code (body parser, Mongoose, Node) carry no code, or a foreign one.
+        const code = Object.hasOwn(ERROR_CODES, String(error.code))
+          ? (error.code as ErrorCode)
+          : statusCode < 500
+            ? ERROR_CODES.BAD_REQUEST
+            : ERROR_CODES.INTERNAL_ERROR;
+        const body: ApiErrorResponse = { statusCode, code, message };
+        return res.status(statusCode).json(body);
       }
     );
   }
