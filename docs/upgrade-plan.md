@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**25 of 47 phases done** (Parts A and B, Phases 15–21). Next: Phase 22 (Vite 8).
+**26 of 47 phases done** (Parts A and B, Phases 15–22). Next: Phase 23 (Client TypeScript tooling + services/utils/hooks).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -37,7 +37,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 |---|---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
-| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 7/11 |
+| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 8/11 |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
@@ -340,13 +340,13 @@ Files: `client/package.json`, any component broken by React 19
 
 Verify: all client tests and e2e pass; manual check of OTP input, tag input and the Persian date picker.
 
-### Phase 22: Vite 8 ⬜
+### Phase 22: Vite 8 ✅
 **Goal:** Vite 8 and plugin-react 6.
 
 Files: `client/package.json`, `client/vite.config.js`
 
-- [ ] Upgrade `vite`, `@vitejs/plugin-react`, `vitest`; adjust config for breaking changes.
-- [ ] `npm audit --prefix client`: 0 high/critical, or list what remains.
+- [x] Upgrade `vite`, `@vitejs/plugin-react`, `vitest`; adjust config for breaking changes.
+- [x] `npm audit --prefix client`: 0 high/critical, or list what remains.
 
 Verify: build, dev, tests, e2e pass.
 

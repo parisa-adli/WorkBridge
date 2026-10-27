@@ -1,6 +1,9 @@
-import DatePicker from "react-multi-date-picker";
+import DatePickerModule from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
+
+// CJS build with __esModule: Vite 8 uses Node interop, so the default import is module.exports
+const DatePicker = DatePickerModule.default ?? DatePickerModule;
 
 function DatePickerField({ label, date, setDate }) {
   return (
