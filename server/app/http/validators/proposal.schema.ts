@@ -1,8 +1,8 @@
-const createError = require("http-errors");
-const Joi = require("joi");
-const { MongoIDPattern } = require("../../../utils/constants");
+import createError from "http-errors";
+import Joi from "joi";
+import { MongoIDPattern } from "../../../utils/constants";
 
-const addProposalSchema = Joi.object({
+export const addProposalSchema = Joi.object({
   description: Joi.string()
     .required()
     .error(createError.BadRequest("توضیحات ارسال شده صحیح نمیباشد")),
@@ -18,6 +18,3 @@ const addProposalSchema = Joi.object({
     .error(createError.BadRequest("شناسه پروژه وارد شده صحیح نمیباشد")),
 });
 
-module.exports = {
-  addProposalSchema,
-};

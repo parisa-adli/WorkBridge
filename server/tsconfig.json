@@ -4,13 +4,13 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "strict": true,
-    "allowJs": true,
+    "allowJs": false,
     "noEmit": true,
     "isolatedModules": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["node"]
+    "types": ["node", "vitest/globals"]
   },
-  "include": ["**/*.ts", "**/*.js"],
+  "include": ["**/*.ts"],
   "exclude": ["node_modules", "uploads"]
 }

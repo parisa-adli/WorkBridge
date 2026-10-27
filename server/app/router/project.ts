@@ -1,8 +1,9 @@
-const { ProjectController } = require("../http/controllers/project.controller");
-const { ROLES } = require("../../utils/constants");
-const { authorize } = require("../http/middlewares/permission.guard");
+import { Router } from "express";
+import { ProjectController } from "../http/controllers/project.controller";
+import { ROLES } from "../../utils/constants";
+import { authorize } from "../http/middlewares/permission.guard";
 
-const router = require("express").Router();
+const router = Router();
 
 router.get("/list", ProjectController.getListOfProjects);
 router.get(
@@ -36,6 +37,4 @@ router.delete(
   ProjectController.deleteProject
 );
 
-module.exports = {
-  projectRoutes: router,
-};
+export { router as projectRoutes };

@@ -1,8 +1,10 @@
-const router = require("express").Router();
-const { rateLimit } = require("express-rate-limit");
+import { Router } from "express";
+import { rateLimit } from "express-rate-limit";
 // const { uploadFile } = require("../../utils/multer");
-const { verifyAccessToken } = require("../http/middlewares/user.middleware");
-const { UserAuthController } = require("../http/controllers/userAuth.controller");
+import { verifyAccessToken } from "../http/middlewares/user.middleware";
+import { UserAuthController } from "../http/controllers/userAuth.controller";
+
+const router = Router();
 
 // One limiter per route, so get-otp and check-otp are counted separately. Tests raise OTP_RATE_LIMIT.
 const otpLimiter = () =>
@@ -29,6 +31,4 @@ router.get("/profile", verifyAccessToken, UserAuthController.getUserProfile);
 
 router.post("/logout", UserAuthController.logout);
 
-module.exports = {
-  userAuthRoutes: router,
-};
+export { router as userAuthRoutes };

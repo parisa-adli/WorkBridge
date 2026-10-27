@@ -1,12 +1,10 @@
-const router = require("express").Router();
-const {
-  CategoryController,
-} = require("../../http/controllers/category.controller");
+import { Router } from "express";
+import { CategoryController } from "../../http/controllers/category.controller";
+
+const router = Router();
 
 router.post("/add", CategoryController.addNewCategory);
 router.patch("/update/:id", CategoryController.updateCategory);
 router.delete("/remove/:id", CategoryController.removeCategory);
 
-module.exports = {
-  categoryAdminRoutes: router,
-};
+export { router as categoryAdminRoutes };

@@ -1,9 +1,11 @@
-const mongoose = require("mongoose");
-const { startApp, stopApp, clearDb, createUser, createCategory } = require("./helpers");
-const { ProjectModel } = require("../app/models/project");
-const { ProposalModel } = require("../app/models/proposal");
+import type { Express } from "express";
+import mongoose from "mongoose";
+import { startApp, stopApp, clearDb, createUser, createCategory, type TestUser } from "./helpers";
+import { ProjectModel } from "../app/models/project";
+import { ProposalModel } from "../app/models/proposal";
 
-let app, owner, otherOwner, freelancer, project;
+let app: Express, owner: TestUser, otherOwner: TestUser, freelancer: TestUser;
+let project: { _id: mongoose.Types.ObjectId };
 
 const proposalBody = () => ({
   description: "I can do it",
@@ -34,7 +36,7 @@ beforeEach(async () => {
 
 const addProposal = async () => {
   await freelancer.agent.post("/api/proposal/add").send(proposalBody()).expect(201);
-  return ProposalModel.findOne({ user: freelancer.user._id });
+  return (await ProposalModel.findOne({ user: freelancer.user._id }))!;
 };
 
 describe("POST /api/proposal/add", () => {
@@ -43,10 +45,10 @@ describe("POST /api/proposal/add", () => {
 
     expect(res.status).toBe(201);
     expect(res.body.data.message).toBe("پیشنهاد با موفقیت ایجاد شد");
-    const proposal = await ProposalModel.findOne({ user: freelancer.user._id });
+    const proposal = (await ProposalModel.findOne({ user: freelancer.user._id }))!;
     expect(proposal).toMatchObject({ status: 1, price: 500000, duration: 10 });
     expect(String(proposal.project)).toBe(String(project._id));
-    expect((await ProjectModel.findById(project._id)).proposals.map(String)).toEqual([String(proposal._id)]);
+    expect((await ProjectModel.findById(project._id))!.proposals.map(String)).toEqual([String(proposal._id)]);
   });
 
   it("forbids owners", async () => {
@@ -88,7 +90,7 @@ describe("POST /api/proposal/add", () => {
     const res = await freelancer.agent.post("/api/proposal/add").send(proposalBody());
     expect(res.status).toBe(409);
     expect(await ProposalModel.countDocuments()).toBe(1);
-    expect((await ProjectModel.findById(project._id)).proposals).toHaveLength(1);
+    expect((await ProjectModel.findById(project._id))!.proposals).toHaveLength(1);
   });
 });
 
@@ -106,7 +108,7 @@ describe("GET /api/proposal/list", () => {
     const res = await freelancer.agent.get("/api/proposal/list");
 
     expect(res.status).toBe(200);
-    expect(res.body.data.proposals.map((p) => p._id)).toEqual([String(mine._id)]);
+    expect(res.body.data.proposals.map((p: { _id: string }) => p._id)).toEqual([String(mine._id)]);
   });
 });
 
@@ -117,8 +119,8 @@ describe("PATCH /api/proposal/:id (accept/reject)", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.message).toBe("وضعیت پروپوزال تایید شد");
-    expect((await ProposalModel.findById(proposal._id)).status).toBe(2);
-    const updated = await ProjectModel.findById(project._id);
+    expect((await ProposalModel.findById(proposal._id))!.status).toBe(2);
+    const updated = (await ProjectModel.findById(project._id))!;
     expect(String(updated.freelancer)).toBe(String(freelancer.user._id));
     expect(updated.status).toBe("OPEN"); // accepting does not close the project
   });
@@ -131,8 +133,8 @@ describe("PATCH /api/proposal/:id (accept/reject)", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.message).toBe("وضعیت پروپوزال به حالت رد شده تغییر یافت");
-    expect((await ProposalModel.findById(proposal._id)).status).toBe(0);
-    expect((await ProjectModel.findById(project._id)).freelancer).toBeNull();
+    expect((await ProposalModel.findById(proposal._id))!.status).toBe(0);
+    expect((await ProjectModel.findById(project._id))!.freelancer).toBeNull();
   });
 
   it("setting back to pending also clears the freelancer", async () => {
@@ -142,7 +144,7 @@ describe("PATCH /api/proposal/:id (accept/reject)", () => {
     const res = await owner.agent.patch(`/api/proposal/${proposal._id}`).send({ status: "1" });
 
     expect(res.body.data.message).toBe("وضعیت پروپوزال به حالت در انتظار تایید تغییر یافت");
-    expect((await ProjectModel.findById(project._id)).freelancer).toBeNull();
+    expect((await ProjectModel.findById(project._id))!.freelancer).toBeNull();
   });
 
   it("forbids freelancers", async () => {
@@ -155,8 +157,8 @@ describe("PATCH /api/proposal/:id (accept/reject)", () => {
     const proposal = await addProposal();
     const res = await otherOwner.agent.patch(`/api/proposal/${proposal._id}`).send({ status: 2 });
     expect(res.status).toBe(403);
-    expect((await ProposalModel.findById(proposal._id)).status).toBe(1);
-    expect((await ProjectModel.findById(project._id)).freelancer).toBeNull();
+    expect((await ProposalModel.findById(proposal._id))!.status).toBe(1);
+    expect((await ProjectModel.findById(project._id))!.freelancer).toBeNull();
   });
 
   it("lets an admin accept a proposal on any project", async () => {
@@ -164,7 +166,7 @@ describe("PATCH /api/proposal/:id (accept/reject)", () => {
     const proposal = await addProposal();
     const res = await admin.agent.patch(`/api/proposal/${proposal._id}`).send({ status: 2 });
     expect(res.status).toBe(200);
-    expect(String((await ProjectModel.findById(project._id)).freelancer)).toBe(String(freelancer.user._id));
+    expect(String((await ProjectModel.findById(project._id))!.freelancer)).toBe(String(freelancer.user._id));
   });
 
   it("returns 404 for a proposal whose project is gone, without changing its status", async () => {
@@ -177,6 +179,6 @@ describe("PATCH /api/proposal/:id (accept/reject)", () => {
     });
     const res = await owner.agent.patch(`/api/proposal/${orphan._id}`).send({ status: 2 });
     expect(res.status).toBe(404);
-    expect((await ProposalModel.findById(orphan._id)).status).toBe(1);
+    expect((await ProposalModel.findById(orphan._id))!.status).toBe(1);
   });
 });

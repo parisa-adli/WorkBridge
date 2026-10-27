@@ -1,8 +1,8 @@
-const Joi = require("joi");
-const createHttpError = require("http-errors");
-const { MongoIDPattern } = require("../../../utils/constants");
+import Joi from "joi";
+import createHttpError from "http-errors";
+import { MongoIDPattern } from "../../../utils/constants";
 
-const addCategorySchema = Joi.object({
+export const addCategorySchema = Joi.object({
   title: Joi.string()
     .required()
     .min(3)
@@ -32,7 +32,7 @@ const addCategorySchema = Joi.object({
     .error(createHttpError.BadRequest("شناسه ارسال شده صحیح نمیباشد")),
 });
 
-const updateCategorySchema = Joi.object({
+export const updateCategorySchema = Joi.object({
   title: Joi.string()
     .min(3)
     .max(100)
@@ -56,7 +56,3 @@ const updateCategorySchema = Joi.object({
     .error(createHttpError.BadRequest("نوع دسته بندی صحیح نمی باشد")),
 });
 
-module.exports = {
-  addCategorySchema,
-  updateCategorySchema,
-};

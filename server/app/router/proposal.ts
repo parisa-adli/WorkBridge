@@ -1,10 +1,9 @@
-const {
-  ProposalController,
-} = require("../http/controllers/proposal.controller");
-const { ROLES } = require("../../utils/constants");
-const { authorize } = require("../http/middlewares/permission.guard");
+import { Router } from "express";
+import { ProposalController } from "../http/controllers/proposal.controller";
+import { ROLES } from "../../utils/constants";
+import { authorize } from "../http/middlewares/permission.guard";
 
-const router = require("express").Router();
+const router = Router();
 
 router.get(
   "/list",
@@ -27,6 +26,4 @@ router.patch(
   ProposalController.changeProposalStatus
 );
 
-module.exports = {
-  proposalRoutes: router,
-};
+export { router as proposalRoutes };

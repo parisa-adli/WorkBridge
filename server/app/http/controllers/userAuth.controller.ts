@@ -1,27 +1,28 @@
-const crypto = require("crypto");
-const Controller = require("./controller");
-const {
+import crypto from "crypto";
+import type { Request, Response } from "express";
+import createError from "http-errors";
+import { StatusCodes as HttpStatus } from "http-status-codes";
+import Controller from "./controller";
+import {
   toPersianDigits,
   setAccessToken,
   setRefreshToken,
   verifyRefreshToken,
   cookieOptions,
-} = require("../../../utils/functions");
-const createError = require("http-errors");
-const { UserModel } = require("../../models/user");
-const CODE_EXPIRES = 90 * 1000; //90 seconds in miliseconds
-const { StatusCodes: HttpStatus } = require("http-status-codes");
-const {
+} from "../../../utils/functions";
+import { UserModel } from "../../models/user";
+import {
   completeProfileSchema,
   updateProfileSchema,
   checkOtpSchema,
   getOtpSchema,
-} = require("../validators/user.schema");
+} from "../validators/user.schema";
+const CODE_EXPIRES = 90 * 1000; //90 seconds in miliseconds
 
 const showOtp = () => process.env.NODE_ENV !== "production";
 
 class userAuthController extends Controller {
-  async getOtp(req, res) {
+  async getOtp(req: Request, res: Response) {
     let { phoneNumber } = req.body;
 
     if (!phoneNumber)
@@ -37,7 +38,7 @@ class userAuthController extends Controller {
     // send OTP
     this.sendOTP(phoneNumber, code, res);
   }
-  async checkOtp(req, res) {
+  async checkOtp(req: Request, res: Response) {
     await checkOtpSchema.validateAsync(req.body);
     const { otp: code, phoneNumber } = req.body;
 
@@ -55,7 +56,7 @@ class userAuthController extends Controller {
       throw createError.BadRequest("کد اعتبار سنجی منقضی شده است");
 
     user.isVerifiedPhoneNumber = true;
-    user.otp.code = null; // single use
+    user.set("otp.code", null); // single use
     await user.save();
 
     // await setAuthCookie(res, user); // set httpOnly cookie
@@ -73,7 +74,7 @@ class userAuthController extends Controller {
       },
     });
   }
-  async saveUser(phoneNumber, code) {
+  async saveUser(phoneNumber: string, code: number) {
     const otp = {
       code,
       expiresIn: Date.now() + CODE_EXPIRES,
@@ -87,13 +88,13 @@ class userAuthController extends Controller {
       otp,
     });
   }
-  async checkUserExist(phoneNumber) {
+  async checkUserExist(phoneNumber: string) {
     const user = await UserModel.findOne({ phoneNumber });
     return user;
   }
-  async updateUser(phoneNumber, objectData = {}) {
+  async updateUser(phoneNumber: string, objectData: Record<string, unknown> = {}) {
     Object.keys(objectData).forEach((key) => {
-      if (["", " ", 0, null, undefined, "0", NaN].includes(objectData[key]))
+      if (([""," ", 0, null, undefined, "0", NaN] as unknown[]).includes(objectData[key]))
         delete objectData[key];
     });
     const updatedResult = await UserModel.updateOne(
@@ -102,7 +103,7 @@ class userAuthController extends Controller {
     );
     return !!updatedResult.modifiedCount;
   }
-  sendOTP(phoneNumber, code, res) {
+  sendOTP(phoneNumber: string, code: number, res: Response) {
     // no SMS provider: outside production, print the code and return it so login still works (PRD R1)
     if (showOtp()) console.log(`OTP for ${phoneNumber}: ${code}`);
     return res.status(HttpStatus.OK).send({
@@ -117,9 +118,10 @@ class userAuthController extends Controller {
       },
     });
   }
-  async completeProfile(req, res) {
+  async completeProfile(req: Request, res: Response) {
     await completeProfileSchema.validateAsync(req.body);
-    const { user } = req;
+    // the route runs verifyAccessToken first, which sets req.user
+    const user = req.user!;
     const { name, email, role } = req.body;
 
     if (!user.isVerifiedPhoneNumber)
@@ -137,9 +139,9 @@ class userAuthController extends Controller {
       { $set: { name, email, isActive: true, role } },
       { returnDocument: "after" }
     );
-    // await setAuthCookie(res, updatedUser);
-    await setAccessToken(res, updatedUser);
-    await setRefreshToken(res, updatedUser);
+    // req.user was loaded from the DB in this request, so the update finds it
+    await setAccessToken(res, updatedUser!);
+    await setRefreshToken(res, updatedUser!);
 
     return res.status(HttpStatus.OK).send({
       statusCode: HttpStatus.OK,
@@ -149,19 +151,19 @@ class userAuthController extends Controller {
       },
     });
   }
-  async updateProfile(req, res) {
-    const { _id: userId } = req.user;
+  async updateProfile(req: Request, res: Response) {
+    // the route runs verifyAccessToken first, which sets req.user
+    const { _id: userId } = req.user!;
     await updateProfileSchema.validateAsync(req.body);
     const { name, email, biography, phoneNumber } = req.body;
 
-    const updateResult = await UserModel.updateOne(
+    // No "nothing changed" check: timestamps bump updatedAt, so modifiedCount is never 0 (known-bugs.md).
+    await UserModel.updateOne(
       { _id: userId },
       {
         $set: { name, email, biography, phoneNumber },
       }
     );
-    if (!updateResult.modifiedCount === 0)
-      throw createError.BadRequest("اطلاعات ویرایش نشد");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
@@ -169,11 +171,12 @@ class userAuthController extends Controller {
       },
     });
   }
-  async refreshToken(req, res) {
+  async refreshToken(req: Request, res: Response) {
     const userId = await verifyRefreshToken(req);
     const user = await UserModel.findById(userId);
-    await setAccessToken(res, user);
-    await setRefreshToken(res, user);
+    // verifyRefreshToken rejects when the user is gone; a null here still throws, as it did in JS
+    await setAccessToken(res, user!);
+    await setRefreshToken(res, user!);
     return res.status(HttpStatus.OK).json({
       StatusCode: HttpStatus.OK,
       data: {
@@ -181,8 +184,9 @@ class userAuthController extends Controller {
       },
     });
   }
-  async getUserProfile(req, res) {
-    const { _id: userId } = req.user;
+  async getUserProfile(req: Request, res: Response) {
+    // the route runs verifyAccessToken first, which sets req.user
+    const { _id: userId } = req.user!;
     const user = await UserModel.findById(userId, { otp: 0 });
 
     return res.status(HttpStatus.OK).json({
@@ -192,11 +196,11 @@ class userAuthController extends Controller {
       },
     });
   }
-  logout(req, res) {
+  logout(req: Request, res: Response) {
     const options = {
       ...cookieOptions(),
       maxAge: 1,
-      expires: Date.now(),
+      expires: new Date(), // res.cookie replaces it from maxAge anyway
       path: "/",
     };
     res.cookie("accessToken", null, options);
@@ -210,6 +214,5 @@ class userAuthController extends Controller {
   }
 }
 
-module.exports = {
-  UserAuthController: new userAuthController(),
-};
+const userAuthControllerInstance = new userAuthController();
+export { userAuthControllerInstance as UserAuthController };

@@ -1,19 +1,19 @@
-const createHttpError = require("http-errors");
-const { UserModel } = require("../../../models/user");
-const Controller = require("../controller");
-const { StatusCodes: HttpStatus } = require("http-status-codes");
-const { ProjectModel } = require("../../../models/project");
-const { ProposalModel } = require("../../../models/proposal");
-const { escapeRegex } = require("../../../../utils/functions");
-const { verifyUserSchema } = require("../../validators/user.schema");
-const { STATUS } = require("../../../../utils/constants");
+import type { Request, Response } from "express";
+import createHttpError from "http-errors";
+import { StatusCodes as HttpStatus } from "http-status-codes";
+import { UserModel } from "../../../models/user";
+import Controller from "../controller";
+import { ProjectModel } from "../../../models/project";
+import { ProposalModel } from "../../../models/proposal";
+import { escapeRegex } from "../../../../utils/functions";
+import { verifyUserSchema } from "../../validators/user.schema";
+import { STATUS } from "../../../../utils/constants";
 
 class UserController extends Controller {
   // ADMIN ROUTES :
-  async getAllUsers(req, res) {
-    let { page, limit } = req.query;
-    page = page || 1;
-    limit = limit || 20;
+  async getAllUsers(req: Request, res: Response) {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
     const skip = (page - 1) * limit;
     const { search } = req.query;
     const searchTerm = new RegExp(escapeRegex(search), "i");
@@ -36,7 +36,7 @@ class UserController extends Controller {
       },
     });
   }
-  async userProfile(req, res) {
+  async userProfile(req: Request<{ userId: string }>, res: Response) {
     const { userId } = req.params;
     const user = await UserModel.findById(userId, { otp: 0 });
     const createdProjects = await ProjectModel.find({ owner: userId });
@@ -53,7 +53,7 @@ class UserController extends Controller {
       },
     });
   }
-  async verifyUser(req, res) {
+  async verifyUser(req: Request<{ userId: string }>, res: Response) {
     const { userId } = req.params;
     const { status } = await verifyUserSchema.validateAsync(req.body);
     const updateResult = await UserModel.updateOne(
@@ -79,6 +79,5 @@ class UserController extends Controller {
   }
 }
 
-module.exports = {
-  UserController: new UserController(),
-};
+const userController = new UserController();
+export { userController as UserController };

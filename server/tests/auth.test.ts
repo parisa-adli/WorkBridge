@@ -1,10 +1,14 @@
-const request = require("supertest");
-const { startApp, stopApp, clearDb, login } = require("./helpers");
-const { UserModel } = require("../app/models/user");
-const { cookieOptions } = require("../utils/functions");
+import type { Express } from "express";
+import request from "supertest";
+import { startApp, stopApp, clearDb, login } from "./helpers";
+import { UserModel } from "../app/models/user";
+import { cookieOptions } from "../utils/functions";
 
 const PHONE = "09120000001";
-let app;
+let app: Express;
+
+// get-otp has created the user before these lookups
+const findUser = async (phoneNumber = PHONE) => (await UserModel.findOne({ phoneNumber }))!;
 
 beforeAll(async () => {
   app = await startApp();
@@ -30,21 +34,21 @@ describe("POST /api/user/get-otp", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data).toMatchObject({ expiresIn: 90000, phoneNumber: PHONE });
-    const user = await UserModel.findOne({ phoneNumber: PHONE });
+    const user = await findUser();
     expect(user).toMatchObject({ status: 1, role: "OWNER", isActive: false, isVerifiedPhoneNumber: false });
-    expect(String(user.otp.code)).toMatch(/^\d{6}$/);
-    expect(user.otp.expiresIn.getTime()).toBeGreaterThan(Date.now());
+    expect(String(user.otp!.code)).toMatch(/^\d{6}$/);
+    expect(user.otp!.expiresIn.getTime()).toBeGreaterThan(Date.now());
   });
 
   it("issues a new code to an existing user", async () => {
     await request(app).post("/api/user/get-otp").send({ phoneNumber: PHONE });
-    const before = (await UserModel.findOne({ phoneNumber: PHONE })).otp.expiresIn;
+    const before = (await findUser()).otp!.expiresIn;
 
     const res = await request(app).post("/api/user/get-otp").send({ phoneNumber: PHONE });
 
     expect(res.status).toBe(200);
     expect(await UserModel.countDocuments({ phoneNumber: PHONE })).toBe(1);
-    expect((await UserModel.findOne({ phoneNumber: PHONE })).otp.expiresIn.getTime()).toBeGreaterThan(before.getTime());
+    expect((await findUser()).otp!.expiresIn.getTime()).toBeGreaterThan(before.getTime());
   });
 
   it("rejects a malformed phone number", async () => {
@@ -56,8 +60,8 @@ describe("POST /api/user/get-otp", () => {
 
   it("returns the code outside production", async () => {
     const res = await request(app).post("/api/user/get-otp").send({ phoneNumber: PHONE });
-    const user = await UserModel.findOne({ phoneNumber: PHONE });
-    expect(res.body.data.code).toBe(user.otp.code);
+    const user = await findUser();
+    expect(res.body.data.code).toBe(user.otp!.code);
   });
 
   it("does not return the code in production", async () => {
@@ -77,14 +81,14 @@ describe("POST /api/user/get-otp", () => {
       phones.map((phoneNumber) => request(app).post("/api/user/get-otp").send({ phoneNumber }))
     );
     for (const [i, phoneNumber] of phones.entries()) {
-      const user = await UserModel.findOne({ phoneNumber });
-      expect(responses[i].body.data.code).toBe(user.otp.code);
+      const user = await findUser(phoneNumber);
+      expect(responses[i].body.data.code).toBe(user.otp!.code);
     }
   });
 });
 
 describe("POST /api/user/check-otp", () => {
-  const getCode = async () => String((await UserModel.findOne({ phoneNumber: PHONE })).otp.code);
+  const getCode = async () => String((await findUser()).otp!.code);
 
   beforeEach(async () => {
     await request(app).post("/api/user/get-otp").send({ phoneNumber: PHONE });
@@ -118,10 +122,10 @@ describe("POST /api/user/check-otp", () => {
     expect(res.body.data.message).toBe("کد تایید شد، لطفا اطلاعات خود را تکمیل کنید");
     expect(res.body.data.user.phoneNumber).toBe(PHONE);
     expect(res.body.data.user.otp).toBeUndefined();
-    const cookies = res.headers["set-cookie"].join(";");
+    const cookies = res.get("Set-Cookie")!.join(";");
     expect(cookies).toMatch(/accessToken=s%3A/);
     expect(cookies).toMatch(/refreshToken=s%3A/);
-    expect((await UserModel.findOne({ phoneNumber: PHONE })).isVerifiedPhoneNumber).toBe(true);
+    expect((await findUser()).isVerifiedPhoneNumber).toBe(true);
   });
 
   it("rejects the same code a second time", async () => {
@@ -170,7 +174,7 @@ describe("session", () => {
   it("POST /logout cookies are not secure in development, like the login cookies", async () => {
     const res = await request(app).post("/api/user/logout");
     expect(res.headers["set-cookie"]).toHaveLength(2);
-    expect(res.headers["set-cookie"].join(";")).not.toMatch(/Secure/);
+    expect(res.get("Set-Cookie")!.join(";")).not.toMatch(/Secure/);
   });
 
   it("cookieOptions is secure everywhere but development", () => {
@@ -241,7 +245,7 @@ describe("POST /api/user/complete-profile", () => {
     const agent = await login(app, PHONE);
     const res = await agent.post("/api/user/complete-profile").send({ name: "Test User", role: "OWNER" });
     expect(res.status).toBe(200);
-    const user = await UserModel.findOne({ phoneNumber: PHONE });
+    const user = await findUser();
     expect(user).toMatchObject({ name: "Test User", role: "OWNER", isActive: true });
     expect(user.email).toBeUndefined();
   });

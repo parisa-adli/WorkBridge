@@ -1,26 +1,26 @@
-const Controller = require("./controller");
-const { StatusCodes: HttpStatus } = require("http-status-codes");
-const { ProjectModel } = require("../../models/project");
-const { ProposalModel } = require("../../models/proposal");
-const createHttpError = require("http-errors");
-const {
+import type { Request, Response } from "express";
+import { StatusCodes as HttpStatus } from "http-status-codes";
+import createHttpError from "http-errors";
+import Controller from "./controller";
+import { ProjectModel } from "../../models/project";
+import { ProposalModel } from "../../models/proposal";
+import type { UserDocument } from "../../models/user";
+import {
   addProjectSchema,
   changeProjectStatusSchema,
-} = require("../validators/project.schema");
-const { ROLES, PROJECT_STATUS } = require("../../../utils/constants");
-const {
-  findByIdOr404,
-  buildProjectQuery,
-} = require("../../../utils/functions");
+} from "../validators/project.schema";
+import { ROLES, PROJECT_STATUS } from "../../../utils/constants";
+import { findByIdOr404, buildProjectQuery } from "../../../utils/functions";
 
-function assertProjectOwner(project, user) {
+export function assertProjectOwner(project: { owner: unknown }, user: UserDocument) {
   if (user.role !== ROLES.ADMIN && String(project.owner) !== String(user._id))
     throw createHttpError.Forbidden("شما به این قسمت دسترسی ندارید");
 }
 
+// Project routes run after verifyAccessToken, which sets req.user.
 class ProjectController extends Controller {
-  async addNewProject(req, res) {
-    const userId = req.user._id;
+  async addNewProject(req: Request, res: Response) {
+    const userId = req.user!._id;
     await addProjectSchema.validateAsync(req.body);
     const { title, description, tags, category, budget, deadline } = req.body;
 
@@ -45,7 +45,7 @@ class ProjectController extends Controller {
       },
     });
   }
-  async getListOfProjects(req, res) {
+  async getListOfProjects(req: Request, res: Response) {
     const { filter, sort } = await buildProjectQuery(req.query);
 
     const projects = await ProjectModel.find(filter)
@@ -64,10 +64,10 @@ class ProjectController extends Controller {
       },
     });
   }
-  async getListOfOwnerProjects(req, res) {
+  async getListOfOwnerProjects(req: Request, res: Response) {
     const { filter, sort } = await buildProjectQuery(req.query);
 
-    const projects = await ProjectModel.find({ ...filter, owner: req.user._id })
+    const projects = await ProjectModel.find({ ...filter, owner: req.user!._id })
       .populate([
         { path: "category", select: { title: 1, englishTitle: 1 } },
         { path: "owner", select: { name: 1 } },
@@ -82,9 +82,9 @@ class ProjectController extends Controller {
       },
     });
   }
-  async getProjectById(req, res) {
+  async getProjectById(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
-    await this.findOwnProject(id, req.user);
+    await this.findOwnProject(id, req.user!);
     const project = await ProjectModel.findById(id).populate([
       {
         path: "category",
@@ -124,15 +124,15 @@ class ProjectController extends Controller {
       },
     });
   }
-  async findOwnProject(id, user) {
+  async findOwnProject(id: string, user: UserDocument) {
     const project = await findByIdOr404(ProjectModel, id, "پروژه یافت نشد.");
     assertProjectOwner(project, user);
     return project;
   }
-  async changeProjectStatus(req, res) {
+  async changeProjectStatus(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
     const { status } = await changeProjectStatusSchema.validateAsync(req.body);
-    await this.findOwnProject(id, req.user);
+    await this.findOwnProject(id, req.user!);
 
     const updateResult = await ProjectModel.updateOne(
       { _id: id },
@@ -152,9 +152,9 @@ class ProjectController extends Controller {
       },
     });
   }
-  async deleteProject(req, res) {
+  async deleteProject(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
-    const project = await this.findOwnProject(id, req.user);
+    const project = await this.findOwnProject(id, req.user!);
 
     if (project.freelancer)
       throw createHttpError.BadRequest("پروژه قابل حذف نیست");
@@ -169,9 +169,9 @@ class ProjectController extends Controller {
       },
     });
   }
-  async updateProject(req, res) {
+  async updateProject(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
-    await this.findOwnProject(id, req.user);
+    await this.findOwnProject(id, req.user!);
     const { title, description, tags, deadline, category, budget } = req.body;
     console.log(req.body);
     await addProjectSchema.validateAsync(req.body);
@@ -192,7 +192,5 @@ class ProjectController extends Controller {
   }
 }
 
-module.exports = {
-  ProjectController: new ProjectController(),
-  assertProjectOwner,
-};
+const projectController = new ProjectController();
+export { projectController as ProjectController };

@@ -1,10 +1,13 @@
-const request = require("supertest");
-const { startApp, stopApp } = require("./helpers");
+import type { Express } from "express";
+import request from "supertest";
+import { startApp, stopApp } from "./helpers";
 
-// Runs after setup.js and before the app (and its limiters) load.
-process.env.OTP_RATE_LIMIT = "2";
+// Hoisted above the imports: runs after setup.ts and before the app (and its limiters) load.
+vi.hoisted(() => {
+  process.env.OTP_RATE_LIMIT = "2";
+});
 
-let app;
+let app: Express;
 
 beforeAll(async () => {
   app = await startApp();

@@ -1,7 +1,8 @@
-const request = require("supertest");
-const { startApp, stopApp } = require("./helpers");
+import type { Express } from "express";
+import request from "supertest";
+import { startApp, stopApp } from "./helpers";
 
-let app;
+let app: Express;
 
 beforeAll(async () => {
   app = await startApp();

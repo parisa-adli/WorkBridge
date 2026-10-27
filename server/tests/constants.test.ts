@@ -1,4 +1,4 @@
-const { ROLES, STATUS, PROJECT_STATUS, LIMITS } = require("../utils/constants");
+import { ROLES, STATUS, PROJECT_STATUS, LIMITS } from "../utils/constants";
 
 // These values are shared with the client (client/src/constants/index.js); change both together.
 describe("constants", () => {

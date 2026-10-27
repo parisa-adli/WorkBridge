@@ -36,6 +36,7 @@
     "@types/http-errors": "^2.0.5",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.6.5",
+    "@types/supertest": "^7.2.1",
     "eslint": "^9.39.5",
     "globals": "^15.15.0",
     "mongodb-memory-server": "^10.4.3",

@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**21 of 47 phases done** (Parts A and B, Phases 15–17). Next: Phase 18 (Server TypeScript, controllers/routes/tests).
+**22 of 47 phases done** (Parts A and B, Phases 15–18). Next: Phase 19 (Typed envelope and error codes).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -37,7 +37,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 |---|---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
-| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 3/11 |
+| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 4/11 |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
@@ -297,12 +297,12 @@ Files: `server/tsconfig.json`, `server/package.json` (`tsx watch` replaces nodem
 
 Verify: `npm run typecheck --prefix server` and lint pass; `npm run dev` works through `tsx watch`.
 
-### Phase 18: Server TypeScript, controllers/routes/tests ⬜
+### Phase 18: Server TypeScript, controllers/routes/tests ✅
 **Goal:** the whole server is TypeScript; `allowJs` off.
 
 Files: `server/app/http/controllers/**`, `server/app/router/**`, `server/app/http/validators/*`, `server/tests/*`
 
-- [ ] Convert remaining files; turn off `allowJs`; no `any` without a comment saying why.
+- [x] Convert remaining files; turn off `allowJs`; no `any` without a comment saying why.
 
 Verify: typecheck passes with `allowJs: false`; tests pass.
 

@@ -25,7 +25,7 @@ module.exports = defineConfig([
     },
   },
   {
-    files: ["tests/**/*.js"],
+    files: ["tests/**/*.ts"],
     languageOptions: { globals: globals.vitest },
   },
 ]);

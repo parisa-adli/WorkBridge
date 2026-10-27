@@ -1,12 +1,12 @@
-const createError = require("http-errors");
-const Joi = require("joi");
-const {
+import createError from "http-errors";
+import Joi from "joi";
+import {
   MongoIDPattern,
   LIMITS,
   PROJECT_STATUS,
-} = require("../../../utils/constants");
+} from "../../../utils/constants";
 
-const addProjectSchema = Joi.object({
+export const addProjectSchema = Joi.object({
   title: Joi.string()
     .required()
     .min(LIMITS.PROJECT_TITLE_MIN)
@@ -33,14 +33,10 @@ const addProjectSchema = Joi.object({
     .error(createError.BadRequest("ددلاین پروژه را وارد کنید")),
 });
 
-const changeProjectStatusSchema = Joi.object({
+export const changeProjectStatusSchema = Joi.object({
   status: Joi.string()
     .required()
     .valid(...Object.values(PROJECT_STATUS))
     .error(createError.BadRequest("وضعیت پروژه صحیح نمیباشد")),
 });
 
-module.exports = {
-  addProjectSchema,
-  changeProjectStatusSchema,
-};

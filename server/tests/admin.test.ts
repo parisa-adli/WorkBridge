@@ -1,7 +1,8 @@
-const { startApp, stopApp, clearDb, createUser } = require("./helpers");
-const { UserModel } = require("../app/models/user");
+import type { Express } from "express";
+import { startApp, stopApp, clearDb, createUser, type TestUser } from "./helpers";
+import { UserModel } from "../app/models/user";
 
-let app, admin, member;
+let app: Express, admin: TestUser, member: TestUser;
 
 beforeAll(async () => {
   app = await startApp();
@@ -13,14 +14,14 @@ beforeEach(async () => {
   member = await createUser(app, { phoneNumber: "09120000032", role: "FREELANCER", status: 1 });
 });
 
-const setStatus = (status, agent = admin.agent) =>
+const setStatus = (status: unknown, agent = admin.agent) =>
   agent.patch(`/api/admin/user/verify/${member.user._id}`).send({ status });
 
 describe("admin user management", () => {
   it("lists users", async () => {
     const res = await admin.agent.get("/api/admin/user/list");
     expect(res.status).toBe(200);
-    expect(res.body.data.users.map((u) => u.phoneNumber).sort()).toEqual(["09120000031", "09120000032"]);
+    expect(res.body.data.users.map((u: { phoneNumber: string }) => u.phoneNumber).sort()).toEqual(["09120000031", "09120000032"]);
   });
 
   it("verifying a pending user lets them use verified routes", async () => {
@@ -30,7 +31,7 @@ describe("admin user management", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.message).toBe("وضعیت کاربر تایید شد");
-    expect((await UserModel.findById(member.user._id)).status).toBe(2);
+    expect((await UserModel.findById(member.user._id))!.status).toBe(2);
     expect((await member.agent.get("/api/proposal/list")).status).toBe(200);
   });
 
@@ -55,13 +56,13 @@ describe("admin user management", () => {
     const res = await setStatus(status);
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("وضعیت کاربر صحیح نمی باشد");
-    expect((await UserModel.findById(member.user._id).lean()).status).toBe(1);
+    expect((await UserModel.findById(member.user._id).lean())!.status).toBe(1);
   });
 
   it("searches users by name, email or phone", async () => {
     const res = await admin.agent.get("/api/admin/user/list?search=0032");
     expect(res.status).toBe(200);
-    expect(res.body.data.users.map((u) => u.phoneNumber)).toEqual(["09120000032"]);
+    expect(res.body.data.users.map((u: { phoneNumber: string }) => u.phoneNumber)).toEqual(["09120000032"]);
   });
 
   it.each(["(", ".*"])("treats search %s literally instead of as a regex", async (search) => {

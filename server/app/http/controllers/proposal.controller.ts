@@ -1,23 +1,25 @@
-const Controller = require("./controller");
-const { StatusCodes: HttpStatus } = require("http-status-codes");
-const createHttpError = require("http-errors");
-const { ProposalModel } = require("../../models/proposal");
-const { addProposalSchema } = require("../validators/proposal.schema");
-const { ProjectModel } = require("../../models/project");
-const { assertProjectOwner } = require("./project.controller");
-const {
+import type { Request, Response } from "express";
+import { StatusCodes as HttpStatus } from "http-status-codes";
+import createHttpError from "http-errors";
+import Controller from "./controller";
+import { ProposalModel } from "../../models/proposal";
+import { addProposalSchema } from "../validators/proposal.schema";
+import { ProjectModel } from "../../models/project";
+import { assertProjectOwner } from "./project.controller";
+import {
   copyObject,
   findByIdOr404,
   createdAtSort,
-} = require("../../../utils/functions");
-const { ROLES, STATUS, PROJECT_STATUS } = require("../../../utils/constants");
+} from "../../../utils/functions";
+import { ROLES, STATUS, PROJECT_STATUS } from "../../../utils/constants";
 
-const findProposal = (id) =>
+const findProposal = (id: unknown) =>
   findByIdOr404(ProposalModel, id, "پیشنهاد یافت نشد.");
 
+// Proposal routes run after verifyAccessToken, which sets req.user.
 class ProposalController extends Controller {
-  async addNewProposal(req, res) {
-    const userId = req.user._id;
+  async addNewProposal(req: Request, res: Response) {
+    const userId = req.user!._id;
     await addProposalSchema.validateAsync(req.body);
     const { description, price, duration, projectId } = req.body;
 
@@ -49,10 +51,10 @@ class ProposalController extends Controller {
       },
     });
   }
-  async getListOfProposals(req, res) {
-    let dbQuery = {};
+  async getListOfProposals(req: Request, res: Response) {
+    const dbQuery: Record<string, unknown> = {};
 
-    const user = req.user;
+    const user = req.user!;
     if (user.role !== ROLES.ADMIN) {
       dbQuery["user"] = user._id;
     }
@@ -68,7 +70,7 @@ class ProposalController extends Controller {
       },
     });
   }
-  async getProposalById(req, res) {
+  async getProposalById(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
     const proposal = await findProposal(id);
     return res.status(HttpStatus.OK).json({
@@ -78,10 +80,9 @@ class ProposalController extends Controller {
       },
     });
   }
-  async changeProposalStatus(req, res) {
+  async changeProposalStatus(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
-    let { status } = req.body;
-    status = Number(status);
+    const status = Number(req.body.status);
 
     const proposal = await findProposal(id);
     const project = await findByIdOr404(
@@ -89,16 +90,14 @@ class ProposalController extends Controller {
       proposal.project,
       "پروژه یافت نشد."
     );
-    assertProjectOwner(project, req.user);
+    assertProjectOwner(project, req.user!);
 
     await ProposalModel.updateOne(
       { _id: id },
       { $set: { status } }
     );
 
-    let freelancer = copyObject(proposal).user;
-
-    if (status !== STATUS.ACCEPTED) freelancer = null;
+    const freelancer = status === STATUS.ACCEPTED ? copyObject(proposal).user : null;
 
     await ProjectModel.updateOne(
       { _id: project._id },
@@ -120,6 +119,5 @@ class ProposalController extends Controller {
   }
 }
 
-module.exports = {
-  ProposalController: new ProposalController(),
-};
+const proposalController = new ProposalController();
+export { proposalController as ProposalController };

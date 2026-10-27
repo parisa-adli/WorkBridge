@@ -38,7 +38,7 @@ Dark mode lives in `context/DarkModeContext.jsx` and is stored via `useLocalStor
 
 `index.ts` → `app/server.ts` (an `Application` class: helmet, CORS with credentials, 100kb body limit, static files only from `uploads/` at `/uploads`, signed cookie-parser, routes under `/api`, and a central error handler that returns `{ statusCode, message }`).
 
-TypeScript is mid-conversion: strict `tsconfig.json` with `allowJs`, so `.ts` (utils, models, middlewares, entry, `server.ts`) and `.js` (controllers, routers, validators, tests) coexist. `tsx` runs both (`dev` is `tsx watch`; `tests/setup.js` registers `tsx/cjs` so tests can `require` `.ts`). `npm run typecheck --prefix server` runs `tsc --noEmit`. `req.user` is typed in `types/express.d.ts`.
+The server is all TypeScript: strict `tsconfig.json` with `allowJs: false` (only the ESLint and Vitest configs are `.js`). `tsx` runs it (`dev` is `tsx watch`); Vitest runs the `.ts` tests directly. `npm run typecheck --prefix server` runs `tsc --noEmit`. Any `any` needs a comment saying why. `req.user` is typed in `types/express.d.ts`.
 
 - `app/router/router.js` mounts `/user`, `/category`, `/project`, `/proposal` and `/admin`. Project, proposal and admin routes require `verifyAccessToken` + `isVerifiedUser` (user `status`: 0 rejected, 1 pending, 2 verified). Per-route role checks use `authorize(...ROLES)` from `permission.guard.ts`. Roles are in `utils/constants.ts`.
 - Controllers (`app/http/controllers`) are classes extending `Controller`; Express 5 forwards their async errors to the central handler. They validate with Joi schemas from `app/http/validators`, throw `http-errors`, and reply with `{ statusCode, data: { message, ... } }`. The client relies on this `data` envelope.

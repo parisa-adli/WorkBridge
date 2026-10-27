@@ -91,4 +91,4 @@ class Application {
   }
 }
 
-export = Application;
+export default Application;

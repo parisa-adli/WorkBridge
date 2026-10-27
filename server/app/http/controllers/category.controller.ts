@@ -1,19 +1,22 @@
-const Controller = require("./controller");
-const { StatusCodes: HttpStatus } = require("http-status-codes");
-const createHttpError = require("http-errors");
-const {
+import type { Request, Response } from "express";
+import { StatusCodes as HttpStatus } from "http-status-codes";
+import createHttpError from "http-errors";
+import Controller from "./controller";
+import {
   addCategorySchema,
   updateCategorySchema,
-} = require("../validators/category.schema");
-const { CategoryModel } = require("../../models/category");
-const { findByIdOr404 } = require("../../../utils/functions");
+} from "../validators/category.schema";
+import { CategoryModel } from "../../models/category";
+import { findByIdOr404 } from "../../../utils/functions";
 
 class CategoryController extends Controller {
-  async getListOfCategories(req, res) {
+  async getListOfCategories(req: Request, res: Response) {
     // only plain string values of known fields, so no `?title[$ne]=x` operators
-    const query = {};
-    for (const field of ["title", "englishTitle", "type"])
-      if (typeof req.query[field] === "string") query[field] = req.query[field];
+    const query: Record<string, string> = {};
+    for (const field of ["title", "englishTitle", "type"]) {
+      const value = req.query[field];
+      if (typeof value === "string") query[field] = value;
+    }
     const categories = await CategoryModel.find(query);
     if (!categories)
       throw createHttpError.ServiceUnavailable("دسته بندی ها یافت نشد");
@@ -25,9 +28,10 @@ class CategoryController extends Controller {
       },
     });
   }
-  async addNewCategory(req, res) {
+  async addNewCategory(req: Request, res: Response) {
     console.log(req.body);
-    const { title, englishTitle, description, type, parent } =
+    // `parent` is validated but not saved: the schema field is `parentId` (current-state.md).
+    const { title, englishTitle, description, type } =
       await addCategorySchema.validateAsync(req.body);
     await this.findCategoryWithTitle(englishTitle);
     const category = await CategoryModel.create({
@@ -35,7 +39,6 @@ class CategoryController extends Controller {
       englishTitle,
       description,
       type,
-      parent,
     });
 
     if (!category) throw createHttpError.InternalServerError("خطای داخلی");
@@ -46,15 +49,15 @@ class CategoryController extends Controller {
       },
     });
   }
-  async findCategoryWithTitle(englishTitle) {
+  async findCategoryWithTitle(englishTitle: string) {
     const category = await CategoryModel.findOne({ englishTitle });
     if (category)
       throw createHttpError.BadRequest("دسته بندی با این عنوان وجود دارد.");
   }
-  checkExistCategory(id) {
+  checkExistCategory(id: string) {
     return findByIdOr404(CategoryModel, id, "دسته بندی یافت نشد.");
   }
-  async updateCategory(req, res) {
+  async updateCategory(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
     const { title, englishTitle, type, description } = req.body;
     await this.checkExistCategory(id);
@@ -74,7 +77,7 @@ class CategoryController extends Controller {
       },
     });
   }
-  async removeCategory(req, res) {
+  async removeCategory(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
     const category = await this.checkExistCategory(id);
     const deleteResult = await CategoryModel.deleteMany({
@@ -89,7 +92,7 @@ class CategoryController extends Controller {
       },
     });
   }
-  async getCategoryById(req, res) {
+  async getCategoryById(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
     const category = await this.checkExistCategory(id);
     return res.status(HttpStatus.OK).json({
@@ -101,6 +104,5 @@ class CategoryController extends Controller {
   }
 }
 
-module.exports = {
-  CategoryController: new CategoryController(),
-};
+const categoryController = new CategoryController();
+export { categoryController as CategoryController };

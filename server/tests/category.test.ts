@@ -1,9 +1,11 @@
-const request = require("supertest");
-const { startApp, stopApp, clearDb, createUser, createCategory } = require("./helpers");
-const { CategoryModel } = require("../app/models/category");
-const { escapeRegex } = require("../utils/functions");
+import type { Express } from "express";
+import type mongoose from "mongoose";
+import request from "supertest";
+import { startApp, stopApp, clearDb, createUser, createCategory, type TestUser } from "./helpers";
+import { CategoryModel } from "../app/models/category";
+import { escapeRegex } from "../utils/functions";
 
-let app;
+let app: Express;
 
 beforeAll(async () => {
   app = await startApp();
@@ -15,8 +17,9 @@ beforeEach(async () => {
   await createCategory("mobile");
 });
 
-const list = (query) => request(app).get(`/api/category/list${query}`);
-const titles = (res) => res.body.data.categories.map((c) => c.englishTitle).sort();
+const list = (query: string) => request(app).get(`/api/category/list${query}`);
+const titles = (res: request.Response) =>
+  res.body.data.categories.map((c: { englishTitle: string }) => c.englishTitle).sort();
 
 describe("GET /api/category/list", () => {
   it("filters by a whitelisted field", async () => {
@@ -39,14 +42,14 @@ describe("GET /api/category/list", () => {
 });
 
 describe("admin category writes that change nothing", () => {
-  let admin, web;
+  let admin: TestUser["agent"], web: { _id: unknown };
   beforeEach(async () => {
     ({ agent: admin } = await createUser(app, { phoneNumber: "09120000031", role: "ADMIN" }));
-    web = await CategoryModel.findOne({ englishTitle: "web" });
+    web = (await CategoryModel.findOne({ englishTitle: "web" }))!;
   });
 
   it("update returns its own 500 message (was a ReferenceError)", async () => {
-    vi.spyOn(CategoryModel, "updateOne").mockResolvedValueOnce({ modifiedCount: 0 });
+    vi.spyOn(CategoryModel, "updateOne").mockResolvedValueOnce({ modifiedCount: 0 } as mongoose.UpdateWriteOpResult);
     const res = await admin
       .patch(`/api/admin/category/update/${web._id}`)
       .send({ title: "دسته وب", englishTitle: "web", description: "category", type: "post" });
@@ -55,7 +58,7 @@ describe("admin category writes that change nothing", () => {
   });
 
   it("remove returns its own 500 message (was a ReferenceError)", async () => {
-    vi.spyOn(CategoryModel, "deleteMany").mockResolvedValueOnce({ deletedCount: 0 });
+    vi.spyOn(CategoryModel, "deleteMany").mockResolvedValueOnce({ deletedCount: 0 } as mongoose.mongo.DeleteResult);
     const res = await admin.delete(`/api/admin/category/remove/${web._id}`);
     expect(res.status).toBe(500);
     expect(res.body.message).toBe("حدف دسته بندی انجام نشد");

@@ -1,13 +1,17 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const Application = require("../app/server");
+import express from "express";
+import mongoose from "mongoose";
+import type { MockInstance } from "vitest";
+import Application from "../app/server";
 
-let listen, exit, error;
+let listen: MockInstance<typeof express.application.listen>;
+let exit: MockInstance<typeof process.exit>;
+let error: MockInstance<typeof console.error>;
 
+// The mocks return nothing; the app never reads listen()'s server or relies on exit() not returning.
 beforeEach(() => {
   process.env.APP_DB = "mongodb://localhost:27017/startup-test";
-  listen = vi.spyOn(express.application, "listen").mockImplementation(() => {});
-  exit = vi.spyOn(process, "exit").mockImplementation(() => {});
+  listen = vi.spyOn(express.application, "listen").mockImplementation(() => undefined as never);
+  exit = vi.spyOn(process, "exit").mockImplementation(() => undefined as never);
   error = vi.spyOn(console, "error").mockImplementation(() => {});
 });
 afterEach(() => vi.restoreAllMocks());
@@ -40,9 +44,15 @@ describe("Application.start", () => {
   });
 
   it("listens only after Mongo connects", async () => {
-    const order = [];
-    vi.spyOn(mongoose, "connect").mockImplementationOnce(async () => order.push("connect"));
-    listen.mockImplementation(() => order.push("listen"));
+    const order: string[] = [];
+    vi.spyOn(mongoose, "connect").mockImplementationOnce(async () => {
+      order.push("connect");
+      return mongoose;
+    });
+    listen.mockImplementation(() => {
+      order.push("listen");
+      return undefined as never;
+    });
     await new Application().start();
 
     expect(order).toEqual(["connect", "listen"]);
