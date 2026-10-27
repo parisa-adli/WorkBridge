@@ -9,7 +9,7 @@ beforeAll(async () => {
 afterAll(stopApp);
 
 describe("static files", () => {
-  it.each(["/app/server.js", "/package.json"])("does not serve server source %s", async (path) => {
+  it.each(["/app/server.js", "/app/server.ts", "/package.json"])("does not serve server source %s", async (path) => {
     const res = await request(app).get(path);
     expect(res.status).toBe(404);
   });

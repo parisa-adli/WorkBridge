@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { ROLES, STATUS } = require("../../utils/constants");
+import mongoose from "mongoose";
+import { ROLES, STATUS } from "../../utils/constants";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -52,6 +52,5 @@ UserSchema.index({
   phoneNumber: "text",
 });
 
-module.exports = {
-  UserModel: mongoose.model("User", UserSchema),
-};
+export const UserModel = mongoose.model("User", UserSchema);
+export type UserDocument = mongoose.HydratedDocument<mongoose.InferSchemaType<typeof UserSchema>>;

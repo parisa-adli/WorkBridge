@@ -9,7 +9,7 @@ import {
   STATUS_BADGES,
 } from ".";
 
-// These values are shared with the server (server/utils/constants.js); change both together.
+// These values are shared with the server (server/utils/constants.ts); change both together.
 describe("constants", () => {
   it("roles and their home paths", () => {
     expect(ROLES).toEqual({ ADMIN: "ADMIN", OWNER: "OWNER", FREELANCER: "FREELANCER" });

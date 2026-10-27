@@ -1,10 +1,11 @@
-const cookieParser = require("cookie-parser");
-const createHttpError = require("http-errors");
-const JWT = require("jsonwebtoken");
-const { UserModel } = require("../../models/user");
-const { STATUS } = require("../../../utils/constants");
+import cookieParser from "cookie-parser";
+import createHttpError from "http-errors";
+import JWT, { type JwtPayload } from "jsonwebtoken";
+import type { Request, Response, NextFunction } from "express";
+import { UserModel } from "../../models/user";
+import { STATUS } from "../../../utils/constants";
 
-async function verifyAccessToken(req, res, next) {
+export async function verifyAccessToken(req: Request, res: Response, next: NextFunction) {
   try {
     const accessToken = req.signedCookies["accessToken"];
     if (!accessToken) {
@@ -12,15 +13,15 @@ async function verifyAccessToken(req, res, next) {
     }
     const token = cookieParser.signedCookie(
       accessToken,
-      process.env.COOKIE_PARSER_SECRET_KEY
+      process.env.COOKIE_PARSER_SECRET_KEY ?? ""
     );
     JWT.verify(
-      token,
-      process.env.ACCESS_TOKEN_SECRET_KEY,
+      token || "",
+      process.env.ACCESS_TOKEN_SECRET_KEY ?? "",
       async (err, payload) => {
         try {
           if (err) throw createHttpError.Unauthorized("توکن نامعتبر است");
-          const { _id } = payload;
+          const { _id } = payload as JwtPayload;
           const user = await UserModel.findById(_id, {
             password: 0,
             otp: 0,
@@ -38,9 +39,10 @@ async function verifyAccessToken(req, res, next) {
   }
 }
 
-async function isVerifiedUser(req, res, next) {
+export async function isVerifiedUser(req: Request, res: Response, next: NextFunction) {
   try {
-    const user = req.user;
+    // Runs after verifyAccessToken, which sets req.user; a missing user still lands in catch.
+    const user = req.user!;
     if (user.status === STATUS.PENDING) {
       throw createHttpError.Forbidden("پروفایل شما در انتظار بررسی است.");
     }
@@ -54,8 +56,3 @@ async function isVerifiedUser(req, res, next) {
     next(error);
   }
 }
-
-module.exports = {
-  verifyAccessToken,
-  isVerifiedUser,
-};

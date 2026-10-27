@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import { STATUS } from "../../utils/constants";
 const ObjectId = mongoose.Schema.Types.ObjectId;
-const { STATUS } = require("../../utils/constants");
 
 const ProposalSchema = new mongoose.Schema(
   {
@@ -21,6 +21,4 @@ const ProposalSchema = new mongoose.Schema(
   }
 );
 
-module.exports = {
-  ProposalModel: mongoose.model("Proposal", ProposalSchema),
-};
+export const ProposalModel = mongoose.model("Proposal", ProposalSchema);

@@ -49,7 +49,7 @@ async function startApps(mongoUri, attempts = 3) {
     const clientUrl = `http://localhost:${clientPort}`;
 
     // Explicit values win over server/.env, which dotenv never overrides.
-    const server = start(["index.js"], path.join(root, "server"), {
+    const server = start([path.join(root, "server/node_modules/tsx/dist/cli.mjs"), "index.ts"], path.join(root, "server"), {
       PORT: String(serverPort),
       APP_DB: mongoUri,
       NODE_ENV: "development",

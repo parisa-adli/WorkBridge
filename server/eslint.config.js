@@ -1,7 +1,9 @@
 const js = require("@eslint/js");
 const globals = require("globals");
+const tseslint = require("typescript-eslint");
+const { defineConfig } = require("eslint/config");
 
-module.exports = [
+module.exports = defineConfig([
   js.configs.recommended,
   {
     files: ["**/*.js"],
@@ -15,7 +17,15 @@ module.exports = [
     },
   },
   {
+    files: ["**/*.ts"],
+    extends: [tseslint.configs.recommended],
+    languageOptions: { globals: globals.node },
+    rules: {
+      "@typescript-eslint/no-unused-vars": ["error", { ignoreRestSiblings: true }],
+    },
+  },
+  {
     files: ["tests/**/*.js"],
     languageOptions: { globals: globals.vitest },
   },
-];
+]);

@@ -8,7 +8,7 @@ WorkBridge: a freelancing platform (owners post projects, freelancers send propo
 
 Install: `npm install && npm install --prefix client && npm install --prefix server`
 
-- `npm run dev` (root): runs server (nodemon, port 5000) and client (Vite, port 3000 per `client/vite.config.js`) together via `concurrently`
+- `npm run dev` (root): runs server (`tsx watch`, port 5000) and client (Vite, port 3000 per `client/vite.config.js`) together via `concurrently`
 - `npm run build --prefix client`: production build
 - `npm run lint --prefix client`: flat ESLint config (`client/eslint.config.js`).
 - `npm run lint --prefix server`: flat ESLint config (`server/eslint.config.js`).
@@ -36,9 +36,11 @@ Dark mode lives in `context/DarkModeContext.jsx` and is stored via `useLocalStor
 
 ## Server architecture (`server/`)
 
-`index.js` → `app/server.js` (an `Application` class: helmet, CORS with credentials, 100kb body limit, static files only from `uploads/` at `/uploads`, signed cookie-parser, routes under `/api`, and a central error handler that returns `{ statusCode, message }`).
+`index.ts` → `app/server.ts` (an `Application` class: helmet, CORS with credentials, 100kb body limit, static files only from `uploads/` at `/uploads`, signed cookie-parser, routes under `/api`, and a central error handler that returns `{ statusCode, message }`).
 
-- `app/router/router.js` mounts `/user`, `/category`, `/project`, `/proposal` and `/admin`. Project, proposal and admin routes require `verifyAccessToken` + `isVerifiedUser` (user `status`: 0 rejected, 1 pending, 2 verified). Per-route role checks use `authorize(...ROLES)` from `permission.guard.js`. Roles are in `utils/constants.js`.
+TypeScript is mid-conversion: strict `tsconfig.json` with `allowJs`, so `.ts` (utils, models, middlewares, entry, `server.ts`) and `.js` (controllers, routers, validators, tests) coexist. `tsx` runs both (`dev` is `tsx watch`; `tests/setup.js` registers `tsx/cjs` so tests can `require` `.ts`). `npm run typecheck --prefix server` runs `tsc --noEmit`. `req.user` is typed in `types/express.d.ts`.
+
+- `app/router/router.js` mounts `/user`, `/category`, `/project`, `/proposal` and `/admin`. Project, proposal and admin routes require `verifyAccessToken` + `isVerifiedUser` (user `status`: 0 rejected, 1 pending, 2 verified). Per-route role checks use `authorize(...ROLES)` from `permission.guard.ts`. Roles are in `utils/constants.ts`.
 - Controllers (`app/http/controllers`) are classes extending `Controller`; Express 5 forwards their async errors to the central handler. They validate with Joi schemas from `app/http/validators`, throw `http-errors`, and reply with `{ statusCode, data: { message, ... } }`. The client relies on this `data` envelope.
 - Mongoose models: `user`, `project` (status `OPEN`/`CLOSED`), `proposal`, `category`. No SMS is sent: outside production `sendOTP` logs the code and returns it in the `get-otp` response (the login toast shows it). `get-otp`/`check-otp` are rate-limited per IP (`OTP_RATE_LIMIT`, default 10 per 15 min).
 

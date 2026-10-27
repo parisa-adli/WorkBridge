@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+import { PROJECT_STATUS } from "../../utils/constants";
 const ObjectId = mongoose.Schema.Types.ObjectId;
-const { PROJECT_STATUS } = require("../../utils/constants");
 
 const ProjectSchema = new mongoose.Schema(
   {
@@ -25,6 +25,4 @@ const ProjectSchema = new mongoose.Schema(
   }
 );
 
-module.exports = {
-  ProjectModel: mongoose.model("Project", ProjectSchema),
-};
+export const ProjectModel = mongoose.model("Project", ProjectSchema);

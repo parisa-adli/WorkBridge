@@ -1,4 +1,4 @@
-// Single source for roles, statuses and validation limits. Mirrors server/utils/constants.js.
+// Single source for roles, statuses and validation limits. Mirrors server/utils/constants.ts.
 
 export const ROLES = Object.freeze({
   ADMIN: "ADMIN",

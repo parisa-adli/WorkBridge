@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**20 of 47 phases done** (Parts A and B, Phases 15–16). Next: Phase 17 (Server TypeScript tooling + infrastructure files).
+**21 of 47 phases done** (Parts A and B, Phases 15–17). Next: Phase 18 (Server TypeScript, controllers/routes/tests).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -37,7 +37,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 |---|---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
-| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 2/11 |
+| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 3/11 |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
@@ -286,14 +286,14 @@ Files: `server/package.json`, `server/app/models/*`, `server/app/server.js`, con
 
 Verify: all tests pass; audit result recorded in the PR.
 
-### Phase 17: Server TypeScript tooling + infrastructure files ⬜
+### Phase 17: Server TypeScript tooling + infrastructure files ✅
 **Goal:** server compiles with `tsc --noEmit` in strict mode, with `allowJs` so the conversion can be split.
 
 Files: `server/tsconfig.json`, `server/package.json` (`tsx watch` replaces nodemon; `typecheck` script), `server/eslint.config.js` (typescript-eslint), `server/utils/*`, `server/app/models/*`, `server/app/http/middlewares/*`, `server/index.js`, `server/app/server.js`, `.github/workflows/ci.yml`
 
-- [ ] Add `typescript`, `tsx`, `typescript-eslint`, `@types/*`; strict `tsconfig` with `allowJs`.
-- [ ] Convert utils, models, middlewares, entry and `server.js` to `.ts`.
-- [ ] Enable the CI typecheck step for the server.
+- [x] Add `typescript`, `tsx`, `typescript-eslint`, `@types/*`; strict `tsconfig` with `allowJs`.
+- [x] Convert utils, models, middlewares, entry and `server.js` to `.ts`.
+- [x] Enable the CI typecheck step for the server.
 
 Verify: `npm run typecheck --prefix server` and lint pass; `npm run dev` works through `tsx watch`.
 

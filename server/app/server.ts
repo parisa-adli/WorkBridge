@@ -1,13 +1,12 @@
-const express = require("express");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const helmet = require("helmet");
-// const allRoutes = require("./router/router");
-const dotenv = require("dotenv");
-const mongoose = require("mongoose");
-const createError = require("http-errors");
-const path = require("path");
-const { allRoutes } = require("./router/router");
+import express, { type NextFunction, type Request, type Response } from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import createError from "http-errors";
+import path from "path";
+import { allRoutes } from "./router/router";
 dotenv.config();
 
 const REQUIRED_ENV = [
@@ -36,7 +35,7 @@ class Application {
       await this.connectToDB();
       this.createServer();
     } catch (err) {
-      console.error("Server failed to start:", err.message);
+      console.error("Server failed to start:", (err as Error).message);
       process.exit(1);
     }
   }
@@ -47,7 +46,8 @@ class Application {
   async connectToDB() {
     // Keep unknown filter keys in queries (Mongoose 7+ default) so they match nothing instead of being dropped.
     mongoose.set("strictQuery", false);
-    await mongoose.connect(process.env.APP_DB);
+    // start() has checked APP_DB is set.
+    await mongoose.connect(process.env.APP_DB!);
     console.log("MongoDB connected!!");
   }
   configServer() {
@@ -76,17 +76,19 @@ class Application {
       next(createError.NotFound("آدرس مورد نظر یافت نشد"));
     });
     // Express treats a handler as an error handler only when it takes 4 args.
-    // eslint-disable-next-line no-unused-vars
-    this.#app.use((error, req, res, next) => {
-      const serverError = createError.InternalServerError();
-      const statusCode = error.status || serverError.status;
-      const message = error.message || serverError.message;
-      return res.status(statusCode).json({
-        statusCode,
-        message,
-      });
-    });
+    this.#app.use(
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      (error: { status?: number; message?: string }, req: Request, res: Response, next: NextFunction) => {
+        const serverError = createError.InternalServerError();
+        const statusCode = error.status || serverError.status;
+        const message = error.message || serverError.message;
+        return res.status(statusCode).json({
+          statusCode,
+          message,
+        });
+      }
+    );
   }
 }
 
-module.exports = Application;
+export = Application;

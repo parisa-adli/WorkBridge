@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const CategorySchema = new mongoose.Schema(
@@ -29,6 +29,4 @@ const CategorySchema = new mongoose.Schema(
 
 CategorySchema.index({ title: "text", englishTitle: "text" });
 
-module.exports = {
-  CategoryModel: mongoose.model("Category", CategorySchema),
-};
+export const CategoryModel = mongoose.model("Category", CategorySchema);

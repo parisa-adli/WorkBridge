@@ -1,3 +1,6 @@
+// Tests load the app with Node's own require, which can't resolve .ts files without tsx's hook.
+require("tsx/cjs");
+
 // Runs before each test file. Set env before the app loads so dotenv never pulls values from server/.env.
 Object.assign(process.env, {
   NODE_ENV: "development", // cookies without `secure`, so supertest sends them over http
