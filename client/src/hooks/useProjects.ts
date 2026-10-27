@@ -13,7 +13,7 @@ export default function useProjects() {
     queryFn: () => getProjectsApi(search),
   });
 
-  const { projects } = data || {};
+  const { projects = [] } = data || {};
 
   return { projects, isLoading };
 }

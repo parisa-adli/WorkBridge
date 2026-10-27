@@ -14,7 +14,7 @@ export type ProjectStatus = (typeof PROJECT_STATUS)[keyof typeof PROJECT_STATUS]
 
 type Timestamps = { createdAt: string; updatedAt: string };
 // A populated user reference carries only the selected fields.
-type UserRef = { _id: string; name: string };
+export type UserRef = { _id: string; name: string };
 
 export type User = Timestamps & {
   _id: string;

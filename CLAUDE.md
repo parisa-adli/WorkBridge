@@ -12,28 +12,28 @@ Install: `npm install && npm install --prefix client && npm install --prefix ser
 - `npm run build --prefix client`: production build
 - `npm run lint --prefix client`: flat ESLint config (`client/eslint.config.js`).
 - `npm run lint --prefix server`: flat ESLint config (`server/eslint.config.js`).
-- `npm run typecheck --prefix client`: `tsc --noEmit`, strict with `allowJs`. The data layer (`services`, `utils`, `hooks`, `context`, `constants`) is TypeScript and typed against `src/types/api.ts`; components are still `.jsx` until Phase 24.
+- `npm run typecheck --prefix client`: `tsc --noEmit`, strict with `allowJs: false`: all of `client/src` is `.ts`/`.tsx` (only the Vite, ESLint, PostCSS and Tailwind configs are `.js`). API data is typed against `src/types/api.ts`.
 - `npm test --prefix server`: Vitest + Supertest behavior tests (`server/tests/`) against an in-memory MongoDB (the first run downloads a ~600MB mongod binary). They pin current behavior, including the bugs listed in `docs/known-bugs.md`.
-- `npm test --prefix client`: Vitest + Testing Library (jsdom) characterization tests next to the code (`*.test.js(x)`), pinning current behavior.
+- `npm test --prefix client`: Vitest + Testing Library (jsdom) characterization tests next to the code (`*.test.ts(x)`), pinning current behavior.
 - `npm run e2e` (root): Playwright suite in `e2e/`. Global setup starts an in-memory MongoDB (seeded with one category), the server and the Vite dev server on free ports, so nothing needs to be running. First run: `npx playwright install chromium`.
 
 The server needs `server/.env`; copy `server/.env.example`.
 
-**API target:** `BASE_URL` in `client/src/services/httpService.js` reads `VITE_BASE_URL` and defaults to the local server (`http://localhost:5000/api`). To hit the deployed backend (`https://freelancer-bc.runflare.run/api`), set `VITE_BASE_URL` in `client/.env` (see `client/.env.example`).
+**API target:** `BASE_URL` in `client/src/services/httpService.ts` reads `VITE_BASE_URL` and defaults to the local server (`http://localhost:5000/api`). To hit the deployed backend (`https://freelancer-bc.runflare.run/api`), set `VITE_BASE_URL` in `client/.env` (see `client/.env.example`).
 
 ## Client architecture (`client/src`)
 
 The data flow is layered, and each feature follows it:
 
-1. `services/*Service.js`: thin API functions on the shared `http` axios instance. They return `data.data`, the server's payload envelope.
-2. `features/<domain>/use*.js`: TanStack Query hooks wrapping those services. Queries use string keys (`["owner-projects"]`, `["projects", queryObject]`, `["project", id]`, ...). Mutations show `toast.success(data.message)` / `toast.error(err?.response?.data?.message)` and call `invalidateQueries` on the affected keys. When you add a mutation, invalidate every key that lists the changed entity.
-3. `features/<domain>/*.jsx`: domain components. `pages/` holds thin route components. `ui/` holds shared building blocks (`Table`, `Modal`, `RHFSelect`, `Textfield`, `Filter`, ...). Forms use React Hook Form; the auth forms use `zodResolver` with schemas in `schemas/auth.js` that mirror the server's and read limits from `constants/`.
+1. `services/*Service.ts`: thin API functions on the shared `http` axios instance. They return `data.data`, the server's payload envelope.
+2. `features/<domain>/use*.ts`: TanStack Query hooks wrapping those services. Queries use string keys (`["owner-projects"]`, `["projects", queryObject]`, `["project", id]`, ...). Mutations show `toast.success(data.message)` / `toast.error(err?.response?.data?.message)` and call `invalidateQueries` on the affected keys. When you add a mutation, invalidate every key that lists the changed entity.
+3. `features/<domain>/*.tsx`: domain components. `pages/` holds thin route components. `ui/` holds shared building blocks (`Table`, `Modal`, `RHFSelect`, `Textfield`, `Filter`, ...). `AppLayout` renders the `Sidebar` and takes the role's nav links as `children`. Forms use React Hook Form; form-field components are generic over the form's values, so `name` must be a field of the form. The auth forms use `zodResolver` with schemas in `schemas/auth.ts` that mirror the server's and read limits from `constants/`.
 
-**Auth/roles:** login is OTP by phone (`SendOTPForm` → `CheckOTPForm` → `CompleteProfileForm`). The session is httpOnly JWT cookies. `httpService` retries a request once after a 401 by calling `/user/refresh-token`. Routes live in `App.jsx` under `/owner`, `/freelancer` and `/admin`, each wrapped in `ProtectedRoute`. `useAuthorize` reads the role from the **first URL segment** and compares it with `user.role` (`OWNER`/`FREELANCER`/`ADMIN`). It also requires `user.status === 2` (verified). So a new role-scoped page must sit under its role's path prefix.
+**Auth/roles:** login is OTP by phone (`SendOTPForm` → `CheckOTPForm` → `CompleteProfileForm`). The session is httpOnly JWT cookies. `httpService` retries a request once after a 401 by calling `/user/refresh-token`. Routes live in `App.tsx` under `/owner`, `/freelancer` and `/admin`, each wrapped in `ProtectedRoute`. `useAuthorize` reads the role from the **first URL segment** and compares it with `user.role` (`OWNER`/`FREELANCER`/`ADMIN`). It also requires `user.status === 2` (verified). So a new role-scoped page must sit under its role's path prefix.
 
 List filtering and sorting are driven by URL query params: `useProjects` passes `location.search` directly to `/project/list`.
 
-Dark mode lives in `context/DarkModeContext.jsx` and is stored via `useLocalStorageState`. Persian numbers and dates come from `utils/`.
+Dark mode lives in `context/DarkModeContext.tsx` and is stored via `useLocalStorageState`. Persian numbers and dates come from `utils/`.
 
 ## Server architecture (`server/`)
 

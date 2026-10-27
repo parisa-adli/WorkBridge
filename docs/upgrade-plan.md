@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**27 of 47 phases done** (Parts A and B, Phases 15–23). Next: Phase 24 (Client TypeScript, components).
+**28 of 47 phases done** (Parts A and B, Phases 15–24). Next: Phase 25 (Zod for projects, proposals, categories and admin).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -37,7 +37,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 |---|---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
-| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 9/11 |
+| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 10/11 |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
@@ -360,13 +360,13 @@ Files: `client/tsconfig.json`, `client/package.json` (`typecheck`), `client/esli
 
 Verify: typecheck and lint pass; tests pass.
 
-### Phase 24: Client TypeScript, components ⬜
+### Phase 24: Client TypeScript, components ✅
 **Goal:** the whole client is TypeScript; `allowJs` off.
 
 Files: `client/src/features/**`, `pages/*`, `ui/*`, `App.jsx`, `main.jsx`, client tests
 
-- [ ] Convert to `.tsx`; type the `Table` compound component and `AppLayout`'s `cloneElement` injection (or replace it with a prop).
-- [ ] Turn off `allowJs`.
+- [x] Convert to `.tsx`; type the `Table` compound component and `AppLayout`'s `cloneElement` injection (or replace it with a prop).
+- [x] Turn off `allowJs`.
 
 Verify: typecheck passes with `allowJs: false`; build, tests, e2e pass.
 
