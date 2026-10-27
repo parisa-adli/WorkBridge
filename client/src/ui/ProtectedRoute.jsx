@@ -20,6 +20,9 @@ function ProtectedRoute({ children }) {
     }
 
     if (!isAuthorized && !isLoading) negative("/not-access", { replace: true });
+    // TODO(phase 13): isVerified is missing from deps, and a logged-out visitor hits all three branches
+    // (gets the "not verified" toast and ends on /not-access instead of /auth).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, isAuthenticated, isAuthorized, negative]);
 
   // 3. while loading => show loading

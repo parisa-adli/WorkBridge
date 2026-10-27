@@ -1,6 +1,4 @@
-import { useState } from "react";
 import Textfield from "../../ui/Textfield";
-import RadioInput from "../../ui/RadioInput";
 import { useMutation } from "@tanstack/react-query";
 import { completeProfile } from "../../services/authService";
 import Loading from "../../ui/Loading";

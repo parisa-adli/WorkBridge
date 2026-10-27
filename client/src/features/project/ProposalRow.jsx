@@ -22,7 +22,7 @@ const statusStyle = [
 ];
 
 function ProposalRow({ proposal, index }) {
-  const { status, user } = proposal;
+  const { status } = proposal;
   const [open, setOpen] = useState(false);
 
   return (

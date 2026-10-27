@@ -16,11 +16,12 @@ function AuthContainer() {
 
   useEffect(() => {
     if (user) navigate("/", { replace: true });
+    // TODO(phase 13): fix effect dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const {
     isPending: isSendingOtp,
-    error,
     data: otpResponse,
     mutateAsync,
   } = useMutation({

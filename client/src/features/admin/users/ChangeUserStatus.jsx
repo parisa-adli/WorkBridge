@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
 import Loading from "../../../ui/Loading";
 import RHFSelect from "../../../ui/RHFSelect";
 import useChangeUserStatus from "./useChangeUserStatus";

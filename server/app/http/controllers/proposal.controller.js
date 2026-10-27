@@ -79,7 +79,7 @@ class ProposalController extends Controller {
   }
   async changeProposalStatus(req, res) {
     const { id } = req.params;
-    let { status, projectId } = req.body;
+    let { status } = req.body;
     status = Number(status);
 
     const proposal = await ProposalModel.findOneAndUpdate(

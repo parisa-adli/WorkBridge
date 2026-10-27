@@ -65,6 +65,8 @@ class CategoryController extends Controller {
       }
     );
     if (updateResult.modifiedCount == 0)
+      // TODO(phase 12): createError is undefined here; fix the reference.
+      // eslint-disable-next-line no-undef
       throw createError.InternalServerError("به روزرسانی انجام نشد");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -80,6 +82,8 @@ class CategoryController extends Controller {
       $or: [{ _id: category._id }, { parentId: category._id }],
     });
     if (deleteResult.deletedCount == 0)
+      // TODO(phase 12): createError is undefined here; fix the reference.
+      // eslint-disable-next-line no-undef
       throw createError.InternalServerError("حدف دسته بندی انجام نشد");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,

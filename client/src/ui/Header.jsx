@@ -1,5 +1,3 @@
-import { HiMenu } from "react-icons/hi";
-import UserAvatar from "../features/authentication/UserAvatar";
 import useUser from "../features/authentication/useUser";
 import HeaderMenu from "./HeaderMenu";
 import { FiMenu } from "react-icons/fi";

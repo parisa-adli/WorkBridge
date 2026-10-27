@@ -4,9 +4,7 @@ function RadioInput({
   id,
   value,
   register,
-  checked,
   validationSchema,
-  errors,
   watch,
 }) {
   return (

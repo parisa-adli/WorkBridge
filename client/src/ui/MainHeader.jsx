@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import UserAvatar from "../features/authentication/UserAvatar";
 import HeaderMenu from "./HeaderMenu";
 
 function MainHeader() {

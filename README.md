@@ -29,7 +29,7 @@ npm install --prefix client
 npm install --prefix server
 ```
 
-Create `server/.env`:
+Create `server/.env` (start from `server/.env.example`):
 
 ```env
 APP_DB=mongodb://localhost:27017/workbridge
@@ -39,15 +39,15 @@ ACCESS_TOKEN_SECRET_KEY=
 REFRESH_TOKEN_SECRET_KEY=
 COOKIE_PARSER_SECRET_KEY=
 TOKEN_SECRET_KEY=
-CLIENT_URL=http://localhost:5173
+CLIENT_URL=http://localhost:3000
 SERVER_URL=http://localhost:5000
-ALLOW_CORS_ORIGIN=http://localhost:5173
+ALLOW_CORS_ORIGIN=http://localhost:3000
 DOMAIN=localhost
 NODE_ENV=development
 ZARINPAL_CALLBACK_URL=
 ```
 
-The client's API URL is set in `client/src/services/httpService.js` (`BASE_URL`). To use your local server, change it to `http://localhost:5000/api`.
+The client talks to `http://localhost:5000/api` by default. To use another API, set `VITE_BASE_URL` in `client/.env` (see `client/.env.example`).
 
 Run client and server together from the root:
 

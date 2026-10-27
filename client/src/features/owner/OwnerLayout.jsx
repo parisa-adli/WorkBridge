@@ -1,4 +1,3 @@
-import { GoHomeFill } from "react-icons/go";
 import AppLayout from "../../ui/AppLayout";
 import CustomNavLink from "../../ui/CustomNavLink";
 import Sidebar from "../../ui/Sidebar";

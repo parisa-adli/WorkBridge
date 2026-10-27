@@ -5,8 +5,6 @@ const { CategoryModel } = require("../../models/category");
 const { ProjectModel } = require("../../models/project");
 const createHttpError = require("http-errors");
 const { addProjectSchema } = require("../validators/project.schema");
-const { ProposalModel } = require("../../models/proposal");
-const ObjectId = mongoose.Types.ObjectId;
 
 class ProjectController extends Controller {
   async addNewProject(req, res) {
@@ -226,6 +224,8 @@ class ProjectController extends Controller {
       }
     );
     if (updateResult.modifiedCount == 0)
+      // TODO(phase 12): createError is undefined here (known-bugs #11); fix the reference.
+      // eslint-disable-next-line no-undef
       throw createError.InternalServerError("به روزرسانی انجام نشد");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,

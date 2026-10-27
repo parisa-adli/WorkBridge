@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  safety-net:
+    runs-on: ubuntu-latest
+    env:
+      # One shared download dir so the server tests and e2e reuse the same cached mongod.
+      MONGOMS_DOWNLOAD_DIR: ${{ github.workspace }}/.cache/mongodb-binaries
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+            server/package-lock.json
+
+      - name: Cache mongod binary
+        uses: actions/cache@v4
+        with:
+          path: .cache/mongodb-binaries
+          key: mongod-${{ runner.os }}-${{ hashFiles('package-lock.json', 'server/package-lock.json') }}
+
+      - name: Install
+        run: |
+          npm ci
+          npm ci --prefix client
+          npm ci --prefix server
+
+      - name: Lint client
+        run: npm run lint --prefix client
+      - name: Lint server
+        run: npm run lint --prefix server
+
+      # Typecheck goes here once TypeScript exists (server: plan Phase 17, client: Phase 23).
+      # - name: Typecheck server
+      #   run: npm run typecheck --prefix server
+      # - name: Typecheck client
+      #   run: npm run typecheck --prefix client
+
+      - name: Test client
+        run: npm test --prefix client
+      - name: Test server
+        run: npm test --prefix server
+
+      - name: Build client
+        run: npm run build --prefix client
+
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - name: Install Playwright Chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      # The cache holds the browser only; apt packages still need installing.
+      - name: Install Playwright system deps
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: E2E
+        run: npm run e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7

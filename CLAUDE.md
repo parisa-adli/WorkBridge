@@ -8,14 +8,17 @@ WorkBridge: a freelancing platform (owners post projects, freelancers send propo
 
 Install: `npm install && npm install --prefix client && npm install --prefix server`
 
-- `npm run dev` (root): runs server (nodemon, port 5000) and client (Vite, port 3000 per `client/vite.config.js`; README's 5173 for `CLIENT_URL`/`ALLOW_CORS_ORIGIN` is wrong) together via `concurrently`
+- `npm run dev` (root): runs server (nodemon, port 5000) and client (Vite, port 3000 per `client/vite.config.js`) together via `concurrently`
 - `npm run build --prefix client`: production build
-- `npm run lint --prefix client`: currently broken. ESLint 9 is installed but the config is legacy `client/.eslintrc.cjs`, so ESLint asks for a flat config. Either migrate it to `eslint.config.js` or run with `ESLINT_USE_FLAT_CONFIG=false`.
-- `npm test --prefix server`: Jest + Supertest behavior tests (`server/tests/`) against an in-memory MongoDB (the first run downloads a ~600MB mongod binary). They pin current behavior, including the bugs listed in `docs/known-bugs.md`. The client has no tests.
+- `npm run lint --prefix client`: flat ESLint config (`client/eslint.config.js`). Known client bugs are disabled line by line with `TODO(phase 13)`.
+- `npm run lint --prefix server`: flat ESLint config (`server/eslint.config.js`). `no-undef` is disabled on the known `createError` bugs with `TODO(phase 12)`.
+- `npm test --prefix server`: Vitest + Supertest behavior tests (`server/tests/`) against an in-memory MongoDB (the first run downloads a ~600MB mongod binary). They pin current behavior, including the bugs listed in `docs/known-bugs.md`.
+- `npm test --prefix client`: Vitest + Testing Library (jsdom) characterization tests next to the code (`*.test.js(x)`), pinning current behavior, including the extra-writes bug in `useLocalStorageState`.
+- `npm run e2e` (root): Playwright suite in `e2e/`. Global setup starts an in-memory MongoDB (seeded with one category), the server and the Vite dev server on free ports, so nothing needs to be running. First run: `npx playwright install chromium`.
 
-The server needs `server/.env`; the variable list is in `README.md`.
+The server needs `server/.env`; copy `server/.env.example`.
 
-**API target:** `BASE_URL` in `client/src/services/httpService.js` points to the deployed backend (`https://freelancer-bc.runflare.run/api`), not your local server. Change it to `http://localhost:5000/api` when testing server changes locally.
+**API target:** `BASE_URL` in `client/src/services/httpService.js` reads `VITE_BASE_URL` and defaults to the local server (`http://localhost:5000/api`). To hit the deployed backend (`https://freelancer-bc.runflare.run/api`), set `VITE_BASE_URL` in `client/.env` (see `client/.env.example`).
 
 ## Client architecture (`client/src`)
 
@@ -38,3 +41,17 @@ Dark mode lives in `context/DarkModeContext.jsx` and is stored via `useLocalStor
 - `app/router/router.js` mounts `/user`, `/category`, `/project`, `/proposal` and `/admin`. Project, proposal and admin routes require `verifyAccessToken` + `isVerifiedUser` (user `status`: 0 rejected, 1 pending, 2 verified). Per-route role checks use `authorize(...ROLES)` from `permission.guard.js`. Roles are in `utils/constants.js`.
 - Controllers (`app/http/controllers`) are classes extending `Controller` and wrapped in `express-async-handler`. They validate with Joi schemas from `app/http/validators`, throw `http-errors`, and reply with `{ statusCode, data: { message, ... } }`. The client relies on this `data` envelope.
 - Mongoose models: `user`, `project` (status `OPEN`/`CLOSED`), `proposal`, `category`. SMS OTP goes through Kavenegar.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues on `parisa-adli/WorkBridge` (via `gh`). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
