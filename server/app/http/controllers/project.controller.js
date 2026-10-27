@@ -1,6 +1,7 @@
 const Controller = require("./controller");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
 const { ProjectModel } = require("../../models/project");
+const { ProposalModel } = require("../../models/proposal");
 const createHttpError = require("http-errors");
 const {
   addProjectSchema,
@@ -159,13 +160,14 @@ class ProjectController extends Controller {
       throw createHttpError.BadRequest("پروژه قابل حذف نیست");
 
     const result = await ProjectModel.deleteOne({ _id: id });
-    if (result.deletedCount)
-      return res.status(HttpStatus.OK).json({
-        statusCode: HttpStatus.OK,
-        data: {
-          message: "پروژه با موفقیت حذف شد",
-        },
-      });
+    if (!result.deletedCount) throw createHttpError.NotFound("پروژه یافت نشد.");
+    await ProposalModel.deleteMany({ project: id });
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: {
+        message: "پروژه با موفقیت حذف شد",
+      },
+    });
   }
   async updateProject(req, res) {
     const { id } = req.params;
@@ -180,9 +182,7 @@ class ProjectController extends Controller {
       }
     );
     if (updateResult.modifiedCount == 0)
-      // TODO(phase 12): createError is undefined here (known-bugs #11); fix the reference.
-      // eslint-disable-next-line no-undef
-      throw createError.InternalServerError("به روزرسانی انجام نشد");
+      throw createHttpError.InternalServerError("به روزرسانی انجام نشد");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {

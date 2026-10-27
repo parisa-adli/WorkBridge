@@ -1,5 +1,6 @@
 const { startApp, stopApp, clearDb, createUser, createCategory } = require("./helpers");
 const { ProjectModel } = require("../app/models/project");
+const { ProposalModel } = require("../app/models/proposal");
 
 let app, owner, otherOwner, freelancer, admin, category;
 
@@ -130,10 +131,15 @@ describe("GET project lists", () => {
     const popular = await owner.agent.get("/api/project/owner-projects?sort=popular");
     expect(popular.body.data.projects.map((p) => p._id)).toEqual([first._id, second._id]);
 
-    const unknown = await owner.agent.get("/api/project/owner-projects?category=nope");
-    expect(unknown.status).toBe(200);
-    expect(unknown.body.data.projects).toEqual([]);
   });
+
+  it.each(["?category=nope", "?category=web,nope", "?category=web&category=mobile"])(
+    "/owner-projects%s returns 400 instead of crashing",
+    async (query) => {
+      const res = await owner.agent.get(`/api/project/owner-projects${query}`);
+      expect(res.status).toBe(400);
+    }
+  );
 });
 
 describe("PATCH /api/project/update/:id", () => {
@@ -152,6 +158,14 @@ describe("PATCH /api/project/update/:id", () => {
     const project = await addProject();
     const res = await owner.agent.patch(`/api/project/update/${project._id}`).send(projectBody());
     expect(res.status).toBe(200);
+  });
+
+  it("returns its own 500 message when the update writes nothing (was a ReferenceError)", async () => {
+    const project = await addProject();
+    vi.spyOn(ProjectModel, "updateOne").mockResolvedValueOnce({ modifiedCount: 0 });
+    const res = await owner.agent.patch(`/api/project/update/${project._id}`).send(projectBody());
+    expect(res.status).toBe(500);
+    expect(res.body.message).toBe("به روزرسانی انجام نشد");
   });
 
   it("returns 400 for a malformed id", async () => {
@@ -252,6 +266,28 @@ describe("GET and DELETE /api/project/:id", () => {
     const res = await owner.agent.delete(`/api/project/${project._id}`);
     expect(res.status).toBe(200);
     expect(await ProjectModel.findById(project._id)).toBeNull();
+  });
+
+  it("deletes the project's proposals with it, and no others", async () => {
+    const project = await addProject();
+    const other = await addProject();
+    for (const { _id } of [project, other])
+      await freelancer.agent
+        .post("/api/proposal/add")
+        .send({ description: "I can do it", price: 500000, duration: 10, projectId: String(_id) })
+        .expect(201);
+
+    await owner.agent.delete(`/api/project/${project._id}`).expect(200);
+
+    expect(await ProposalModel.countDocuments({ project: project._id })).toBe(0);
+    expect(await ProposalModel.countDocuments({ project: other._id })).toBe(1);
+  });
+
+  it("responds 404 instead of hanging when the delete removes nothing", async () => {
+    const project = await addProject();
+    vi.spyOn(ProjectModel, "deleteOne").mockResolvedValueOnce({ deletedCount: 0 });
+    const res = await owner.agent.delete(`/api/project/${project._id}`);
+    expect(res.status).toBe(404);
   });
 
   it("refuses to delete a project that has a freelancer", async () => {

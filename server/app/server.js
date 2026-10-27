@@ -9,32 +9,47 @@ const createError = require("http-errors");
 const path = require("path");
 const { allRoutes } = require("./router/router");
 dotenv.config();
+
+const REQUIRED_ENV = [
+  "APP_DB",
+  "ACCESS_TOKEN_SECRET_KEY",
+  "REFRESH_TOKEN_SECRET_KEY",
+  "COOKIE_PARSER_SECRET_KEY",
+  "ALLOW_CORS_ORIGIN",
+];
+
 class Application {
   #app = express();
-  #PORT = process.env.PORT || 5000;
-  #DB_URI = process.env.APP_DB;
 
   constructor() {
-    this.createServer();
-    this.connectToDB();
     this.configServer();
     this.initClientSession();
     this.configRoutes();
     this.errorHandling();
   }
-  createServer() {
-    this.#app.listen(this.#PORT, () =>
-      console.log(`listening on port ${this.#PORT}`)
-    );
+  // Checks env and connects to Mongo before listening; exits the process if either fails.
+  async start() {
+    try {
+      const missing = REQUIRED_ENV.filter((name) => !process.env[name]);
+      if (missing.length)
+        throw new Error(`Missing required env vars: ${missing.join(", ")}`);
+      await this.connectToDB();
+      this.createServer();
+    } catch (err) {
+      console.error("Server failed to start:", err.message);
+      process.exit(1);
+    }
   }
-  connectToDB() {
-    mongoose
-      .connect(this.#DB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      })
-      .then(() => console.log("MongoDB connected!!"))
-      .catch((err) => console.log("Failed to connect to MongoDB", err));
+  createServer() {
+    const port = process.env.PORT || 5000;
+    this.#app.listen(port, () => console.log(`listening on port ${port}`));
+  }
+  async connectToDB() {
+    await mongoose.connect(process.env.APP_DB, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("MongoDB connected!!");
   }
   configServer() {
     // The client runs on another origin, so uploaded files must be loadable cross-origin.

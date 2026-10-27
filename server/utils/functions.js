@@ -59,10 +59,15 @@ async function buildProjectQuery({ search, category, sort, status }) {
   const filter = {};
   if (search) filter.title = new RegExp(escapeRegex(search), "i");
   if (["OPEN", "CLOSED"].includes(status)) filter.status = { $eq: status };
+  if (category && typeof category !== "string")
+    throw createError.BadRequest("دسته بندی مورد نظر صحیح نمی باشد");
   if (category && !category.includes("ALL")) {
+    const titles = category.split(",");
     const categories = await CategoryModel.find({
-      englishTitle: { $in: category.split(",") },
+      englishTitle: { $in: titles },
     });
+    if (titles.some((t) => !categories.some((c) => c.englishTitle === t)))
+      throw createError.BadRequest("دسته بندی مورد نظر یافت نشد");
     filter.category = { $in: categories.map((c) => c._id) };
   }
   return { filter, sort: createdAtSort(sort) };

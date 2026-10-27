@@ -11,14 +11,13 @@ async function startApp() {
   mongod = await MongoMemoryServer.create();
   process.env.APP_DB = mongod.getUri();
 
-  // Application listens in its constructor and keeps the express app private: capture it instead of opening a port.
+  // Application keeps the express app private: capture it at listen() instead of opening a port.
   let app;
   vi.spyOn(express.application, "listen").mockImplementation(function () {
     app = this;
   });
   const Application = require("../app/server");
-  new Application();
-  await mongoose.connection.asPromise();
+  await new Application().start();
   return app;
 }
 

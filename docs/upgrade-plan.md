@@ -211,9 +211,9 @@ Verify: tests pass, with the pinned tests flipped and new ones for the whitelist
 
 Files: `category.controller.js`, `project.controller.js`, `server/app/models/project.js`, `server/app/server.js`, `server/index.js`, tests for each
 
-- [ ] Fix `createError` references (#11, `category.controller.js`), the `getListOfOwnerProjects` unknown-category crash, and the `deleteProject` hang (and delete its proposals).
-- [ ] Connect to Mongo before `listen`; exit on failure. Validate required env vars at startup.
-- [ ] Remove the `TODO(phase 12)` lint disables from Phase 3.
+- [x] Fix `createError` references (#11, `category.controller.js`), the `getListOfOwnerProjects` unknown-category crash, and the `deleteProject` hang (and delete its proposals).
+- [x] Connect to Mongo before `listen`; exit on failure. Validate required env vars at startup.
+- [x] Remove the `TODO(phase 12)` lint disables from Phase 3.
 
 Verify: tests pass, including new ones for each fix.
 
