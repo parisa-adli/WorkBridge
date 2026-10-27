@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   LIMITS,
+  PHONE_PATTERN,
   PROJECT_STATUS,
   PROJECT_STATUS_BADGES,
   ROLE_HOME,
@@ -36,6 +37,13 @@ describe("constants", () => {
       PROJECT_TITLE_MAX: 30,
       PROJECT_BUDGET_MIN: 100000,
       PROJECT_BUDGET_MAX: 1000000000,
+      OTP_MIN: 5,
+      OTP_MAX: 6,
+      NAME_MIN: 5,
+      NAME_MAX: 100,
+      PROFILE_NAME_MAX: 50,
+      BIOGRAPHY_MAX: 30,
     });
+    expect(PHONE_PATTERN.source).toBe("^09[0-9]{9}$");
   });
 });

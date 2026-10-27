@@ -49,6 +49,23 @@ describe("AuthContainer", () => {
     expect(toast.success).toHaveBeenCalledWith("sent");
   });
 
+  it("shows the phone error and sends nothing for a malformed number", async () => {
+    renderAuth();
+    fireEvent.change(screen.getByLabelText("شماره موبایل"), { target: { value: "0912" } });
+    fireEvent.click(screen.getByRole("button", { name: "ارسال کد تایید" }));
+    expect(await screen.findByText("شماره موبایل وارد شده صحیح نمیباشد")).toBeInTheDocument();
+    expect(getOtp).not.toHaveBeenCalled();
+  });
+
+  it("shows the code error and sends nothing for an incomplete code", async () => {
+    getOtp.mockResolvedValue({ message: "sent" });
+    renderAuth();
+    await sendOtp();
+    fireEvent.click(screen.getByRole("button", { name: "تایید" }));
+    expect(await screen.findByText("کد ارسال شده صحیح نمیباشد")).toBeInTheDocument();
+    expect(checkOtp).not.toHaveBeenCalled();
+  });
+
   it("shows the rate-limit message from check-otp", async () => {
     getOtp.mockResolvedValue({ message: "sent" });
     checkOtp.mockRejectedValue({
@@ -59,7 +76,14 @@ describe("AuthContainer", () => {
     });
     renderAuth();
     await sendOtp();
+    // the form now checks the code length before calling the server
+    fireEvent.paste(screen.getByLabelText("Please enter OTP character 1"), {
+      clipboardData: { getData: () => "123456" },
+    });
     fireEvent.click(screen.getByRole("button", { name: "تایید" }));
+    await waitFor(() =>
+      expect(checkOtp.mock.calls[0][0]).toEqual({ phoneNumber: "09120000001", otp: "123456" })
+    );
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith("too many requests")
     );

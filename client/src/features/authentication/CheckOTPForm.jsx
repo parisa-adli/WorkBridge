@@ -7,13 +7,20 @@ import { useNavigate } from "react-router-dom";
 import { HiArrowRight } from "react-icons/hi";
 import { FiEdit } from "react-icons/fi";
 import Loading from "../../ui/Loading";
-import { STATUS } from "../../constants";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LIMITS, STATUS } from "../../constants";
+import { checkOtpSchema } from "../../schemas/auth";
 import redirectByRole from "../../utils/redirectByRole";
 
 const RESEND_TIME = 90;
 
 function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }) {
-  const [otp, setOtp] = useState("");
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ resolver: zodResolver(checkOtpSchema), defaultValues: { otp: "" } });
   const [time, setTime] = useState(RESEND_TIME);
   const navigate = useNavigate();
 
@@ -21,8 +28,7 @@ function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }) {
     mutationFn: checkOtp,
   });
 
-  const checkOtpHandler = async (e) => {
-    e.preventDefault();
+  const checkOtpHandler = async ({ otp }) => {
     try {
       const { user, message } = await mutateAsync({ phoneNumber, otp });
       toast.success(message);
@@ -67,22 +73,33 @@ function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }) {
           </button>
         )}
       </div>
-      <form className="space-y-10" onSubmit={checkOtpHandler}>
+      <form className="space-y-10" onSubmit={handleSubmit(checkOtpHandler)}>
         <p className="font-bold text-secondary-800">کد تایید را وارد کنید</p>
-        <OTPInput
-          value={otp}
-          onChange={setOtp}
-          numInputs={6}
-          renderSeparator={<span className="text-secondary-900">-</span>}
-          renderInput={(props) => <input type="number" {...props} />}
-          containerStyle="flex flex-row-reverse gap-x-2 justify-center"
-          inputStyle={{
-            width: "2.5rem",
-            padding: "0.5rem 0.2rem",
-            border: "1px solid rgb(var(--color-primary-300))",
-            borderRadius: "0.5rem",
-          }}
-        />
+        <div>
+          <Controller
+            name="otp"
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <OTPInput
+                value={value}
+                onChange={onChange}
+                numInputs={LIMITS.OTP_MAX}
+                renderSeparator={<span className="text-secondary-900">-</span>}
+                renderInput={(props) => <input type="number" {...props} />}
+                containerStyle="flex flex-row-reverse gap-x-2 justify-center"
+                inputStyle={{
+                  width: "2.5rem",
+                  padding: "0.5rem 0.2rem",
+                  border: "1px solid rgb(var(--color-primary-300))",
+                  borderRadius: "0.5rem",
+                }}
+              />
+            )}
+          />
+          {errors.otp && (
+            <span className="text-error block text-sm mt-2">{errors.otp.message}</span>
+          )}
+        </div>
         {isPending ? (
           <Loading />
         ) : (

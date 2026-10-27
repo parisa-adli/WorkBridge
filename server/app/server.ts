@@ -80,7 +80,7 @@ class Application {
     // Express treats a handler as an error handler only when it takes 4 args.
     this.#app.use(
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      (error: { status?: number; message?: string; code?: unknown }, req: Request, res: Response, next: NextFunction) => {
+      (error: { status?: number; message?: string; code?: unknown; field?: unknown }, req: Request, res: Response, next: NextFunction) => {
         const serverError = createError.InternalServerError();
         const statusCode = error.status || serverError.status;
         const message = error.message || serverError.message;
@@ -91,6 +91,7 @@ class Application {
             ? ERROR_CODES.BAD_REQUEST
             : ERROR_CODES.INTERNAL_ERROR;
         const body: ApiErrorResponse = { statusCode, code, message };
+        if (typeof error.field === "string") body.field = error.field;
         return res.status(statusCode).json(body);
       }
     );

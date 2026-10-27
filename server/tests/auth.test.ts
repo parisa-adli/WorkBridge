@@ -269,3 +269,51 @@ describe("POST /api/user/complete-profile", () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe("PATCH /api/user/update", () => {
+  const update = { name: "Updated Name", email: "new@example.com", biography: "React" };
+
+  it("updates the profile", async () => {
+    const agent = await login(app, PHONE);
+    const res = await agent.patch("/api/user/update").send(update);
+    expect(res.status).toBe(200);
+    expect(res.body.data.code).toBe(SUCCESS_CODES.PROFILE_UPDATED);
+    expect(await findUser()).toMatchObject(update);
+  });
+
+  it("accepts an empty biography", async () => {
+    const agent = await login(app, PHONE);
+    const res = await agent.patch("/api/user/update").send({ ...update, biography: "" });
+    expect(res.status).toBe(200);
+  });
+});
+
+// Every auth route validates its body with Zod: 400, the first failing field, its code and the Persian message.
+describe("validation errors", () => {
+  const cases: [string, string, Record<string, unknown>, string, string, string][] = [
+    ["get-otp", "post", {}, "phoneNumber", ERROR_CODES.PHONE_REQUIRED, "شماره موبایل معتبر را وارد کنید"],
+    ["get-otp", "post", { phoneNumber: "   " }, "phoneNumber", ERROR_CODES.INVALID_PHONE, "شماره موبایل وارد شده صحیح نمیباشد"],
+    ["get-otp", "post", { phoneNumber: "0912000000" }, "phoneNumber", ERROR_CODES.INVALID_PHONE, "شماره موبایل وارد شده صحیح نمیباشد"],
+    ["check-otp", "post", { phoneNumber: PHONE }, "otp", ERROR_CODES.INVALID_OTP, "کد ارسال شده صحیح نمیباشد"],
+    ["check-otp", "post", { phoneNumber: PHONE, otp: "1234" }, "otp", ERROR_CODES.INVALID_OTP, "کد ارسال شده صحیح نمیباشد"],
+    ["check-otp", "post", { phoneNumber: PHONE, otp: "1234567" }, "otp", ERROR_CODES.INVALID_OTP, "کد ارسال شده صحیح نمیباشد"],
+    ["check-otp", "post", { phoneNumber: PHONE, otp: 123456 }, "otp", ERROR_CODES.INVALID_OTP, "کد ارسال شده صحیح نمیباشد"],
+    ["check-otp", "post", { phoneNumber: "123", otp: "123456" }, "phoneNumber", ERROR_CODES.INVALID_PHONE, "شماره موبایل وارد شده صحیح نمیباشد"],
+    ["complete-profile", "post", { role: "OWNER", name: "abcd" }, "name", ERROR_CODES.INVALID_NAME, "نام کاربری وارد شده صحیح نمی باشد"],
+    ["complete-profile", "post", { role: "OWNER", name: "a".repeat(101) }, "name", ERROR_CODES.INVALID_NAME, "نام کاربری وارد شده صحیح نمی باشد"],
+    ["complete-profile", "post", { role: "OWNER", email: "not-an-email" }, "email", ERROR_CODES.INVALID_EMAIL, "ایمیل وارد شده صحیح نمی باشد"],
+    ["complete-profile", "post", { name: "Test User" }, "role", ERROR_CODES.INVALID_ROLE, "نقش وارد شده صحیح نمی باشد"],
+    ["update", "patch", { email: "a@b.com" }, "name", ERROR_CODES.INVALID_NAME, "نام کاربری وارد شده صحیح نمی باشد"],
+    ["update", "patch", { name: "a".repeat(51), email: "a@b.com" }, "name", ERROR_CODES.INVALID_NAME, "نام کاربری وارد شده صحیح نمی باشد"],
+    ["update", "patch", { name: "Test User" }, "email", ERROR_CODES.INVALID_EMAIL, "ایمیل وارد شده صحیح نمی باشد"],
+    ["update", "patch", { name: "Test User", email: "a@b.com", phoneNumber: "0912" }, "phoneNumber", ERROR_CODES.INVALID_PHONE, "شماره موبایل وارد شده صحیح نمیباشد"],
+    ["update", "patch", { name: "Test User", email: "a@b.com", biography: "a".repeat(31) }, "biography", ERROR_CODES.INVALID_BIOGRAPHY, "حوزه تخصصی صحیح نمی باشد."],
+  ];
+
+  it.each(cases)("%s %s %j fails on %s", async (route, method, body, field, code, message) => {
+    const agent = route === "get-otp" || route === "check-otp" ? request.agent(app) : await login(app, PHONE);
+    const res = await (method === "patch" ? agent.patch(`/api/user/${route}`) : agent.post(`/api/user/${route}`)).send(body);
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ statusCode: 400, code, message, field });
+  });
+});

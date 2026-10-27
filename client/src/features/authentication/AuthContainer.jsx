@@ -5,13 +5,20 @@ import toast from "react-hot-toast";
 import { getOtp } from "../../services/authService";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { sendOtpSchema } from "../../schemas/auth";
 import useUser from "./useUser";
 import { useNavigate } from "react-router-dom";
 
 function AuthContainer() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const { handleSubmit, register, getValues } = useForm();
+  const {
+    handleSubmit,
+    register,
+    getValues,
+    formState: { errors },
+  } = useForm({ resolver: zodResolver(sendOtpSchema) });
   const { user } = useUser();
 
   useEffect(() => {
@@ -47,6 +54,7 @@ function AuthContainer() {
             //onSubmit={sendOtpHandler}
             setStep={setStep}
             register={register}
+            errors={errors}
             // phoneNumber={phoneNumber}
             // onChange={(e) => setPhoneNumber(e.target.value)}
           />

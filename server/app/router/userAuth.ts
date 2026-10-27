@@ -4,6 +4,13 @@ import { rateLimit } from "express-rate-limit";
 import { verifyAccessToken } from "../http/middlewares/user.middleware";
 import { UserAuthController } from "../http/controllers/userAuth.controller";
 import { ERROR_CODES } from "../../utils/errorCodes";
+import { validate } from "../http/middlewares/validate";
+import {
+  checkOtpSchema,
+  completeProfileSchema,
+  getOtpSchema,
+  updateProfileSchema,
+} from "../http/validators/user.schema";
 
 const router = Router();
 
@@ -19,15 +26,21 @@ const otpLimiter = () =>
     },
   });
 
-router.post("/get-otp", otpLimiter(), UserAuthController.getOtp);
-router.post("/check-otp", otpLimiter(), UserAuthController.checkOtp);
+router.post("/get-otp", otpLimiter(), validate(getOtpSchema), UserAuthController.getOtp);
+router.post("/check-otp", otpLimiter(), validate(checkOtpSchema), UserAuthController.checkOtp);
 router.post(
   "/complete-profile",
   verifyAccessToken,
+  validate(completeProfileSchema),
   UserAuthController.completeProfile
 );
 router.get("/refresh-token", UserAuthController.refreshToken);
-router.patch("/update", verifyAccessToken, UserAuthController.updateProfile);
+router.patch(
+  "/update",
+  verifyAccessToken,
+  validate(updateProfileSchema),
+  UserAuthController.updateProfile
+);
 
 router.get("/profile", verifyAccessToken, UserAuthController.getUserProfile);
 

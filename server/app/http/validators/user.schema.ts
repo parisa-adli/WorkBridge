@@ -1,68 +1,56 @@
 import Joi from "joi";
-import { ROLES, STATUS } from "../../../utils/constants";
+import { z } from "zod";
+import { LIMITS, PHONE_PATTERN, ROLES, STATUS } from "../../../utils/constants";
 import { apiError } from "../../../utils/apiResponse";
 import { ERROR_CODES } from "../../../utils/errorCodes";
+import { issue } from "../middlewares/validate";
 
-const invalidPhone = () =>
-  apiError(400, ERROR_CODES.INVALID_PHONE, "شماره موبایل وارد شده صحیح نمیباشد");
-const invalidName = () =>
-  apiError(400, ERROR_CODES.INVALID_NAME, "نام کاربری وارد شده صحیح نمی باشد");
-const invalidEmail = () =>
-  apiError(400, ERROR_CODES.INVALID_EMAIL, "ایمیل وارد شده صحیح نمی باشد");
+const invalidPhone = issue(ERROR_CODES.INVALID_PHONE, "شماره موبایل وارد شده صحیح نمیباشد");
+const invalidOtp = issue(ERROR_CODES.INVALID_OTP, "کد ارسال شده صحیح نمیباشد");
+const invalidName = issue(ERROR_CODES.INVALID_NAME, "نام کاربری وارد شده صحیح نمی باشد");
+const invalidEmail = issue(ERROR_CODES.INVALID_EMAIL, "ایمیل وارد شده صحیح نمی باشد");
 
-export const getOtpSchema = Joi.object({
-  phoneNumber: Joi.string()
-    .length(11)
-    .pattern(/^09[0-9]{9}$/)
-    .error(invalidPhone()),
+const phoneNumber = z.string(invalidPhone).regex(PHONE_PATTERN, invalidPhone);
+
+export const getOtpSchema = z.object({
+  // any falsy value counts as missing; anything else is read as a trimmed string
+  phoneNumber: z.preprocess(
+    (value) => (value ? String(value).trim() : undefined),
+    z
+      .string(issue(ERROR_CODES.PHONE_REQUIRED, "شماره موبایل معتبر را وارد کنید"))
+      .regex(PHONE_PATTERN, invalidPhone)
+  ),
 });
 
-export const checkOtpSchema = Joi.object({
-  otp: Joi.string()
-    .required()
-    .min(5)
-    .max(6)
-    .error(apiError(400, ERROR_CODES.INVALID_OTP, "کد ارسال شده صحیح نمیباشد")),
-  phoneNumber: Joi.string()
-    .length(11)
-    .pattern(/^09[0-9]{9}$/)
-    .error(invalidPhone()),
+export const checkOtpSchema = z.object({
+  otp: z.string(invalidOtp).min(LIMITS.OTP_MIN, invalidOtp).max(LIMITS.OTP_MAX, invalidOtp),
+  phoneNumber: phoneNumber.optional(),
 });
 
-export const completeProfileSchema = Joi.object({
-  name: Joi.string()
-    .min(5)
-    .max(100)
-    .error(invalidName()),
-  email: Joi.string()
-    .email()
-    .error(invalidEmail()),
-  role: Joi.string()
-    .required()
-    .valid(ROLES.FREELANCER, ROLES.OWNER)
-    .error(apiError(400, ERROR_CODES.INVALID_ROLE, "نقش وارد شده صحیح نمی باشد")),
+export const completeProfileSchema = z.object({
+  name: z.string(invalidName).min(LIMITS.NAME_MIN, invalidName).max(LIMITS.NAME_MAX, invalidName).optional(),
+  email: z.email(invalidEmail).optional(),
+  role: z.enum(
+    [ROLES.FREELANCER, ROLES.OWNER],
+    issue(ERROR_CODES.INVALID_ROLE, "نقش وارد شده صحیح نمی باشد")
+  ),
 });
 
-export const updateProfileSchema = Joi.object({
-  name: Joi.string()
-    .min(5)
-    .max(50)
-    .required()
-    .error(invalidName()),
-  email: Joi.string()
-    .required()
-    .email()
-    .error(invalidEmail()),
-  phoneNumber: Joi.string()
-    .length(11)
-    .pattern(/^09[0-9]{9}$/)
-    .error(invalidPhone()),
-  biography: Joi.string()
-    .max(30)
-    .allow("")
-    .error(apiError(400, ERROR_CODES.INVALID_BIOGRAPHY, "حوزه تخصصی صحیح نمی باشد.")),
+const invalidBiography = issue(ERROR_CODES.INVALID_BIOGRAPHY, "حوزه تخصصی صحیح نمی باشد.");
+
+export const updateProfileSchema = z.object({
+  name: z.string(invalidName).min(LIMITS.NAME_MIN, invalidName).max(LIMITS.PROFILE_NAME_MAX, invalidName),
+  email: z.email(invalidEmail),
+  phoneNumber: phoneNumber.optional(),
+  biography: z.string(invalidBiography).max(LIMITS.BIOGRAPHY_MAX, invalidBiography).optional(),
 });
 
+export type GetOtpBody = z.infer<typeof getOtpSchema>;
+export type CheckOtpBody = z.infer<typeof checkOtpSchema>;
+export type CompleteProfileBody = z.infer<typeof completeProfileSchema>;
+export type UpdateProfileBody = z.infer<typeof updateProfileSchema>;
+
+// Admin schemas move to Zod in Phase 25.
 export const verifyUserSchema = Joi.object({
   status: Joi.number()
     .required()

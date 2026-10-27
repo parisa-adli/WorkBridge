@@ -12,25 +12,20 @@ import {
 import { apiError, sendData } from "../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
 import { UserModel } from "../../models/user";
-import {
-  completeProfileSchema,
-  updateProfileSchema,
-  checkOtpSchema,
-  getOtpSchema,
+import type {
+  CheckOtpBody,
+  CompleteProfileBody,
+  GetOtpBody,
+  UpdateProfileBody,
 } from "../validators/user.schema";
 const CODE_EXPIRES = 90 * 1000; //90 seconds in miliseconds
 
 const showOtp = () => process.env.NODE_ENV !== "production";
 
 class userAuthController extends Controller {
-  async getOtp(req: Request, res: Response) {
-    let { phoneNumber } = req.body;
-
-    if (!phoneNumber)
-      throw apiError(400, ERROR_CODES.PHONE_REQUIRED, "شماره موبایل معتبر را وارد کنید");
-
-    phoneNumber = String(phoneNumber).trim();
-    await getOtpSchema.validateAsync({ phoneNumber });
+  // The routes validate each body (validate(schema) in router/userAuth.ts) before these handlers run.
+  async getOtp(req: Request<object, unknown, GetOtpBody>, res: Response) {
+    const { phoneNumber } = req.body;
     const code = crypto.randomInt(100000, 1000000);
 
     const result = await this.saveUser(phoneNumber, code);
@@ -39,8 +34,7 @@ class userAuthController extends Controller {
     // send OTP
     this.sendOTP(phoneNumber, code, res);
   }
-  async checkOtp(req: Request, res: Response) {
-    await checkOtpSchema.validateAsync(req.body);
+  async checkOtp(req: Request<object, unknown, CheckOtpBody>, res: Response) {
     const { otp: code, phoneNumber } = req.body;
 
     const user = await UserModel.findOne(
@@ -115,8 +109,7 @@ class userAuthController extends Controller {
       ...(showOtp() && { otp: code }),
     });
   }
-  async completeProfile(req: Request, res: Response) {
-    await completeProfileSchema.validateAsync(req.body);
+  async completeProfile(req: Request<object, unknown, CompleteProfileBody>, res: Response) {
     // the route runs verifyAccessToken first, which sets req.user
     const user = req.user!;
     const { name, email, role } = req.body;
@@ -148,10 +141,9 @@ class userAuthController extends Controller {
       user: updatedUser,
     });
   }
-  async updateProfile(req: Request, res: Response) {
+  async updateProfile(req: Request<object, unknown, UpdateProfileBody>, res: Response) {
     // the route runs verifyAccessToken first, which sets req.user
     const { _id: userId } = req.user!;
-    await updateProfileSchema.validateAsync(req.body);
     const { name, email, biography, phoneNumber } = req.body;
 
     // No "nothing changed" check: timestamps bump updatedAt, so modifiedCount is never 0 (known-bugs.md).

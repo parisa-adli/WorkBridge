@@ -5,6 +5,8 @@ import Loading from "../../ui/Loading";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { completeProfileSchema } from "../../schemas/auth";
 import RadioInputGroup from "../../ui/RadioInputGroup";
 import { ROLES, STATUS } from "../../constants";
 import redirectByRole from "../../utils/redirectByRole";
@@ -15,7 +17,7 @@ function CompleteProfileForm() {
     register,
     watch,
     formState: { errors },
-  } = useForm();
+  } = useForm({ resolver: zodResolver(completeProfileSchema) });
   // const [name, setName] = useState("");
   // const [email, setEmail] = useState("");
   // const [role, setRole] = useState("");
@@ -50,9 +52,6 @@ function CompleteProfileForm() {
             name="name"
             register={register}
             required
-            validationSchema={{
-              required: "نام و نام خانوادگی ضروری است",
-            }}
             errors={errors}
           />
           <Textfield
@@ -60,13 +59,6 @@ function CompleteProfileForm() {
             name="email"
             register={register}
             required
-            validationSchema={{
-              required: "ایمیل ضروری است",
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "ایمیل نامعتبر است",
-              },
-            }}
             errors={errors}
           />
           <RadioInputGroup
@@ -75,9 +67,6 @@ function CompleteProfileForm() {
             watch={watch}
             configs={{
               name: "role",
-              validationSchema: {
-                required: "انتخاب نقش ضروری است",
-              },
               options: [
                 {
                   value: ROLES.OWNER,

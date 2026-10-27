@@ -1,4 +1,4 @@
-import { ROLES, STATUS, PROJECT_STATUS, LIMITS } from "../utils/constants";
+import { ROLES, STATUS, PROJECT_STATUS, LIMITS, PHONE_PATTERN } from "../utils/constants";
 import { ERROR_CODES, SUCCESS_CODES } from "../utils/errorCodes";
 
 // These values are shared with the client (client/src/constants/index.js); change both together.
@@ -24,6 +24,13 @@ describe("constants", () => {
       PROJECT_TITLE_MAX: 30,
       PROJECT_BUDGET_MIN: 100000,
       PROJECT_BUDGET_MAX: 1000000000,
+      OTP_MIN: 5,
+      OTP_MAX: 6,
+      NAME_MIN: 5,
+      NAME_MAX: 100,
+      PROFILE_NAME_MAX: 50,
+      BIOGRAPHY_MAX: 30,
     });
+    expect(PHONE_PATTERN.source).toBe("^09[0-9]{9}$");
   });
 });

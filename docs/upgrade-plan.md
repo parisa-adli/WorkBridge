@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**23 of 47 phases done** (Parts A and B, Phases 15–19). Next: Phase 20 (Zod for auth and profile).
+**24 of 47 phases done** (Parts A and B, Phases 15–20). Next: Phase 21 (React 19 + client in-major bumps).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -37,7 +37,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 |---|---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
-| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 5/11 |
+| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 6/11 |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
@@ -318,15 +318,15 @@ Files: `server/utils/apiResponse.ts`, `server/utils/errorCodes.ts` (new), `serve
 
 Verify: tests and e2e pass; client still shows Persian toasts (it reads `message` until Phase 27).
 
-### Phase 20: Zod for auth and profile (server + client) ⬜
+### Phase 20: Zod for auth and profile (server + client) ✅
 **Goal:** the auth domain validates with Zod on both sides in one go: the OTP, complete-profile and update-profile routes, and the forms that call them.
 
 Files: `server/app/http/validators/user.schema.ts`, a `validate(schema)` middleware (new), `userAuth.controller.ts`, `server/package.json`, `client/src/schemas/auth.js` (new), `SendOTPForm`, `CheckOTPForm`, `CompleteProfileForm`, `client/package.json`, tests on both sides
 
-- [ ] Add `zod` to both packages and `@hookform/resolvers` to the client.
-- [ ] Server: port the user schemas with the same rules and Persian messages; request types from `z.infer`; validation errors return 400 with the failing field and a `code`.
-- [ ] Client: the three forms use `zodResolver` with schemas that mirror the server's, reading limits from the Phase 14 constants.
-- [ ] Tests: server validation errors for each route; client schema test that limits match the constants (PRD R8).
+- [x] Add `zod` to both packages and `@hookform/resolvers` to the client.
+- [x] Server: port the user schemas with the same rules and Persian messages; request types from `z.infer`; validation errors return 400 with the failing field and a `code`.
+- [x] Client: the three forms use `zodResolver` with schemas that mirror the server's, reading limits from the Phase 14 constants.
+- [x] Tests: server validation errors for each route; client schema test that limits match the constants (PRD R8).
 
 Verify: each auth form shows the same Persian messages as before; e2e OTP flow passes.
 
