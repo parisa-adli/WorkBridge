@@ -42,9 +42,8 @@ jobs:
 
       - name: Typecheck server
         run: npm run typecheck --prefix server
-      # Client typecheck goes here once TypeScript exists (plan Phase 23).
-      # - name: Typecheck client
-      #   run: npm run typecheck --prefix client
+      - name: Typecheck client
+        run: npm run typecheck --prefix client
 
       - name: Test client
         run: npm test --prefix client

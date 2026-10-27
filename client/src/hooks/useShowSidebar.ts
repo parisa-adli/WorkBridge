@@ -6,7 +6,7 @@ export default function useShowSidebar() {
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
-    const handleResize = (e) => {
+    const handleResize = (e: MediaQueryList | MediaQueryListEvent) => {
       if (e.matches) {
         setIsShowSidebar(true);
       } else {

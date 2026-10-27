@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**26 of 47 phases done** (Parts A and B, Phases 15–22). Next: Phase 23 (Client TypeScript tooling + services/utils/hooks).
+**27 of 47 phases done** (Parts A and B, Phases 15–23). Next: Phase 24 (Client TypeScript, components).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -37,7 +37,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 |---|---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
-| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 8/11 |
+| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 9/11 |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
@@ -350,13 +350,13 @@ Files: `client/package.json`, `client/vite.config.js`
 
 Verify: build, dev, tests, e2e pass.
 
-### Phase 23: Client TypeScript tooling + services/utils/hooks ⬜
+### Phase 23: Client TypeScript tooling + services/utils/hooks ✅
 **Goal:** client typechecks in strict mode with `allowJs`; the data layer is typed.
 
 Files: `client/tsconfig.json`, `client/package.json` (`typecheck`), `client/eslint.config.js` (typescript-eslint), `client/src/services/*`, `utils/*`, `hooks/*`, `context/*`, `constants/*`, `client/src/types/api.ts` (new: `ApiResponse<T>` and entity types), CI
 
-- [ ] Convert the listed folders; type services against `ApiResponse<T>`.
-- [ ] Enable the CI typecheck step for the client.
+- [x] Convert the listed folders; type services against `ApiResponse<T>`.
+- [x] Enable the CI typecheck step for the client.
 
 Verify: typecheck and lint pass; tests pass.
 

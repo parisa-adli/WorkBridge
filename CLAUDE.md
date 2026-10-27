@@ -12,6 +12,7 @@ Install: `npm install && npm install --prefix client && npm install --prefix ser
 - `npm run build --prefix client`: production build
 - `npm run lint --prefix client`: flat ESLint config (`client/eslint.config.js`).
 - `npm run lint --prefix server`: flat ESLint config (`server/eslint.config.js`).
+- `npm run typecheck --prefix client`: `tsc --noEmit`, strict with `allowJs`. The data layer (`services`, `utils`, `hooks`, `context`, `constants`) is TypeScript and typed against `src/types/api.ts`; components are still `.jsx` until Phase 24.
 - `npm test --prefix server`: Vitest + Supertest behavior tests (`server/tests/`) against an in-memory MongoDB (the first run downloads a ~600MB mongod binary). They pin current behavior, including the bugs listed in `docs/known-bugs.md`.
 - `npm test --prefix client`: Vitest + Testing Library (jsdom) characterization tests next to the code (`*.test.js(x)`), pinning current behavior.
 - `npm run e2e` (root): Playwright suite in `e2e/`. Global setup starts an in-memory MongoDB (seeded with one category), the server and the Vite dev server on free ports, so nothing needs to be running. First run: `npx playwright install chromium`.

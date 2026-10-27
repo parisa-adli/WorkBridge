@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 
 const BASE_URL =
   import.meta.env.VITE_BASE_URL || "http://localhost:5000/api";
@@ -15,8 +15,8 @@ app.interceptors.request.use(
 
 app.interceptors.response.use(
   (res) => res,
-  async (err) => {
-    const originalConfig = err.config;
+  async (err: AxiosError) => {
+    const originalConfig = err.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
 
     if (err.response?.status === 401 && originalConfig && !originalConfig._retry) {
       originalConfig._retry = true;
