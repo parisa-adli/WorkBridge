@@ -29,6 +29,6 @@ describe("toLocalDateShort", () => {
   });
 });
 
-test("CI red check: deliberately failing (throwaway branch)", () => {
+it("CI red check: deliberately failing (throwaway branch)", () => {
   expect(1).toBe(2);
 });
