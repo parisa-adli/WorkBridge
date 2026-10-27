@@ -4,6 +4,9 @@ const Controller = require("../controller");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
 const { ProjectModel } = require("../../../models/project");
 const { ProposalModel } = require("../../../models/proposal");
+const { escapeRegex } = require("../../../../utils/functions");
+const { verifyUserSchema } = require("../../validators/user.schema");
+const { STATUS } = require("../../../../utils/constants");
 
 class UserController extends Controller {
   // ADMIN ROUTES :
@@ -13,9 +16,7 @@ class UserController extends Controller {
     limit = limit || 20;
     const skip = (page - 1) * limit;
     const { search } = req.query;
-    const searchTerm = new RegExp(search, "ig");
-    // const databaseQuery = {};
-    // if (search) databaseQuery["$text"] = { $search: search };
+    const searchTerm = new RegExp(escapeRegex(search), "i");
     const users = await UserModel.find({
       $or: [
         { name: searchTerm },
@@ -54,8 +55,7 @@ class UserController extends Controller {
   }
   async verifyUser(req, res) {
     const { userId } = req.params;
-    let { status } = req.body;
-    status = Number(status);
+    const { status } = await verifyUserSchema.validateAsync(req.body);
     const updateResult = await UserModel.updateOne(
       { _id: userId },
       { $set: { status } }
@@ -65,8 +65,9 @@ class UserController extends Controller {
       throw createHttpError.InternalServerError(" وضعیت کاربر آپدیت نشد");
 
     let message = "وضعیت کاربر تایید شد";
-    if (status === 0) message = "وضعیت کاربر به حالت رد شده تغییر یافت";
-    if (status === 1)
+    if (status === STATUS.REJECTED)
+      message = "وضعیت کاربر به حالت رد شده تغییر یافت";
+    if (status === STATUS.PENDING)
       message = "وضعیت کاربر به حالت در انتظار تایید تغییر یافت";
 
     return res.status(HttpStatus.OK).json({

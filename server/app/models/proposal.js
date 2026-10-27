@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Schema.Types.ObjectId;
+const { STATUS } = require("../../utils/constants");
 
 const ProposalSchema = new mongoose.Schema(
   {
@@ -7,11 +8,12 @@ const ProposalSchema = new mongoose.Schema(
     duration: { type: Number, required: true },
     description: { type: String, required: true },
     user: { type: ObjectId, ref: "User", required: true },
+    project: { type: ObjectId, ref: "Project", required: true },
     status: {
       type: Number,
       required: true,
-      default: 1,
-      enum: [0, 1, 2],
+      default: STATUS.PENDING,
+      enum: Object.values(STATUS),
     },
   },
   {

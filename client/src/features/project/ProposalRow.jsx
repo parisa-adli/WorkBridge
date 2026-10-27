@@ -5,21 +5,7 @@ import truncateText from "../../utils/truncateText";
 import Modal from "../../ui/Modal";
 import { TbChecklist } from "react-icons/tb";
 import ChangeProposalStatus from "./ChangeProposalStatus";
-
-const statusStyle = [
-  {
-    label: "رد شده",
-    className: "badge--danger",
-  },
-  {
-    label: "در انتطار تایید",
-    className: "badge--secondary",
-  },
-  {
-    label: "تایید شده",
-    className: "badge--success",
-  },
-];
+import StatusBadge from "../../ui/StatusBadge";
 
 function ProposalRow({ proposal, index }) {
   const { status } = proposal;
@@ -35,9 +21,7 @@ function ProposalRow({ proposal, index }) {
       <td>{proposal.duration} روز</td>
       <td>{toPersianNumbersWithComma(proposal.price)}</td>
       <td>
-        <span className={`badge ${statusStyle[status].className}`}>
-          {statusStyle[status].label}
-        </span>
+        <StatusBadge status={status} />
       </td>
       <td>
         <Modal

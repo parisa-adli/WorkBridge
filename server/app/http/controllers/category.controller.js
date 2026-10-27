@@ -4,12 +4,16 @@ const createHttpError = require("http-errors");
 const {
   addCategorySchema,
   updateCategorySchema,
-} = require("../validators/category.shcema");
+} = require("../validators/category.schema");
 const { CategoryModel } = require("../../models/category");
+const { findByIdOr404 } = require("../../../utils/functions");
 
 class CategoryController extends Controller {
   async getListOfCategories(req, res) {
-    const query = req.query;
+    // only plain string values of known fields, so no `?title[$ne]=x` operators
+    const query = {};
+    for (const field of ["title", "englishTitle", "type"])
+      if (typeof req.query[field] === "string") query[field] = req.query[field];
     const categories = await CategoryModel.find(query);
     if (!categories)
       throw createHttpError.ServiceUnavailable("دسته بندی ها یافت نشد");
@@ -47,11 +51,8 @@ class CategoryController extends Controller {
     if (category)
       throw createHttpError.BadRequest("دسته بندی با این عنوان وجود دارد.");
   }
-  async checkExistCategory(id) {
-    const category = await CategoryModel.findById(id);
-    if (!category)
-      throw createHttpError.BadRequest("دسته بندی با این عنوان وجود ندارد.");
-    return category;
+  checkExistCategory(id) {
+    return findByIdOr404(CategoryModel, id, "دسته بندی یافت نشد.");
   }
   async updateCategory(req, res) {
     const { id } = req.params;
@@ -65,9 +66,7 @@ class CategoryController extends Controller {
       }
     );
     if (updateResult.modifiedCount == 0)
-      // TODO(phase 12): createError is undefined here; fix the reference.
-      // eslint-disable-next-line no-undef
-      throw createError.InternalServerError("به روزرسانی انجام نشد");
+      throw createHttpError.InternalServerError("به روزرسانی انجام نشد");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
@@ -82,9 +81,7 @@ class CategoryController extends Controller {
       $or: [{ _id: category._id }, { parentId: category._id }],
     });
     if (deleteResult.deletedCount == 0)
-      // TODO(phase 12): createError is undefined here; fix the reference.
-      // eslint-disable-next-line no-undef
-      throw createError.InternalServerError("حدف دسته بندی انجام نشد");
+      throw createHttpError.InternalServerError("حدف دسته بندی انجام نشد");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {

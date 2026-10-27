@@ -51,10 +51,23 @@ describe("admin user management", () => {
     expect(res.status).toBe(200);
   });
 
-  it("saves a status outside 0/1/2 (updateOne skips enum validation)", async () => {
-    const res = await setStatus(5);
+  it.each([5, "x", undefined])("rejects status %s with 400", async (status) => {
+    const res = await setStatus(status);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("وضعیت کاربر صحیح نمی باشد");
+    expect((await UserModel.findById(member.user._id).lean()).status).toBe(1);
+  });
+
+  it("searches users by name, email or phone", async () => {
+    const res = await admin.agent.get("/api/admin/user/list?search=0032");
     expect(res.status).toBe(200);
-    expect((await UserModel.findById(member.user._id).lean()).status).toBe(5);
+    expect(res.body.data.users.map((u) => u.phoneNumber)).toEqual(["09120000032"]);
+  });
+
+  it.each(["(", ".*"])("treats search %s literally instead of as a regex", async (search) => {
+    const res = await admin.agent.get(`/api/admin/user/list?search=${encodeURIComponent(search)}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.users).toEqual([]);
   });
 
   it("forbids non-admins", async () => {

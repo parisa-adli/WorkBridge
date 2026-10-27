@@ -1,15 +1,16 @@
 import useToggleProjectStatus from "./useToggleProjectStatus";
 import Loading from "../../ui/Loading";
 import Toggle from "../../ui/Toggle";
+import { PROJECT_STATUS, PROJECT_STATUS_BADGES } from "../../constants";
 
 function ToggleProjectStatus({ project }) {
   const { status } = project;
-  //   const enabled = status === "OPEN" ? true : false;
+  const isOpen = status === PROJECT_STATUS.OPEN;
 
   const { isUpdating, toggleProjectStatus } = useToggleProjectStatus();
 
   const toggleHandler = () => {
-    const newStatus = status === "OPEN" ? "CLOSED" : "OPEN";
+    const newStatus = isOpen ? PROJECT_STATUS.CLOSED : PROJECT_STATUS.OPEN;
     toggleProjectStatus({
       id: project._id,
       data: { status: newStatus },
@@ -22,8 +23,8 @@ function ToggleProjectStatus({ project }) {
         <Loading height={20} width={50} />
       ) : (
         <Toggle
-          label={project.status === "OPEN" ? "باز" : "بسته"}
-          enabled={status === "OPEN" ? true : false}
+          label={PROJECT_STATUS_BADGES[isOpen ? PROJECT_STATUS.OPEN : PROJECT_STATUS.CLOSED].label}
+          enabled={isOpen}
           onChange={toggleHandler}
         />
       )}

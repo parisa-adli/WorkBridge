@@ -1,3 +1,4 @@
 export default function toLocalDateShort(date) {
-  return new Date(date).toLocaleDateString("fa-IR");
+  const parsed = new Date(date ?? NaN);
+  return isNaN(parsed) ? "-" : parsed.toLocaleDateString("fa-IR");
 }

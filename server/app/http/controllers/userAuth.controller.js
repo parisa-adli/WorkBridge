@@ -1,10 +1,11 @@
+const crypto = require("crypto");
 const Controller = require("./controller");
 const {
-  generateRandomNumber,
   toPersianDigits,
   setAccessToken,
   setRefreshToken,
   verifyRefreshToken,
+  cookieOptions,
 } = require("../../../utils/functions");
 const createError = require("http-errors");
 const { UserModel } = require("../../models/user");
@@ -14,29 +15,27 @@ const {
   completeProfileSchema,
   updateProfileSchema,
   checkOtpSchema,
+  getOtpSchema,
 } = require("../validators/user.schema");
 
+const showOtp = () => process.env.NODE_ENV !== "production";
+
 class userAuthController extends Controller {
-  constructor() {
-    super();
-    this.code = 0;
-    this.phoneNumber = null;
-  }
   async getOtp(req, res) {
     let { phoneNumber } = req.body;
 
     if (!phoneNumber)
       throw createError.BadRequest("شماره موبایل معتبر را وارد کنید");
 
-    phoneNumber = phoneNumber.trim();
-    this.phoneNumber = phoneNumber;
-    this.code = generateRandomNumber(6);
+    phoneNumber = String(phoneNumber).trim();
+    await getOtpSchema.validateAsync({ phoneNumber });
+    const code = crypto.randomInt(100000, 1000000);
 
-    const result = await this.saveUser(phoneNumber);
+    const result = await this.saveUser(phoneNumber, code);
     if (!result) throw createError.Unauthorized("ورود شما انجام نشد.");
 
     // send OTP
-    this.sendOTP(phoneNumber, res);
+    this.sendOTP(phoneNumber, code, res);
   }
   async checkOtp(req, res) {
     await checkOtpSchema.validateAsync(req.body);
@@ -49,13 +48,14 @@ class userAuthController extends Controller {
 
     if (!user) throw createError.NotFound("کاربری با این مشخصات یافت نشد");
 
-    if (user.otp.code != code)
+    if (!user.otp?.code || String(user.otp.code) !== code)
       throw createError.BadRequest("کد ارسال شده صحیح نمیباشد");
 
     if (new Date(`${user.otp.expiresIn}`).getTime() < Date.now())
       throw createError.BadRequest("کد اعتبار سنجی منقضی شده است");
 
     user.isVerifiedPhoneNumber = true;
+    user.otp.code = null; // single use
     await user.save();
 
     // await setAuthCookie(res, user); // set httpOnly cookie
@@ -73,9 +73,9 @@ class userAuthController extends Controller {
       },
     });
   }
-  async saveUser(phoneNumber) {
+  async saveUser(phoneNumber, code) {
     const otp = {
-      code: this.code,
+      code,
       expiresIn: Date.now() + CODE_EXPIRES,
     };
 
@@ -85,7 +85,6 @@ class userAuthController extends Controller {
     return await UserModel.create({
       phoneNumber,
       otp,
-      // role: ROLES.USER,
     });
   }
   async checkUserExist(phoneNumber) {
@@ -103,9 +102,9 @@ class userAuthController extends Controller {
     );
     return !!updatedResult.modifiedCount;
   }
-  sendOTP(phoneNumber, res) {
-    // dev: no SMS provider, print the code to the server console instead
-    console.log(`OTP for ${phoneNumber}: ${this.code}`);
+  sendOTP(phoneNumber, code, res) {
+    // no SMS provider: outside production, print the code and return it so login still works (PRD R1)
+    if (showOtp()) console.log(`OTP for ${phoneNumber}: ${code}`);
     return res.status(HttpStatus.OK).send({
       statusCode: HttpStatus.OK,
       data: {
@@ -114,6 +113,7 @@ class userAuthController extends Controller {
         )} ارسال گردید`,
         expiresIn: CODE_EXPIRES,
         phoneNumber,
+        ...(showOtp() && { code }),
       },
     });
   }
@@ -125,8 +125,8 @@ class userAuthController extends Controller {
     if (!user.isVerifiedPhoneNumber)
       throw createError.Forbidden("شماره موبایل خود را تایید کنید.");
 
-    const duplicateUser = await UserModel.findOne({ email });
-    console.log(duplicateUser);
+    const duplicateUser =
+      email && (await UserModel.findOne({ email, _id: { $ne: user._id } }));
     if (duplicateUser)
       throw createError.BadRequest(
         "کاربری با این ایمیل قبلا ثبت نام کرده است."
@@ -193,18 +193,14 @@ class userAuthController extends Controller {
     });
   }
   logout(req, res) {
-    const cookieOptions = {
+    const options = {
+      ...cookieOptions(),
       maxAge: 1,
       expires: Date.now(),
-      httpOnly: true,
-      signed: true,
-      sameSite: "Lax",
-      secure: true,
       path: "/",
-      domain: process.env.DOMAIN,
     };
-    res.cookie("accessToken", null, cookieOptions);
-    res.cookie("refreshToken", null, cookieOptions);
+    res.cookie("accessToken", null, options);
+    res.cookie("refreshToken", null, options);
 
     return res.status(HttpStatus.OK).json({
       StatusCode: HttpStatus.OK,

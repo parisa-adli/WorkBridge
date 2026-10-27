@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Schema.Types.ObjectId;
+const { PROJECT_STATUS } = require("../../utils/constants");
 
 const ProjectSchema = new mongoose.Schema(
   {
@@ -8,8 +9,8 @@ const ProjectSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      default: "OPEN",
-      enum: ["OPEN", "CLOSED"],
+      default: PROJECT_STATUS.OPEN,
+      enum: Object.values(PROJECT_STATUS),
     },
     category: { type: ObjectId, ref: "Category", required: true },
     budget: { type: Number, required: true },

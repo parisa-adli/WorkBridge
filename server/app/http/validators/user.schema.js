@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const createHttpError = require("http-errors");
+const { ROLES, STATUS } = require("../../../utils/constants");
 
 const getOtpSchema = Joi.object({
   phoneNumber: Joi.string()
@@ -10,6 +11,7 @@ const getOtpSchema = Joi.object({
 
 const checkOtpSchema = Joi.object({
   otp: Joi.string()
+    .required()
     .min(5)
     .max(6)
     .error(createHttpError.BadRequest("کد ارسال شده صحیح نمیباشد")),
@@ -29,7 +31,7 @@ const completeProfileSchema = Joi.object({
     .error(createHttpError.BadRequest("ایمیل وارد شده صحیح نمی باشد")),
   role: Joi.string()
     .required()
-    .valid("FREELANCER", "OWNER")
+    .valid(ROLES.FREELANCER, ROLES.OWNER)
     .error(createHttpError.BadRequest("نقش وارد شده صحیح نمی باشد")),
 });
 
@@ -53,7 +55,15 @@ const updateProfileSchema = Joi.object({
     .error(createHttpError.BadRequest("حوزه تخصصی صحیح نمی باشد.")),
 });
 
+const verifyUserSchema = Joi.object({
+  status: Joi.number()
+    .required()
+    .valid(...Object.values(STATUS))
+    .error(createHttpError.BadRequest("وضعیت کاربر صحیح نمی باشد")),
+});
+
 module.exports = {
+  verifyUserSchema,
   getOtpSchema,
   completeProfileSchema,
   checkOtpSchema,

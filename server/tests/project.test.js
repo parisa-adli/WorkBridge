@@ -1,7 +1,8 @@
 const { startApp, stopApp, clearDb, createUser, createCategory } = require("./helpers");
 const { ProjectModel } = require("../app/models/project");
+const { ProposalModel } = require("../app/models/proposal");
 
-let app, owner, otherOwner, freelancer, category;
+let app, owner, otherOwner, freelancer, admin, category;
 
 const projectBody = () => ({
   title: "Landing page",
@@ -21,6 +22,7 @@ beforeEach(async () => {
   owner = await createUser(app, { phoneNumber: "09120000011", role: "OWNER" });
   otherOwner = await createUser(app, { phoneNumber: "09120000012", role: "OWNER" });
   freelancer = await createUser(app, { phoneNumber: "09120000013", role: "FREELANCER" });
+  admin = await createUser(app, { phoneNumber: "09120000014", role: "ADMIN" });
   category = await createCategory();
 });
 
@@ -54,10 +56,23 @@ describe("POST /api/project/add", () => {
     expect(res.body.message).toBe("عنوان محصول صحیح نمیباشد");
   });
 
-  it("returns 500 without budget (optional in Joi, required in the model)", async () => {
+  it("rejects a title shorter than 10 characters", async () => {
+    const res = await owner.agent.post("/api/project/add").send({ ...projectBody(), title: "x".repeat(9) });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("عنوان محصول صحیح نمیباشد");
+  });
+
+  it.each([99999, 1000000001])("rejects a budget of %d", async (budget) => {
+    const res = await owner.agent.post("/api/project/add").send({ ...projectBody(), budget });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("قیمت وارد شده صحیح نمیباشد");
+  });
+
+  it("rejects a project without budget with 400", async () => {
     const { budget, ...body } = projectBody();
     const res = await owner.agent.post("/api/project/add").send(body);
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("قیمت وارد شده صحیح نمیباشد");
   });
 
   it("rejects an invalid category id", async () => {
@@ -83,10 +98,26 @@ describe("GET project lists", () => {
     expect(p.category).toMatchObject({ englishTitle: "web" });
   });
 
-  it("/list?search fails with 500 because Project has no text index", async () => {
+  it("/list?search matches the title, case-insensitively", async () => {
+    const match = await addProject();
+    await addProject(owner.agent, { ...projectBody(), title: "Mobile app" });
+
+    const res = await freelancer.agent.get("/api/project/list?search=LANDING");
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.projects.map((p) => p._id)).toEqual([match._id]);
+  });
+
+  it("/list?search treats regex characters literally", async () => {
+    const match = await addProject(owner.agent, { ...projectBody(), title: "C++ (v2) app" });
     await addProject();
-    const res = await freelancer.agent.get("/api/project/list?search=landing");
-    expect(res.status).toBe(500);
+
+    const res = await freelancer.agent.get(`/api/project/list?search=${encodeURIComponent("++ (")}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.projects.map((p) => p._id)).toEqual([match._id]);
+
+    const dot = await freelancer.agent.get("/api/project/list?search=.*");
+    expect(dot.body.data.projects).toEqual([]);
   });
 
   it("/owner-projects returns only the caller's projects", async () => {
@@ -99,6 +130,28 @@ describe("GET project lists", () => {
     expect(res.body.data.projects.map((p) => p._id)).toEqual([mine._id]);
     expect(res.body.data.projects[0].owner.name).toBe("user 09120000011");
   });
+
+  it("/owner-projects shares the /list filters and sorts", async () => {
+    const first = await addProject();
+    const second = await addProject();
+    // raw driver write: mongoose timestamps would ignore a createdAt update
+    await ProjectModel.collection.updateOne({ _id: new ProjectModel.base.Types.ObjectId(first._id) }, { $set: { createdAt: new Date("2020-01-01") } });
+    const latest = await owner.agent.get("/api/project/owner-projects?sort=latest&category=web");
+    expect(latest.body.data.projects.map((p) => p._id)).toEqual([second._id, first._id]);
+
+    // sort=popular is gone: it falls back to oldest first
+    const popular = await owner.agent.get("/api/project/owner-projects?sort=popular");
+    expect(popular.body.data.projects.map((p) => p._id)).toEqual([first._id, second._id]);
+
+  });
+
+  it.each(["?category=nope", "?category=web,nope", "?category=web&category=mobile"])(
+    "/owner-projects%s returns 400 instead of crashing",
+    async (query) => {
+      const res = await owner.agent.get(`/api/project/owner-projects${query}`);
+      expect(res.status).toBe(400);
+    }
+  );
 });
 
 describe("PATCH /api/project/update/:id", () => {
@@ -106,11 +159,11 @@ describe("PATCH /api/project/update/:id", () => {
     const project = await addProject();
     const res = await owner.agent
       .patch(`/api/project/update/${project._id}`)
-      .send({ ...projectBody(), title: "New title" });
+      .send({ ...projectBody(), title: "New project title" });
 
     expect(res.status).toBe(200);
     expect(res.body.data.message).toBe("به روز رسانی با موفقیت انجام شد");
-    expect((await ProjectModel.findById(project._id)).title).toBe("New title");
+    expect((await ProjectModel.findById(project._id)).title).toBe("New project title");
   });
 
   it("succeeds when nothing changed (timestamps bump updatedAt, so modifiedCount is never 0)", async () => {
@@ -119,17 +172,35 @@ describe("PATCH /api/project/update/:id", () => {
     expect(res.status).toBe(200);
   });
 
+  it("returns its own 500 message when the update writes nothing (was a ReferenceError)", async () => {
+    const project = await addProject();
+    vi.spyOn(ProjectModel, "updateOne").mockResolvedValueOnce({ modifiedCount: 0 });
+    const res = await owner.agent.patch(`/api/project/update/${project._id}`).send(projectBody());
+    expect(res.status).toBe(500);
+    expect(res.body.message).toBe("به روزرسانی انجام نشد");
+  });
+
   it("returns 400 for a malformed id", async () => {
     const res = await owner.agent.patch("/api/project/update/123").send(projectBody());
     expect(res.status).toBe(400);
   });
 
-  it("lets a different owner edit the project (no ownership check)", async () => {
+  it("forbids a different owner from editing the project", async () => {
     const project = await addProject();
     const res = await otherOwner.agent
       .patch(`/api/project/update/${project._id}`)
-      .send({ ...projectBody(), title: "Hijacked" });
+      .send({ ...projectBody(), title: "Hijacked title" });
+    expect(res.status).toBe(403);
+    expect((await ProjectModel.findById(project._id)).title).toBe("Landing page");
+  });
+
+  it("lets an admin edit any project", async () => {
+    const project = await addProject();
+    const res = await admin.agent
+      .patch(`/api/project/update/${project._id}`)
+      .send({ ...projectBody(), title: "Edited by admin" });
     expect(res.status).toBe(200);
+    expect((await ProjectModel.findById(project._id)).title).toBe("Edited by admin");
   });
 });
 
@@ -153,17 +224,26 @@ describe("PATCH /api/project/:id (open/close)", () => {
     expect(res.status).toBe(200);
   });
 
-  it("saves an invalid status value (updateOne skips enum validation)", async () => {
+  it.each([{ status: "DONE" }, {}])("rejects an invalid status %o with 400", async (body) => {
     const project = await addProject();
-    const res = await owner.agent.patch(`/api/project/${project._id}`).send({ status: "DONE" });
-    expect(res.status).toBe(200);
-    expect((await ProjectModel.findById(project._id).lean()).status).toBe("DONE");
+    const res = await owner.agent.patch(`/api/project/${project._id}`).send(body);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("وضعیت پروژه صحیح نمیباشد");
+    expect((await ProjectModel.findById(project._id).lean()).status).toBe("OPEN");
   });
 
-  it("lets a different owner close the project (no ownership check)", async () => {
+  it("forbids a different owner from closing the project", async () => {
     const project = await addProject();
     const res = await otherOwner.agent.patch(`/api/project/${project._id}`).send({ status: "CLOSED" });
+    expect(res.status).toBe(403);
+    expect((await ProjectModel.findById(project._id)).status).toBe("OPEN");
+  });
+
+  it("lets an admin close any project", async () => {
+    const project = await addProject();
+    const res = await admin.agent.patch(`/api/project/${project._id}`).send({ status: "CLOSED" });
     expect(res.status).toBe(200);
+    expect((await ProjectModel.findById(project._id)).status).toBe("CLOSED");
   });
 });
 
@@ -179,11 +259,47 @@ describe("GET and DELETE /api/project/:id", () => {
     });
   });
 
+  it("forbids a different owner from reading or deleting the project", async () => {
+    const project = await addProject();
+    expect((await otherOwner.agent.get(`/api/project/${project._id}`)).status).toBe(403);
+    expect((await otherOwner.agent.delete(`/api/project/${project._id}`)).status).toBe(403);
+    expect(await ProjectModel.findById(project._id)).not.toBeNull();
+  });
+
+  it("lets an admin read and delete any project", async () => {
+    const project = await addProject();
+    expect((await admin.agent.get(`/api/project/${project._id}`)).status).toBe(200);
+    expect((await admin.agent.delete(`/api/project/${project._id}`)).status).toBe(200);
+    expect(await ProjectModel.findById(project._id)).toBeNull();
+  });
+
   it("deletes a project without a freelancer", async () => {
     const project = await addProject();
     const res = await owner.agent.delete(`/api/project/${project._id}`);
     expect(res.status).toBe(200);
     expect(await ProjectModel.findById(project._id)).toBeNull();
+  });
+
+  it("deletes the project's proposals with it, and no others", async () => {
+    const project = await addProject();
+    const other = await addProject();
+    for (const { _id } of [project, other])
+      await freelancer.agent
+        .post("/api/proposal/add")
+        .send({ description: "I can do it", price: 500000, duration: 10, projectId: String(_id) })
+        .expect(201);
+
+    await owner.agent.delete(`/api/project/${project._id}`).expect(200);
+
+    expect(await ProposalModel.countDocuments({ project: project._id })).toBe(0);
+    expect(await ProposalModel.countDocuments({ project: other._id })).toBe(1);
+  });
+
+  it("responds 404 instead of hanging when the delete removes nothing", async () => {
+    const project = await addProject();
+    vi.spyOn(ProjectModel, "deleteOne").mockResolvedValueOnce({ deletedCount: 0 });
+    const res = await owner.agent.delete(`/api/project/${project._id}`);
+    expect(res.status).toBe(404);
   });
 
   it("refuses to delete a project that has a freelancer", async () => {

@@ -13,17 +13,16 @@ function ProtectedRoute({ children }) {
 
   // 2. check if is Authorized or not, check is Authenticated or not
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) negative("/auth");
-    if (!isVerified && !isLoading) {
+    if (isLoading) return;
+    if (!isAuthenticated) {
+      negative("/auth");
+    } else if (!isVerified) {
       toast.error("پروفایل شما هنوز تایید نشده است");
       negative("/");
+    } else if (!isAuthorized) {
+      negative("/not-access", { replace: true });
     }
-
-    if (!isAuthorized && !isLoading) negative("/not-access", { replace: true });
-    // TODO(phase 13): isVerified is missing from deps, and a logged-out visitor hits all three branches
-    // (gets the "not verified" toast and ends on /not-access instead of /auth).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, isAuthenticated, isAuthorized, negative]);
+  }, [isLoading, isAuthenticated, isAuthorized, isVerified, negative]);
 
   // 3. while loading => show loading
   if (isLoading)
@@ -34,6 +33,6 @@ function ProtectedRoute({ children }) {
     );
 
   // 4. if user isAuthenticated and isAuthorized => render the app
-  if (isAuthenticated && isAuthorized) return children;
+  if (isAuthenticated && isVerified && isAuthorized) return children;
 }
 export default ProtectedRoute;

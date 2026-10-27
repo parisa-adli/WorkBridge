@@ -4,21 +4,7 @@ import Modal from "../../../ui/Modal";
 import { TbChecklist } from "react-icons/tb";
 import Table from "../../../ui/Table";
 import ChangeUserStatus from "./ChangeUserStatus";
-
-const statusStyle = [
-  {
-    label: "رد شده",
-    className: "badge--danger",
-  },
-  {
-    label: "در انتطار تایید",
-    className: "badge--secondary",
-  },
-  {
-    label: "تایید شده",
-    className: "badge--success",
-  },
-];
+import StatusBadge from "../../../ui/StatusBadge";
 
 function UserRow({ user, index }) {
   const [open, setOpen] = useState(false);
@@ -32,9 +18,7 @@ function UserRow({ user, index }) {
       <td>{user.phoneNumber}</td>
       <td>{user.role}</td>
       <td>
-        <span className={`badge ${statusStyle[status].className}`}>
-          {statusStyle[status].label}
-        </span>
+        <StatusBadge status={status} />
       </td>
       <td>
         <Modal

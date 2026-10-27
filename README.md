@@ -15,7 +15,7 @@ A freelancing platform that connects project owners with freelancers. Owners pos
 | Part | Stack |
 |------|-------|
 | Client (`client/`) | React 18, Vite, Tailwind CSS, React Router, TanStack Query, React Hook Form, Axios |
-| Server (`server/`) | Node.js, Express, MongoDB (Mongoose), JWT cookies, Joi, Kavenegar (SMS) |
+| Server (`server/`) | Node.js, Express, MongoDB (Mongoose), JWT cookies, Joi |
 
 ## Getting started
 
@@ -34,7 +34,6 @@ Create `server/.env` (start from `server/.env.example`):
 ```env
 APP_DB=mongodb://localhost:27017/workbridge
 PORT=5000
-KAVENEGAR_API_KEY=
 ACCESS_TOKEN_SECRET_KEY=
 REFRESH_TOKEN_SECRET_KEY=
 COOKIE_PARSER_SECRET_KEY=
@@ -44,7 +43,6 @@ SERVER_URL=http://localhost:5000
 ALLOW_CORS_ORIGIN=http://localhost:3000
 DOMAIN=localhost
 NODE_ENV=development
-ZARINPAL_CALLBACK_URL=
 ```
 
 The client talks to `http://localhost:5000/api` by default. To use another API, set `VITE_BASE_URL` in `client/.env` (see `client/.env.example`).

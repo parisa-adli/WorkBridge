@@ -6,9 +6,9 @@ Object.assign(process.env, {
   REFRESH_TOKEN_SECRET_KEY: "test-refresh-secret",
   COOKIE_PARSER_SECRET_KEY: "test-cookie-secret",
   TOKEN_SECRET_KEY: "test-token-secret",
-  KAVENEGAR_API_KEY: "test-kavenegar-key",
   ALLOW_CORS_ORIGIN: "http://localhost:3000",
   SERVER_URL: "http://localhost:5000",
+  OTP_RATE_LIMIT: "10000", // rateLimit.test.js lowers it before the app loads
 });
 
 vi.spyOn(console, "log").mockImplementation(() => {});

@@ -48,6 +48,17 @@ describe("httpService 401 handling", () => {
     ]);
   });
 
+  it("rejects a network error (no response) without trying to refresh", async () => {
+    adapter.mockImplementation((config) =>
+      Promise.reject(new AxiosError("Network Error", "ERR_NETWORK", config))
+    );
+
+    await expect(http.get("/project/list")).rejects.toMatchObject({
+      code: "ERR_NETWORK",
+    });
+    expect(calledUrls()).toEqual(["/project/list"]);
+  });
+
   it("does not loop when the replay gets a second 401", async () => {
     adapter.mockImplementation((config) =>
       config.url.endsWith("/user/refresh-token") ? ok(config) : unauthorized(config)

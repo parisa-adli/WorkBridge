@@ -1,12 +1,19 @@
 const Controller = require("./controller");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
-const mongoose = require("mongoose");
 const createHttpError = require("http-errors");
 const { ProposalModel } = require("../../models/proposal");
 const { addProposalSchema } = require("../validators/proposal.schema");
 const { ProjectModel } = require("../../models/project");
-const { copyObject } = require("../../../utils/functions");
-const { ROLES } = require("../../../utils/constants");
+const { assertProjectOwner } = require("./project.controller");
+const {
+  copyObject,
+  findByIdOr404,
+  createdAtSort,
+} = require("../../../utils/functions");
+const { ROLES, STATUS, PROJECT_STATUS } = require("../../../utils/constants");
+
+const findProposal = (id) =>
+  findByIdOr404(ProposalModel, id, "پیشنهاد یافت نشد.");
 
 class ProposalController extends Controller {
   async addNewProposal(req, res) {
@@ -14,11 +21,19 @@ class ProposalController extends Controller {
     await addProposalSchema.validateAsync(req.body);
     const { description, price, duration, projectId } = req.body;
 
+    const project = await findByIdOr404(ProjectModel, projectId, "پروژه یافت نشد.");
+    if (project.status !== PROJECT_STATUS.OPEN)
+      throw createHttpError.BadRequest("پروژه بسته است");
+    // shortcut: check-then-create can race on double submit; add a unique {project, user} index if that shows up.
+    if (await ProposalModel.exists({ project: projectId, user: userId }))
+      throw createHttpError.Conflict("برای این پروژه قبلا پیشنهاد ثبت کرده اید");
+
     const proposal = await ProposalModel.create({
       description,
       price,
       duration,
       user: userId,
+      project: projectId,
     });
     await ProjectModel.updateOne(
       { _id: projectId },
@@ -36,22 +51,15 @@ class ProposalController extends Controller {
   }
   async getListOfProposals(req, res) {
     let dbQuery = {};
-    const { sort } = req.query;
 
     const user = req.user;
     if (user.role !== ROLES.ADMIN) {
       dbQuery["user"] = user._id;
     }
 
-    const sortQuery = {};
-
-    if (!sort) sortQuery["createdAt"] = 1;
-    if (sort) {
-      if (sort === "latest") sortQuery["createdAt"] = -1;
-      if (sort === "earliest") sortQuery["createdAt"] = 1;
-    }
-
-    const proposals = await ProposalModel.find(dbQuery).sort(sortQuery);
+    const proposals = await ProposalModel.find(dbQuery).sort(
+      createdAtSort(req.query.sort)
+    );
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -62,7 +70,7 @@ class ProposalController extends Controller {
   }
   async getProposalById(req, res) {
     const { id } = req.params;
-    const proposal = await this.findProposalById(id);
+    const proposal = await findProposal(id);
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
@@ -70,32 +78,27 @@ class ProposalController extends Controller {
       },
     });
   }
-  async findProposalById(id) {
-    if (!mongoose.isValidObjectId(id))
-      throw createHttpError.BadRequest("شناسه پروژه ارسال شده صحیح نمیباشد");
-    const proposal = await ProposalModel.findById(id);
-    if (!proposal) throw createHttpError.NotFound("پروژه یافت نشد.");
-    return proposal;
-  }
   async changeProposalStatus(req, res) {
     const { id } = req.params;
     let { status } = req.body;
     status = Number(status);
 
-    const proposal = await ProposalModel.findOneAndUpdate(
-      { _id: id },
-      { $set: { status } } // 0, 1, 2
+    const proposal = await findProposal(id);
+    const project = await findByIdOr404(
+      ProjectModel,
+      proposal.project,
+      "پروژه یافت نشد."
     );
-    if (!proposal)
-      throw createHttpError.InternalServerError(" وضعیت پروپوزال آپدیت نشد");
+    assertProjectOwner(project, req.user);
 
-    const project = await ProjectModel.findOne({
-      proposals: { $in: [proposal._id] },
-    });
+    await ProposalModel.updateOne(
+      { _id: id },
+      { $set: { status } }
+    );
 
     let freelancer = copyObject(proposal).user;
 
-    if (status !== 2) freelancer = null;
+    if (status !== STATUS.ACCEPTED) freelancer = null;
 
     await ProjectModel.updateOne(
       { _id: project._id },
@@ -103,8 +106,9 @@ class ProposalController extends Controller {
     );
 
     let message = "وضعیت پروپوزال تایید شد";
-    if (status === 0) message = "وضعیت پروپوزال به حالت رد شده تغییر یافت";
-    if (status === 1)
+    if (status === STATUS.REJECTED)
+      message = "وضعیت پروپوزال به حالت رد شده تغییر یافت";
+    if (status === STATUS.PENDING)
       message = "وضعیت پروپوزال به حالت در انتظار تایید تغییر یافت";
 
     return res.status(HttpStatus.OK).json({

@@ -1,13 +1,16 @@
+import { useNavigate } from "react-router-dom";
 import useUser from "./useUser";
-import usePickUser from "../../hooks/usePickUser";
+import redirectByRole from "../../utils/redirectByRole";
 
 function UserAvatar() {
   const { user } = useUser();
-  const pickUser = usePickUser();
+  const navigate = useNavigate();
+
+  if (!user) return null;
 
   return (
     <div
-      onClick={() => pickUser(user.role)}
+      onClick={() => redirectByRole(navigate, user.role)}
       className="flex items-center gap-x-2 text-secondary-600 cursor-pointer"
     >
       <img
@@ -15,7 +18,7 @@ function UserAvatar() {
         src="/user.jpg"
         alt="user-account"
       />
-      <span>{user?.name}</span>
+      <span>{user.name}</span>
     </div>
   );
 }

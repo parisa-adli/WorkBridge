@@ -5,10 +5,11 @@ import {
 } from "react-icons/hi";
 import { toPersianNumbersWithComma } from "../../utils/toPersianNumber";
 import Stat from "../../ui/Stat";
+import { STATUS } from "../../constants";
 
 function Stats({ proposals }) {
   const numOfProposals = proposals.length;
-  const acceptedProposals = proposals.filter((p) => p.status === 2)
+  const acceptedProposals = proposals.filter((p) => p.status === STATUS.ACCEPTED)
   const balance = acceptedProposals
         .reduce((acc, curr) => acc + curr.price, 0);
 

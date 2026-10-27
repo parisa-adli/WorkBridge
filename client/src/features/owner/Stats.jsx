@@ -8,14 +8,12 @@ import Stat from "../../ui/Stat";
 function Stats({ projects }) {
   const numOfProjects = projects.length;
   const numOfAcceptedProjects = projects.filter(
-    (project) => project.status === "OPEN"
+    (project) => project.freelancer
   ).length;
   const numOfProposals = projects.reduce(
     (acc, curr) => acc + curr.proposals.length,
     0
   );
-
-  //   console.log(projects.filter((project) => project.status === "OPEN").length);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

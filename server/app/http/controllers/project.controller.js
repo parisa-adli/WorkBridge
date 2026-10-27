@@ -1,10 +1,22 @@
 const Controller = require("./controller");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
-const mongoose = require("mongoose");
-const { CategoryModel } = require("../../models/category");
 const { ProjectModel } = require("../../models/project");
+const { ProposalModel } = require("../../models/proposal");
 const createHttpError = require("http-errors");
-const { addProjectSchema } = require("../validators/project.schema");
+const {
+  addProjectSchema,
+  changeProjectStatusSchema,
+} = require("../validators/project.schema");
+const { ROLES, PROJECT_STATUS } = require("../../../utils/constants");
+const {
+  findByIdOr404,
+  buildProjectQuery,
+} = require("../../../utils/functions");
+
+function assertProjectOwner(project, user) {
+  if (user.role !== ROLES.ADMIN && String(project.owner) !== String(user._id))
+    throw createHttpError.Forbidden("شما به این قسمت دسترسی ندارید");
+}
 
 class ProjectController extends Controller {
   async addNewProject(req, res) {
@@ -34,45 +46,16 @@ class ProjectController extends Controller {
     });
   }
   async getListOfProjects(req, res) {
-    let dbQuery = {};
-    const { search, category, sort, status } = req.query;
+    const { filter, sort } = await buildProjectQuery(req.query);
 
-    // SEARCH
-    if (search) dbQuery["$text"] = { $search: search };
-
-    // STATUS
-    if (["OPEN", "CLOSED"].includes(status)) {
-      dbQuery["status"] = { $eq: status };
-    }
-    // CATEGORY
-    if (category && !category.includes("ALL")) {
-      const categories = category.split(",");
-      const categoryIds = [];
-      for (const item of categories) {
-        const category = await CategoryModel.findOne({ englishTitle: item });
-        if (category) categoryIds.push(category._id);
-      }
-      dbQuery["category"] = {
-        $in: categoryIds,
-      };
-    }
-
-    // SORT
-    const sortQuery = {};
-    if (!sort) sortQuery["createdAt"] = 1;
-    if (sort) {
-      if (sort === "latest") sortQuery["createdAt"] = -1;
-      if (sort === "earliest") sortQuery["createdAt"] = 1;
-    }
-
-    const projects = await ProjectModel.find(dbQuery)
+    const projects = await ProjectModel.find(filter)
       .select({
         owner: 0,
         freelancer: 0,
         proposals: 0,
       })
       .populate([{ path: "category", select: { title: 1, englishTitle: 1 } }])
-      .sort(sortQuery);
+      .sort(sort);
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -82,40 +65,15 @@ class ProjectController extends Controller {
     });
   }
   async getListOfOwnerProjects(req, res) {
-    let dbQuery = {};
-    const user = req.user;
-    dbQuery.owner = user._id;
+    const { filter, sort } = await buildProjectQuery(req.query);
 
-    const { search, category, sort } = req.query;
-
-    if (search) dbQuery["$text"] = { $search: search };
-    if (category) {
-      const categories = category.split(",");
-      const categoryIds = [];
-      for (const item of categories) {
-        const { _id } = await CategoryModel.findOne({ englishTitle: item });
-        categoryIds.push(_id);
-      }
-      dbQuery["category"] = {
-        $in: categoryIds,
-      };
-    }
-
-    const sortQuery = {};
-    if (!sort) sortQuery["createdAt"] = 1;
-    if (sort) {
-      if (sort === "latest") sortQuery["createdAt"] = -1;
-      if (sort === "earliest") sortQuery["createdAt"] = 1;
-      if (sort === "popular") sortQuery["likes"] = -1;
-    }
-
-    const projects = await ProjectModel.find(dbQuery)
+    const projects = await ProjectModel.find({ ...filter, owner: req.user._id })
       .populate([
         { path: "category", select: { title: 1, englishTitle: 1 } },
         { path: "owner", select: { name: 1 } },
         { path: "freelancer", select: { name: 1 } },
       ])
-      .sort(sortQuery);
+      .sort(sort);
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -126,7 +84,7 @@ class ProjectController extends Controller {
   }
   async getProjectById(req, res) {
     const { id } = req.params;
-    await this.findProjectById(id);
+    await this.findOwnProject(id, req.user);
     const project = await ProjectModel.findById(id).populate([
       {
         path: "category",
@@ -166,27 +124,26 @@ class ProjectController extends Controller {
       },
     });
   }
-  async findProjectById(id) {
-    if (!mongoose.isValidObjectId(id))
-      throw createHttpError.BadRequest("شناسه پروژ ارسال شده صحیح نمیباشد");
-    const project = await ProjectModel.findById(id);
-    if (!project) throw createHttpError.NotFound("پروژه یافت نشد.");
+  async findOwnProject(id, user) {
+    const project = await findByIdOr404(ProjectModel, id, "پروژه یافت نشد.");
+    assertProjectOwner(project, user);
     return project;
   }
   async changeProjectStatus(req, res) {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status } = await changeProjectStatusSchema.validateAsync(req.body);
+    await this.findOwnProject(id, req.user);
 
     const updateResult = await ProjectModel.updateOne(
       { _id: id },
-      { $set: { status } } // 0, 1, 2
+      { $set: { status } }
     );
 
     if (updateResult.modifiedCount === 0)
       throw createHttpError.InternalServerError(" وضعیت پروپوزال آپدیت نشد");
 
     let message = "پروژه بسته شد";
-    if (status === "OPEN") message = "وضعیت پروژه به حالت باز تغییر یافت";
+    if (status === PROJECT_STATUS.OPEN) message = "وضعیت پروژه به حالت باز تغییر یافت";
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -197,23 +154,24 @@ class ProjectController extends Controller {
   }
   async deleteProject(req, res) {
     const { id } = req.params;
-    const project = await this.findProjectById(id);
+    const project = await this.findOwnProject(id, req.user);
 
     if (project.freelancer)
       throw createHttpError.BadRequest("پروژه قابل حذف نیست");
 
     const result = await ProjectModel.deleteOne({ _id: id });
-    if (result.deletedCount)
-      return res.status(HttpStatus.OK).json({
-        statusCode: HttpStatus.OK,
-        data: {
-          message: "پروژه با موفقیت حذف شد",
-        },
-      });
+    if (!result.deletedCount) throw createHttpError.NotFound("پروژه یافت نشد.");
+    await ProposalModel.deleteMany({ project: id });
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: {
+        message: "پروژه با موفقیت حذف شد",
+      },
+    });
   }
   async updateProject(req, res) {
     const { id } = req.params;
-    await this.findProjectById(id);
+    await this.findOwnProject(id, req.user);
     const { title, description, tags, deadline, category, budget } = req.body;
     console.log(req.body);
     await addProjectSchema.validateAsync(req.body);
@@ -224,9 +182,7 @@ class ProjectController extends Controller {
       }
     );
     if (updateResult.modifiedCount == 0)
-      // TODO(phase 12): createError is undefined here (known-bugs #11); fix the reference.
-      // eslint-disable-next-line no-undef
-      throw createError.InternalServerError("به روزرسانی انجام نشد");
+      throw createHttpError.InternalServerError("به روزرسانی انجام نشد");
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
@@ -238,4 +194,5 @@ class ProjectController extends Controller {
 
 module.exports = {
   ProjectController: new ProjectController(),
+  assertProjectOwner,
 };
