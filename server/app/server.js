@@ -32,7 +32,7 @@ class Application {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       })
-      .then((res) => console.log("MongoDB connected!!"))
+      .then(() => console.log("MongoDB connected!!"))
       .catch((err) => console.log("Failed to connect to MongoDB", err));
   }
   configServer() {
@@ -53,6 +53,8 @@ class Application {
     this.#app.use((req, res, next) => {
       next(createError.NotFound("آدرس مورد نظر یافت نشد"));
     });
+    // Express treats a handler as an error handler only when it takes 4 args.
+    // eslint-disable-next-line no-unused-vars
     this.#app.use((error, req, res, next) => {
       const serverError = createError.InternalServerError();
       const statusCode = error.status || serverError.status;

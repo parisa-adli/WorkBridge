@@ -1,5 +1,4 @@
 const expressAsyncHandler = require("express-async-handler");
-const { verifyAccessToken } = require("../http/middlewares/user.middleware");
 const {
   ProposalController,
 } = require("../http/controllers/proposal.controller");

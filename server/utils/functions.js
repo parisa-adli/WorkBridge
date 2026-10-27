@@ -105,7 +105,7 @@ function verifyRefreshToken(req) {
           });
           if (!user) reject(createError.Unauthorized("حساب کاربری یافت نشد"));
           return resolve(_id);
-        } catch (error) {
+        } catch {
           reject(createError.Unauthorized("حساب کاربری یافت نشد"));
         }
       }
