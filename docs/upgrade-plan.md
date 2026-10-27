@@ -16,7 +16,8 @@ A phase is done only when all of these hold. They are not repeated in each phase
 - [ ] `npm run lint` passes in every package that has it (client from Phase 1, server from Phase 3).
 - [ ] Typecheck passes once TypeScript exists (server from Phase 17, client from Phase 23).
 - [ ] CI is green on the PR (from Phase 7).
-- [ ] One PR per phase.
+- [ ] One PR per phase (a sub-phase such as 12a counts as a phase).
+- [ ] Phases run strictly in order; a phase starts only after the previous one is merged.
 
 **Full-stack feature phases.** A phase that delivers a feature or a user-facing change does it end to end in one session and one PR: server (model, route, validation, controller), client (service, query hook, components, page) and tests on both sides. A feature is never split into a "server phase" and a "client phase". Only pure tooling and dependency upgrades (Part A, Express 5, Mongoose 9, React 19, Vite 8, the TypeScript conversions) touch a single package, because they don't deliver a feature.
 
@@ -29,7 +30,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | Part | Phases | Goal |
 |---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. |
-| B. Security & bugs | 8–14 | Close §6.1, §6.4, §7 on the current stack. |
+| B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). |
@@ -56,9 +57,9 @@ Verify: `git status` is clean on `main`; `npm test --prefix server` passes.
 
 Files: `client/eslint.config.js` (new), `client/.eslintrc.cjs` (delete), `client/package.json`, any client files with real lint errors
 
-- [ ] Port `.eslintrc.cjs` to `eslint.config.js` (`@eslint/js`, `eslint-plugin-react`, `react-hooks`, `react-refresh`, `globals`).
-- [ ] Delete `.eslintrc.cjs`.
-- [ ] Fix errors that are trivial and behavior-neutral (unused imports). For anything that would change behavior (e.g. hook dependency arrays), add a scoped disable with a `TODO(phase 13)` comment instead of fixing it now.
+- [x] Port `.eslintrc.cjs` to `eslint.config.js` (`@eslint/js`, `eslint-plugin-react`, `react-hooks`, `react-refresh`, `globals`).
+- [x] Delete `.eslintrc.cjs`.
+- [x] Fix errors that are trivial and behavior-neutral (unused imports). For anything that would change behavior (e.g. hook dependency arrays), add a scoped disable with a `TODO(phase 13)` comment instead of fixing it now.
 
 Verify: `npm run lint --prefix client` exits 0; the app behaves as before.
 
@@ -183,32 +184,60 @@ Files: `server/app/http/controllers/project.controller.js`, `proposal.controller
 
 Verify: tests pass; e2e still passes.
 
-### Phase 12: Input safety and server error handling
-**Goal:** close §6.1 items 5, 6, §6.4 server items, and bugs #1, #3, #9, #10, #11, #13.
+### Phase 12a: Shared server helpers
+**Goal:** prefactor so 12b and 12c change one place. No behavior change except removing `sort=popular`.
 
-Files: `category.controller.js`, `admin/user.controller.js`, `project.controller.js`, `userAuth.controller.js`, `server/app/models/project.js`, `server/app/http/validators/*`, `server/app/server.js`, `server/utils/functions.js`, tests for each
+Files: `server/utils/functions.js`, `project.controller.js`, `proposal.controller.js`, `category.controller.js`, `admin/user.controller.js`, `userAuth.controller.js`, tests
+
+- [ ] Shared helpers: `findByIdOr404`, `cookieOptions(env)`, one project filter/sort builder for both list endpoints; replace the copies.
+- [ ] Remove `sort=popular` (or define it — PRD open question 4; default: remove).
+
+Verify: tests pass unchanged, apart from the `sort=popular` case.
+
+### Phase 12b: Input safety and validation
+**Goal:** close §6.1 items 5, 6 and bugs #1, #3, #9, #10, #13.
+
+Files: `category.controller.js`, `admin/user.controller.js`, `project.controller.js`, `userAuth.controller.js`, `server/app/http/validators/*`, tests for each
 
 - [ ] Whitelist category query fields; escape regex input in admin user search.
-- [ ] Search: switch `$text` to an escaped regex on title (simpler than adding an index; fixes #10).
+- [ ] Search: switch `$text` to an escaped regex on title, in the shared filter builder (simpler than adding an index; fixes #10).
 - [ ] Validate project status and user status values (#1); make `budget` and `price` required in the schemas (#9, #13).
-- [ ] Fix `createError` references (#11, `category.controller.js`), the `getListOfOwnerProjects` unknown-category crash, the `deleteProject` hang (and delete its proposals), and the `completeProfile` email check (#3).
+- [ ] Fix the `completeProfile` email check (#3).
+
+Verify: tests pass, with the pinned tests flipped and new ones for the whitelist and escaping.
+
+### Phase 12c: Server error handling and startup
+**Goal:** close the §6.4 server items and bug #11.
+
+Files: `category.controller.js`, `project.controller.js`, `server/app/models/project.js`, `server/app/server.js`, `server/index.js`, tests for each
+
+- [ ] Fix `createError` references (#11, `category.controller.js`), the `getListOfOwnerProjects` unknown-category crash, and the `deleteProject` hang (and delete its proposals).
 - [ ] Connect to Mongo before `listen`; exit on failure. Validate required env vars at startup.
-- [ ] Shared helpers: `findByIdOr404`, `cookieOptions(env)`, one project filter/sort builder for both list endpoints. Remove `sort=popular` (or define it — PRD open question 4; default: remove).
 - [ ] Remove the `TODO(phase 12)` lint disables from Phase 3.
 
 Verify: tests pass, including new ones for each fix.
 
-### Phase 13: Client bug fixes
-**Goal:** close the §7 "Broken client behavior" list and the client §6.4 items.
+### Phase 13a: Route guarding and network errors
+**Goal:** the auth-related items of the §7 "Broken client behavior" list.
 
-Files: `ui/ProtectedRoute.jsx`, `App.jsx`, `features/authentication/UserAvatar.jsx`, `hooks/useLocalStorageState.js`, `features/proposals/CreateProposal.jsx`, `features/owner/Stats.jsx`, `pages/CompleteProfile.jsx`, `services/httpService.js`, `features/projects/CreateProjectForm.jsx`, mutation hooks in `features/*/use*.js`, row components with `statusStyle`
+Files: `ui/ProtectedRoute.jsx`, `App.jsx`, `features/authentication/UserAvatar.jsx`, `services/httpService.js`
 
 - [ ] Add the `/not-access` route; fix `ProtectedRoute` effect dependencies and the misleading toast for unauthenticated users.
-- [ ] `UserAvatar` doesn't crash when logged out; `useLocalStorageState` effect deps; proposal form loading state and stray `console.log`; "assigned projects" counts projects with a freelancer; remove the stray `;`; fix "انتطار".
-- [ ] Interceptor handles a missing `err.response`; status rows fall back for unknown values; deadline Invalid Date bug.
-- [ ] Add the missing invalidations (`owner-projects` on accept, `projects` on proposal create and project create/edit/delete).
-- [ ] Remove the `TODO(phase 13)` lint disables from Phase 1.
+- [ ] `UserAvatar` doesn't crash when logged out.
+- [ ] Interceptor handles a missing `err.response`.
 - [ ] Tests for the interceptor network-error case and `ProtectedRoute` redirect.
+
+Verify: client tests pass; manual check of each fix; e2e passes.
+
+### Phase 13b: Client display, form and cache fixes
+**Goal:** close the rest of the §7 list and the client §6.4 items.
+
+Files: `hooks/useLocalStorageState.js`, `features/proposals/CreateProposal.jsx`, `features/owner/Stats.jsx`, `pages/CompleteProfile.jsx`, `features/projects/CreateProjectForm.jsx`, mutation hooks in `features/*/use*.js`, row components with `statusStyle`
+
+- [ ] `useLocalStorageState` effect deps (flip its pinned test); proposal form loading state and stray `console.log`; "assigned projects" counts projects with a freelancer; remove the stray `;`; fix "انتطار".
+- [ ] Status rows fall back for unknown values; deadline Invalid Date bug.
+- [ ] Add the missing invalidations (`owner-projects` on accept, `projects` on proposal create and project create/edit/delete).
+- [ ] Remove the remaining `TODO(phase 13)` lint disables from Phase 1.
 
 Verify: client tests pass; manual check of each listed fix; e2e passes.
 

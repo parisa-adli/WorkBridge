@@ -42,6 +42,10 @@ Dark mode lives in `context/DarkModeContext.jsx` and is stored via `useLocalStor
 - Controllers (`app/http/controllers`) are classes extending `Controller` and wrapped in `express-async-handler`. They validate with Joi schemas from `app/http/validators`, throw `http-errors`, and reply with `{ statusCode, data: { message, ... } }`. The client relies on this `data` envelope.
 - Mongoose models: `user`, `project` (status `OPEN`/`CLOSED`), `proposal`, `category`. SMS OTP goes through Kavenegar.
 
+## Upgrade progress
+
+When a phase of `docs/upgrade-plan.md` is completed, in the same PR: tick its checkboxes in the plan and add a row to the "§7 Progress" table at the end of `docs/upgrade-prd.md` (phase, date, commit/PR, evidence). Tick only after checking the phase's deliverables, not just because a commit exists.
+
 ## Agent skills
 
 ### Issue tracker

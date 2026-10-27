@@ -231,3 +231,11 @@ Acceptance criteria:
 2. **Demo data reset:** scheduled reseed, manual admin button, or neither?
 3. **Becoming admin:** is the seed script enough, or is a CLI/env way to promote a user needed?
 4. **`sort=popular`:** remove it, or define it as sorting by proposal count?
+
+## 7. Progress
+
+One row per completed phase of `docs/upgrade-plan.md` (its checkboxes are ticked at the same time).
+
+| Phase | Completed | Commit / PR | Evidence |
+|---|---|---|---|
+| 1. Client flat ESLint config | 2026-10-27 | `f0c156b`, PR #9 | `client/eslint.config.js` in place, `.eslintrc.cjs` removed; `npm run lint --prefix client` 0 errors; 6 `TODO(phase 13)` disables |
