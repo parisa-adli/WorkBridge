@@ -2,7 +2,10 @@ const Controller = require("./controller");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
 const { ProjectModel } = require("../../models/project");
 const createHttpError = require("http-errors");
-const { addProjectSchema } = require("../validators/project.schema");
+const {
+  addProjectSchema,
+  changeProjectStatusSchema,
+} = require("../validators/project.schema");
 const { ROLES } = require("../../../utils/constants");
 const {
   findByIdOr404,
@@ -127,7 +130,7 @@ class ProjectController extends Controller {
   }
   async changeProjectStatus(req, res) {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status } = await changeProjectStatusSchema.validateAsync(req.body);
     await this.findOwnProject(id, req.user);
 
     const updateResult = await ProjectModel.updateOne(

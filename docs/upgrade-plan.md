@@ -199,10 +199,10 @@ Verify: tests pass unchanged, apart from the `sort=popular` case.
 
 Files: `category.controller.js`, `admin/user.controller.js`, `project.controller.js`, `userAuth.controller.js`, `server/app/http/validators/*`, tests for each
 
-- [ ] Whitelist category query fields; escape regex input in admin user search.
-- [ ] Search: switch `$text` to an escaped regex on title, in the shared filter builder (simpler than adding an index; fixes #10).
-- [ ] Validate project status and user status values (#1); make `budget` and `price` required in the schemas (#9, #13).
-- [ ] Fix the `completeProfile` email check (#3).
+- [x] Whitelist category query fields; escape regex input in admin user search.
+- [x] Search: switch `$text` to an escaped regex on title, in the shared filter builder (simpler than adding an index; fixes #10).
+- [x] Validate project status and user status values (#1); make `budget` and `price` required in the schemas (#9, #13).
+- [x] Fix the `completeProfile` email check (#3).
 
 Verify: tests pass, with the pinned tests flipped and new ones for the whitelist and escaping.
 

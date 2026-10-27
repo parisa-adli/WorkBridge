@@ -10,7 +10,10 @@ const { findByIdOr404 } = require("../../../utils/functions");
 
 class CategoryController extends Controller {
   async getListOfCategories(req, res) {
-    const query = req.query;
+    // only plain string values of known fields, so no `?title[$ne]=x` operators
+    const query = {};
+    for (const field of ["title", "englishTitle", "type"])
+      if (typeof req.query[field] === "string") query[field] = req.query[field];
     const categories = await CategoryModel.find(query);
     if (!categories)
       throw createHttpError.ServiceUnavailable("دسته بندی ها یافت نشد");

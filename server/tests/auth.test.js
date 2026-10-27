@@ -228,10 +228,22 @@ describe("POST /api/user/complete-profile", () => {
     expect(res.body.message).toBe("کاربری با این ایمیل قبلا ثبت نام کرده است.");
   });
 
-  it("rejects a profile without email as a duplicate (known bug)", async () => {
+  it("completes a profile without email", async () => {
+    const other = await login(app, "09120000002");
+    await other.post("/api/user/complete-profile").send(profile).expect(200);
+
     const agent = await login(app, PHONE);
     const res = await agent.post("/api/user/complete-profile").send({ name: "Test User", role: "OWNER" });
-    expect(res.status).toBe(400);
-    expect(res.body.message).toBe("کاربری با این ایمیل قبلا ثبت نام کرده است.");
+    expect(res.status).toBe(200);
+    const user = await UserModel.findOne({ phoneNumber: PHONE });
+    expect(user).toMatchObject({ name: "Test User", role: "OWNER", isActive: true });
+    expect(user.email).toBeUndefined();
+  });
+
+  it("lets a user complete the profile again with their own email", async () => {
+    const agent = await login(app, PHONE);
+    await agent.post("/api/user/complete-profile").send(profile).expect(200);
+    const res = await agent.post("/api/user/complete-profile").send(profile);
+    expect(res.status).toBe(200);
   });
 });

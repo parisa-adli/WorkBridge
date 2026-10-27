@@ -54,7 +54,15 @@ const updateProfileSchema = Joi.object({
     .error(createHttpError.BadRequest("حوزه تخصصی صحیح نمی باشد.")),
 });
 
+const verifyUserSchema = Joi.object({
+  status: Joi.number()
+    .required()
+    .valid(0, 1, 2)
+    .error(createHttpError.BadRequest("وضعیت کاربر صحیح نمی باشد")),
+});
+
 module.exports = {
+  verifyUserSchema,
   getOtpSchema,
   completeProfileSchema,
   checkOtpSchema,

@@ -19,14 +19,22 @@ const addProjectSchema = Joi.object({
     .required()
     .regex(MongoIDPattern)
     .error(createError.BadRequest("دسته بندی مورد نظر  صحیح نمی باشد")),
-  budget: Joi.number().error(
-    createError.BadRequest("قیمت وارد شده صحیح نمیباشد")
-  ),
+  budget: Joi.number()
+    .required()
+    .error(createError.BadRequest("قیمت وارد شده صحیح نمیباشد")),
   deadline: Joi.date()
     .required()
     .error(createError.BadRequest("ددلاین پروژه را وارد کنید")),
 });
 
+const changeProjectStatusSchema = Joi.object({
+  status: Joi.string()
+    .required()
+    .valid("OPEN", "CLOSED")
+    .error(createError.BadRequest("وضعیت پروژه صحیح نمیباشد")),
+});
+
 module.exports = {
   addProjectSchema,
+  changeProjectStatusSchema,
 };

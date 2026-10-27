@@ -125,8 +125,8 @@ class userAuthController extends Controller {
     if (!user.isVerifiedPhoneNumber)
       throw createError.Forbidden("شماره موبایل خود را تایید کنید.");
 
-    const duplicateUser = await UserModel.findOne({ email });
-    console.log(duplicateUser);
+    const duplicateUser =
+      email && (await UserModel.findOne({ email, _id: { $ne: user._id } }));
     if (duplicateUser)
       throw createError.BadRequest(
         "کاربری با این ایمیل قبلا ثبت نام کرده است."

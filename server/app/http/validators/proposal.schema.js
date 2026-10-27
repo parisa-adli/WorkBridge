@@ -6,9 +6,9 @@ const addProposalSchema = Joi.object({
   description: Joi.string()
     .required()
     .error(createError.BadRequest("توضیحات ارسال شده صحیح نمیباشد")),
-  price: Joi.number().error(
-    createError.BadRequest("قیمت وارد شده صحیح نمیباشد")
-  ),
+  price: Joi.number()
+    .required()
+    .error(createError.BadRequest("قیمت وارد شده صحیح نمیباشد")),
   duration: Joi.number()
     .required()
     .error(createError.BadRequest(" زمان انجام پروژه را وارد کنید")),

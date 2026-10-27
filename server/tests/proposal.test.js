@@ -54,6 +54,14 @@ describe("POST /api/proposal/add", () => {
     expect(res.status).toBe(403);
   });
 
+  it("requires price (400, not a model 500)", async () => {
+    const { price, ...body } = proposalBody();
+    const res = await freelancer.agent.post("/api/proposal/add").send(body);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("قیمت وارد شده صحیح نمیباشد");
+    expect(await ProposalModel.countDocuments()).toBe(0);
+  });
+
   it("requires duration", async () => {
     const { duration, ...body } = proposalBody();
     const res = await freelancer.agent.post("/api/proposal/add").send(body);

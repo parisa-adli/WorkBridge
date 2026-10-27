@@ -55,10 +55,11 @@ describe("POST /api/project/add", () => {
     expect(res.body.message).toBe("عنوان محصول صحیح نمیباشد");
   });
 
-  it("returns 500 without budget (optional in Joi, required in the model)", async () => {
+  it("rejects a project without budget with 400", async () => {
     const { budget, ...body } = projectBody();
     const res = await owner.agent.post("/api/project/add").send(body);
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("قیمت وارد شده صحیح نمیباشد");
   });
 
   it("rejects an invalid category id", async () => {
@@ -84,10 +85,26 @@ describe("GET project lists", () => {
     expect(p.category).toMatchObject({ englishTitle: "web" });
   });
 
-  it("/list?search fails with 500 because Project has no text index", async () => {
+  it("/list?search matches the title, case-insensitively", async () => {
+    const match = await addProject();
+    await addProject(owner.agent, { ...projectBody(), title: "Mobile app" });
+
+    const res = await freelancer.agent.get("/api/project/list?search=LANDING");
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.projects.map((p) => p._id)).toEqual([match._id]);
+  });
+
+  it("/list?search treats regex characters literally", async () => {
+    const match = await addProject(owner.agent, { ...projectBody(), title: "C++ (v2)" });
     await addProject();
-    const res = await freelancer.agent.get("/api/project/list?search=landing");
-    expect(res.status).toBe(500);
+
+    const res = await freelancer.agent.get(`/api/project/list?search=${encodeURIComponent("++ (")}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.projects.map((p) => p._id)).toEqual([match._id]);
+
+    const dot = await freelancer.agent.get("/api/project/list?search=.*");
+    expect(dot.body.data.projects).toEqual([]);
   });
 
   it("/owner-projects returns only the caller's projects", async () => {
@@ -181,11 +198,12 @@ describe("PATCH /api/project/:id (open/close)", () => {
     expect(res.status).toBe(200);
   });
 
-  it("saves an invalid status value (updateOne skips enum validation)", async () => {
+  it.each([{ status: "DONE" }, {}])("rejects an invalid status %o with 400", async (body) => {
     const project = await addProject();
-    const res = await owner.agent.patch(`/api/project/${project._id}`).send({ status: "DONE" });
-    expect(res.status).toBe(200);
-    expect((await ProjectModel.findById(project._id).lean()).status).toBe("DONE");
+    const res = await owner.agent.patch(`/api/project/${project._id}`).send(body);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("وضعیت پروژه صحیح نمیباشد");
+    expect((await ProjectModel.findById(project._id).lean()).status).toBe("OPEN");
   });
 
   it("forbids a different owner from closing the project", async () => {

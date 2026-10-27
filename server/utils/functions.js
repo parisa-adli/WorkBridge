@@ -45,6 +45,11 @@ async function findByIdOr404(Model, id, notFoundMessage) {
   return doc;
 }
 
+// user input used inside a RegExp must match literally
+function escapeRegex(text) {
+  return String(text ?? "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function createdAtSort(sort) {
   return { createdAt: sort === "latest" ? -1 : 1 };
 }
@@ -52,7 +57,7 @@ function createdAtSort(sort) {
 // filter and sort for both project list endpoints, built from req.query
 async function buildProjectQuery({ search, category, sort, status }) {
   const filter = {};
-  if (search) filter["$text"] = { $search: search };
+  if (search) filter.title = new RegExp(escapeRegex(search), "i");
   if (["OPEN", "CLOSED"].includes(status)) filter.status = { $eq: status };
   if (category && !category.includes("ALL")) {
     const categories = await CategoryModel.find({
@@ -125,6 +130,7 @@ module.exports = {
   toPersianDigits,
   cookieOptions,
   findByIdOr404,
+  escapeRegex,
   createdAtSort,
   buildProjectQuery,
   setAccessToken,

@@ -4,6 +4,8 @@ const Controller = require("../controller");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
 const { ProjectModel } = require("../../../models/project");
 const { ProposalModel } = require("../../../models/proposal");
+const { escapeRegex } = require("../../../../utils/functions");
+const { verifyUserSchema } = require("../../validators/user.schema");
 
 class UserController extends Controller {
   // ADMIN ROUTES :
@@ -13,9 +15,7 @@ class UserController extends Controller {
     limit = limit || 20;
     const skip = (page - 1) * limit;
     const { search } = req.query;
-    const searchTerm = new RegExp(search, "ig");
-    // const databaseQuery = {};
-    // if (search) databaseQuery["$text"] = { $search: search };
+    const searchTerm = new RegExp(escapeRegex(search), "i");
     const users = await UserModel.find({
       $or: [
         { name: searchTerm },
@@ -54,8 +54,7 @@ class UserController extends Controller {
   }
   async verifyUser(req, res) {
     const { userId } = req.params;
-    let { status } = req.body;
-    status = Number(status);
+    const { status } = await verifyUserSchema.validateAsync(req.body);
     const updateResult = await UserModel.updateOne(
       { _id: userId },
       { $set: { status } }
