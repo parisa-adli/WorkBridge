@@ -44,7 +44,14 @@ Dark mode lives in `context/DarkModeContext.jsx` and is stored via `useLocalStor
 
 ## Upgrade progress
 
-When a phase of `docs/upgrade-plan.md` is completed, in the same PR: tick its checkboxes in the plan and add a row to the "§7 Progress" table at the end of `docs/upgrade-prd.md` (phase, date, commit/PR, evidence). Tick only after checking the phase's deliverables, not just because a commit exists. Also flip the phase heading's `⬜` to `✅` and update the plan's "Progress" count and Overview Status column (the convention is described in the plan's "Progress" section).
+When a phase of `docs/upgrade-plan.md` is completed, you **must** do all of the following in the same commit/PR as the phase's changes. A phase without them is not done:
+
+1. **Mark the phase with a green checkmark:** change its heading's `⬜` to `✅` in `docs/upgrade-plan.md` (e.g. `### Phase 15: Express 5 ✅`). When every phase of a Part is done, mark the Part heading `✅` too.
+2. Tick the phase's checkboxes in the plan.
+3. Update the plan's "Progress" count and next phase, and the Overview table's Status column (e.g. `⬜ 1/11`, then `✅ 11/11`).
+4. Add a row to the "§7 Progress" table at the end of `docs/upgrade-prd.md` (phase, date, commit/PR, evidence).
+
+Mark and tick only after checking the phase's deliverables, not just because a commit exists.
 
 ## Agent skills
 
