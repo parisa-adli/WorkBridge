@@ -8,11 +8,9 @@ export default function useCreateProject() {
   const { isPending: isCreating, mutate: createProject } = useMutation({
     mutationFn: createProjectApi,
     onSuccess: (data) => {
-        toast.success(data.message),
-          
-        queryClient.invalidateQueries({
-          queryKey: ["owner-projects"],
-        });
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["owner-projects"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
 
     onError: (err) => toast.error(err?.response?.data?.message),

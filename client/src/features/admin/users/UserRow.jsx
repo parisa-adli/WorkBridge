@@ -11,7 +11,7 @@ const statusStyle = [
     className: "badge--danger",
   },
   {
-    label: "در انتطار تایید",
+    label: "در انتظار تایید",
     className: "badge--secondary",
   },
   {
@@ -20,9 +20,12 @@ const statusStyle = [
   },
 ];
 
+const unknownStatus = { label: "نامشخص", className: "badge--secondary" };
+
 function UserRow({ user, index }) {
   const [open, setOpen] = useState(false);
   const { status } = user;
+  const badge = statusStyle[status] ?? unknownStatus;
 
   return (
     <Table.Row>
@@ -32,8 +35,8 @@ function UserRow({ user, index }) {
       <td>{user.phoneNumber}</td>
       <td>{user.role}</td>
       <td>
-        <span className={`badge ${statusStyle[status].className}`}>
-          {statusStyle[status].label}
+        <span className={`badge ${badge.className}`}>
+          {badge.label}
         </span>
       </td>
       <td>

@@ -234,10 +234,10 @@ Verify: client tests pass; manual check of each fix; e2e passes.
 
 Files: `hooks/useLocalStorageState.js`, `features/proposals/CreateProposal.jsx`, `features/owner/Stats.jsx`, `pages/CompleteProfile.jsx`, `features/projects/CreateProjectForm.jsx`, mutation hooks in `features/*/use*.js`, row components with `statusStyle`
 
-- [ ] `useLocalStorageState` effect deps (flip its pinned test); proposal form loading state and stray `console.log`; "assigned projects" counts projects with a freelancer; remove the stray `;`; fix "انتطار".
-- [ ] Status rows fall back for unknown values; deadline Invalid Date bug.
-- [ ] Add the missing invalidations (`owner-projects` on accept, `projects` on proposal create and project create/edit/delete).
-- [ ] Remove the remaining `TODO(phase 13)` lint disables from Phase 1.
+- [x] `useLocalStorageState` effect deps (flip its pinned test); proposal form loading state and stray `console.log`; "assigned projects" counts projects with a freelancer; remove the stray `;`; fix "انتطار".
+- [x] Status rows fall back for unknown values; deadline Invalid Date bug.
+- [x] Add the missing invalidations (`owner-projects` on accept, `projects` on proposal create and project create/edit/delete).
+- [x] Remove the remaining `TODO(phase 13)` lint disables from Phase 1.
 
 Verify: client tests pass; manual check of each listed fix; e2e passes.
 

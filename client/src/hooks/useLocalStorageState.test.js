@@ -19,13 +19,14 @@ describe("useLocalStorageState", () => {
     expect(second.result.current[0]).toBe(true);
   });
 
-  // Pins a known bug: the effect has no dependency array, so it writes on every render.
-  it("writes to localStorage on every render, even when the value is unchanged", () => {
+  it("writes to localStorage only when the value changes, not on every render", () => {
     const setItem = vi.spyOn(Storage.prototype, "setItem");
-    const { rerender } = renderHook(() => useLocalStorageState("isDarkMode", false));
+    const { result, rerender } = renderHook(() => useLocalStorageState("isDarkMode", false));
     rerender();
     rerender();
-    expect(setItem).toHaveBeenCalledTimes(3);
+    expect(setItem).toHaveBeenCalledTimes(1);
+    act(() => result.current[1](true));
+    expect(setItem).toHaveBeenCalledTimes(2);
     setItem.mockRestore();
   });
 });

@@ -11,7 +11,7 @@ const statusStyle = [
     className: "badge--danger",
   },
   {
-    label: "در انتطار تایید",
+    label: "در انتظار تایید",
     className: "badge--secondary",
   },
   {
@@ -20,8 +20,11 @@ const statusStyle = [
   },
 ];
 
+const unknownStatus = { label: "نامشخص", className: "badge--secondary" };
+
 function ProposalRow({ proposal, index }) {
   const { description, duration, price, status } = proposal;
+  const badge = statusStyle[status] ?? unknownStatus;
   return (
     <Table.Row>
       <td>{index + 1}</td>
@@ -29,8 +32,8 @@ function ProposalRow({ proposal, index }) {
       <td>{toPersianNumbers(duration)} روز</td>
       <td>{toPersianNumbersWithComma(price)}</td>
       <td>
-        <span className={`badge ${statusStyle[status].className}`}>
-          {statusStyle[status].label}
+        <span className={`badge ${badge.className}`}>
+          {badge.label}
         </span>
       </td>
     </Table.Row>

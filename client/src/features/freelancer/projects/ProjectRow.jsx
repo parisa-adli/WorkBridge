@@ -18,8 +18,11 @@ const projectStatus = {
   },
 };
 
+const unknownStatus = { label: "نامشخص", className: "badge--secondary" };
+
 function ProjectRow({ project, index }) {
   const { title, budget, deadline, status } = project;
+  const badge = projectStatus[status] ?? unknownStatus;
   const [open, setOpen] = useState(false);
   return (
     <Table.Row>
@@ -29,8 +32,8 @@ function ProjectRow({ project, index }) {
       <td>{toPersianNumbersWithComma(budget)}</td>
       <td>{toLocalDateShort(deadline)}</td>
       <td>
-        <span className={`badge ${projectStatus[status].className}`}>
-          {projectStatus[status].label}
+        <span className={`badge ${badge.className}`}>
+          {badge.label}
         </span>
       </td>
       <td>

@@ -283,12 +283,11 @@ function Home() {
               <a className="footer-social">
                 <FaTelegramPlane />
               </a>
-              {/* TODO(phase 13): add rel="noreferrer" */}
-              {/* eslint-disable-next-line react/jsx-no-target-blank */}
               <a
                 className="footer-social"
                 href="https://www.linkedin.com/in/parisa-adli/"
                 target="_blank"
+                rel="noreferrer"
               >
                 <FaLinkedin />
               </a>

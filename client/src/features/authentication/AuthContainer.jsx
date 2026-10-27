@@ -16,9 +16,7 @@ function AuthContainer() {
 
   useEffect(() => {
     if (user) navigate("/", { replace: true });
-    // TODO(phase 13): fix effect dependencies
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, navigate]);
 
   const {
     isPending: isSendingOtp,

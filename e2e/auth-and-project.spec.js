@@ -56,7 +56,7 @@ test.describe.serial("OTP login", () => {
     await page.getByLabel("بودجه").fill("200000");
     await page.getByLabel("دسته بندی").selectOption({ label: "برنامه نویسی" });
 
-    // The deadline has no default (an empty date throws on submit), so pick a day.
+    // The deadline has no default (submitting without one is refused), so pick a day.
     const deadline = page.locator(".rmdp-container input");
     await deadline.click();
     await page.locator(".rmdp-day-picker .rmdp-day:not(.rmdp-deactive):not(.rmdp-disabled):not(.rmdp-day-hidden) span").last().click();

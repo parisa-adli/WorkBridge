@@ -8,6 +8,7 @@ import useCategories from "../../hooks/useCategories";
 import useCreateProject from "./useCreateProject";
 import Loading from "../../ui/Loading";
 import useEditProject from "./useEditProject";
+import toast from "react-hot-toast";
 
 function CreateProjectForm({ onClose, projectToEdit = {} }) {
   const { _id: editId } = projectToEdit;
@@ -41,12 +42,13 @@ function CreateProjectForm({ onClose, projectToEdit = {} }) {
   } = useForm({ defaultValues: editValues });
 
   const [tags, setTags] = useState(prevTags || []);
-  const [date, setDate] = useState(new Date(deadline || ""));
+  const [date, setDate] = useState(deadline ? new Date(deadline) : null);
   const { categories } = useCategories();
   const { isCreating, createProject } = useCreateProject();
   const { isEditing, editProject } = useEditProject();
 
   const onSubmit = (data) => {
+    if (!date) return toast.error("ددلاین ضروری است");
     const newProject = {
       ...data,
       deadline: new Date(date).toISOString(),

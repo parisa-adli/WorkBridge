@@ -3,20 +3,17 @@ import toast from "react-hot-toast";
 import { createProposalsApi } from "../../services/proposalService";
 
 export default function useCreateProposal() {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   const { isPending: isCreating, mutate: createProposal } = useMutation({
     mutationFn: createProposalsApi,
     onSuccess: (data) => {
-        toast.success(data.message),
-          
-        queryClient.invalidateQueries({
-          queryKey: ["proposals"],
-        });
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["proposals"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
 
     onError: (err) => toast.error(err?.response?.data?.message),
   });
   return { isCreating, createProposal };
-  
 }

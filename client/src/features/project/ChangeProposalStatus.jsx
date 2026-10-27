@@ -11,7 +11,7 @@ const options = [
     value: 0,
   },
   {
-    label: "در انتطار تایید",
+    label: "در انتظار تایید",
     value: 1,
   },
   {

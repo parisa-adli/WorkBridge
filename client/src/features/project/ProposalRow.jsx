@@ -12,7 +12,7 @@ const statusStyle = [
     className: "badge--danger",
   },
   {
-    label: "در انتطار تایید",
+    label: "در انتظار تایید",
     className: "badge--secondary",
   },
   {
@@ -21,8 +21,11 @@ const statusStyle = [
   },
 ];
 
+const unknownStatus = { label: "نامشخص", className: "badge--secondary" };
+
 function ProposalRow({ proposal, index }) {
   const { status } = proposal;
+  const badge = statusStyle[status] ?? unknownStatus;
   const [open, setOpen] = useState(false);
 
   return (
@@ -35,8 +38,8 @@ function ProposalRow({ proposal, index }) {
       <td>{proposal.duration} روز</td>
       <td>{toPersianNumbersWithComma(proposal.price)}</td>
       <td>
-        <span className={`badge ${statusStyle[status].className}`}>
-          {statusStyle[status].label}
+        <span className={`badge ${badge.className}`}>
+          {badge.label}
         </span>
       </td>
       <td>
