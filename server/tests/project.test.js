@@ -1,7 +1,7 @@
 const { startApp, stopApp, clearDb, createUser, createCategory } = require("./helpers");
 const { ProjectModel } = require("../app/models/project");
 
-let app, owner, otherOwner, freelancer, category;
+let app, owner, otherOwner, freelancer, admin, category;
 
 const projectBody = () => ({
   title: "Landing page",
@@ -21,6 +21,7 @@ beforeEach(async () => {
   owner = await createUser(app, { phoneNumber: "09120000011", role: "OWNER" });
   otherOwner = await createUser(app, { phoneNumber: "09120000012", role: "OWNER" });
   freelancer = await createUser(app, { phoneNumber: "09120000013", role: "FREELANCER" });
+  admin = await createUser(app, { phoneNumber: "09120000014", role: "ADMIN" });
   category = await createCategory();
 });
 
@@ -124,12 +125,22 @@ describe("PATCH /api/project/update/:id", () => {
     expect(res.status).toBe(400);
   });
 
-  it("lets a different owner edit the project (no ownership check)", async () => {
+  it("forbids a different owner from editing the project", async () => {
     const project = await addProject();
     const res = await otherOwner.agent
       .patch(`/api/project/update/${project._id}`)
       .send({ ...projectBody(), title: "Hijacked" });
+    expect(res.status).toBe(403);
+    expect((await ProjectModel.findById(project._id)).title).toBe("Landing page");
+  });
+
+  it("lets an admin edit any project", async () => {
+    const project = await addProject();
+    const res = await admin.agent
+      .patch(`/api/project/update/${project._id}`)
+      .send({ ...projectBody(), title: "By admin" });
     expect(res.status).toBe(200);
+    expect((await ProjectModel.findById(project._id)).title).toBe("By admin");
   });
 });
 
@@ -160,10 +171,18 @@ describe("PATCH /api/project/:id (open/close)", () => {
     expect((await ProjectModel.findById(project._id).lean()).status).toBe("DONE");
   });
 
-  it("lets a different owner close the project (no ownership check)", async () => {
+  it("forbids a different owner from closing the project", async () => {
     const project = await addProject();
     const res = await otherOwner.agent.patch(`/api/project/${project._id}`).send({ status: "CLOSED" });
+    expect(res.status).toBe(403);
+    expect((await ProjectModel.findById(project._id)).status).toBe("OPEN");
+  });
+
+  it("lets an admin close any project", async () => {
+    const project = await addProject();
+    const res = await admin.agent.patch(`/api/project/${project._id}`).send({ status: "CLOSED" });
     expect(res.status).toBe(200);
+    expect((await ProjectModel.findById(project._id)).status).toBe("CLOSED");
   });
 });
 
@@ -177,6 +196,20 @@ describe("GET and DELETE /api/project/:id", () => {
       owner: { name: "user 09120000011" },
       proposals: [],
     });
+  });
+
+  it("forbids a different owner from reading or deleting the project", async () => {
+    const project = await addProject();
+    expect((await otherOwner.agent.get(`/api/project/${project._id}`)).status).toBe(403);
+    expect((await otherOwner.agent.delete(`/api/project/${project._id}`)).status).toBe(403);
+    expect(await ProjectModel.findById(project._id)).not.toBeNull();
+  });
+
+  it("lets an admin read and delete any project", async () => {
+    const project = await addProject();
+    expect((await admin.agent.get(`/api/project/${project._id}`)).status).toBe(200);
+    expect((await admin.agent.delete(`/api/project/${project._id}`)).status).toBe(200);
+    expect(await ProjectModel.findById(project._id)).toBeNull();
   });
 
   it("deletes a project without a freelancer", async () => {

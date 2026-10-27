@@ -177,10 +177,10 @@ Verify: tests pass; the e2e OTP flow still passes.
 
 Files: `server/app/http/controllers/project.controller.js`, `proposal.controller.js`, `server/app/models/proposal.js`, `server/tests/project.test.js`, `proposal.test.js`
 
-- [ ] Project read/update/status/delete and proposal status change check `project.owner === req.user._id`; ADMIN bypasses. Others get 403.
-- [ ] `addNewProposal`: project must exist (404) and be `OPEN` (400); one proposal per freelancer per project (409).
-- [ ] Add a `project` ref on `Proposal`, set on create. `changeProposalStatus` finds the project through it and returns 404 before writing anything.
-- [ ] Flip tests for #2, #7, #8; add duplicate-proposal and admin-bypass tests.
+- [x] Project read/update/status/delete and proposal status change check `project.owner === req.user._id`; ADMIN bypasses. Others get 403.
+- [x] `addNewProposal`: project must exist (404) and be `OPEN` (400); one proposal per freelancer per project (409).
+- [x] Add a `project` ref on `Proposal`, set on create. `changeProposalStatus` finds the project through it and returns 404 before writing anything.
+- [x] Flip tests for #2, #7, #8; add duplicate-proposal and admin-bypass tests.
 
 Verify: tests pass; e2e still passes.
 

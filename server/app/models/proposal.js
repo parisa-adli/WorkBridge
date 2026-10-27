@@ -7,6 +7,7 @@ const ProposalSchema = new mongoose.Schema(
     duration: { type: Number, required: true },
     description: { type: String, required: true },
     user: { type: ObjectId, ref: "User", required: true },
+    project: { type: ObjectId, ref: "Project", required: true },
     status: {
       type: Number,
       required: true,

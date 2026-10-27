@@ -5,6 +5,7 @@ const createHttpError = require("http-errors");
 const { ProposalModel } = require("../../models/proposal");
 const { addProposalSchema } = require("../validators/proposal.schema");
 const { ProjectModel } = require("../../models/project");
+const { assertProjectOwner } = require("./project.controller");
 const { copyObject } = require("../../../utils/functions");
 const { ROLES } = require("../../../utils/constants");
 
@@ -14,11 +15,20 @@ class ProposalController extends Controller {
     await addProposalSchema.validateAsync(req.body);
     const { description, price, duration, projectId } = req.body;
 
+    const project = await ProjectModel.findById(projectId);
+    if (!project) throw createHttpError.NotFound("پروژه یافت نشد.");
+    if (project.status !== "OPEN")
+      throw createHttpError.BadRequest("پروژه بسته است");
+    // shortcut: check-then-create can race on double submit; add a unique {project, user} index if that shows up.
+    if (await ProposalModel.exists({ project: projectId, user: userId }))
+      throw createHttpError.Conflict("برای این پروژه قبلا پیشنهاد ثبت کرده اید");
+
     const proposal = await ProposalModel.create({
       description,
       price,
       duration,
       user: userId,
+      project: projectId,
     });
     await ProjectModel.updateOne(
       { _id: projectId },
@@ -82,16 +92,15 @@ class ProposalController extends Controller {
     let { status } = req.body;
     status = Number(status);
 
-    const proposal = await ProposalModel.findOneAndUpdate(
+    const proposal = await this.findProposalById(id);
+    const project = await ProjectModel.findById(proposal.project);
+    if (!project) throw createHttpError.NotFound("پروژه یافت نشد.");
+    assertProjectOwner(project, req.user);
+
+    await ProposalModel.updateOne(
       { _id: id },
       { $set: { status } } // 0, 1, 2
     );
-    if (!proposal)
-      throw createHttpError.InternalServerError(" وضعیت پروپوزال آپدیت نشد");
-
-    const project = await ProjectModel.findOne({
-      proposals: { $in: [proposal._id] },
-    });
 
     let freelancer = copyObject(proposal).user;
 

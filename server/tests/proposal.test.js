@@ -45,6 +45,7 @@ describe("POST /api/proposal/add", () => {
     expect(res.body.data.message).toBe("پیشنهاد با موفقیت ایجاد شد");
     const proposal = await ProposalModel.findOne({ user: freelancer.user._id });
     expect(proposal).toMatchObject({ status: 1, price: 500000, duration: 10 });
+    expect(String(proposal.project)).toBe(String(project._id));
     expect((await ProjectModel.findById(project._id)).proposals.map(String)).toEqual([String(proposal._id)]);
   });
 
@@ -59,25 +60,40 @@ describe("POST /api/proposal/add", () => {
     expect(res.status).toBe(400);
   });
 
-  it("accepts a proposal for a project that does not exist", async () => {
+  it("returns 404 for a project that does not exist", async () => {
     const res = await freelancer.agent
       .post("/api/proposal/add")
       .send({ ...proposalBody(), projectId: String(new mongoose.Types.ObjectId()) });
-    expect(res.status).toBe(201);
-    expect(await ProposalModel.countDocuments()).toBe(1);
+    expect(res.status).toBe(404);
+    expect(await ProposalModel.countDocuments()).toBe(0);
   });
 
-  it("accepts a proposal for a CLOSED project", async () => {
+  it("returns 400 for a CLOSED project", async () => {
     await ProjectModel.updateOne({ _id: project._id }, { status: "CLOSED" });
     const res = await freelancer.agent.post("/api/proposal/add").send(proposalBody());
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(400);
+    expect(await ProposalModel.countDocuments()).toBe(0);
+  });
+
+  it("returns 409 for a second proposal from the same freelancer", async () => {
+    await addProposal();
+    const res = await freelancer.agent.post("/api/proposal/add").send(proposalBody());
+    expect(res.status).toBe(409);
+    expect(await ProposalModel.countDocuments()).toBe(1);
+    expect((await ProjectModel.findById(project._id)).proposals).toHaveLength(1);
   });
 });
 
 describe("GET /api/proposal/list", () => {
   it("returns only the freelancer's own proposals", async () => {
     const mine = await addProposal();
-    await ProposalModel.create({ description: "other", price: 1, duration: 1, user: otherOwner.user._id });
+    await ProposalModel.create({
+      description: "other",
+      price: 1,
+      duration: 1,
+      user: otherOwner.user._id,
+      project: project._id,
+    });
 
     const res = await freelancer.agent.get("/api/proposal/list");
 
@@ -127,17 +143,32 @@ describe("PATCH /api/proposal/:id (accept/reject)", () => {
     expect(res.status).toBe(403);
   });
 
-  it("lets an owner accept a proposal on someone else's project (no ownership check)", async () => {
+  it("forbids an owner from accepting a proposal on someone else's project", async () => {
     const proposal = await addProposal();
     const res = await otherOwner.agent.patch(`/api/proposal/${proposal._id}`).send({ status: 2 });
+    expect(res.status).toBe(403);
+    expect((await ProposalModel.findById(proposal._id)).status).toBe(1);
+    expect((await ProjectModel.findById(project._id)).freelancer).toBeNull();
+  });
+
+  it("lets an admin accept a proposal on any project", async () => {
+    const admin = await createUser(app, { phoneNumber: "09120000024", role: "ADMIN" });
+    const proposal = await addProposal();
+    const res = await admin.agent.patch(`/api/proposal/${proposal._id}`).send({ status: 2 });
     expect(res.status).toBe(200);
     expect(String((await ProjectModel.findById(project._id)).freelancer)).toBe(String(freelancer.user._id));
   });
 
-  it("returns 500 for a proposal no project links to, after already changing its status", async () => {
-    const orphan = await ProposalModel.create({ description: "x", price: 1, duration: 1, user: freelancer.user._id });
+  it("returns 404 for a proposal whose project is gone, without changing its status", async () => {
+    const orphan = await ProposalModel.create({
+      description: "x",
+      price: 1,
+      duration: 1,
+      user: freelancer.user._id,
+      project: new mongoose.Types.ObjectId(),
+    });
     const res = await owner.agent.patch(`/api/proposal/${orphan._id}`).send({ status: 2 });
-    expect(res.status).toBe(500);
-    expect((await ProposalModel.findById(orphan._id)).status).toBe(2);
+    expect(res.status).toBe(404);
+    expect((await ProposalModel.findById(orphan._id)).status).toBe(1);
   });
 });

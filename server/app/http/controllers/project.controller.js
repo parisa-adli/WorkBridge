@@ -5,6 +5,12 @@ const { CategoryModel } = require("../../models/category");
 const { ProjectModel } = require("../../models/project");
 const createHttpError = require("http-errors");
 const { addProjectSchema } = require("../validators/project.schema");
+const { ROLES } = require("../../../utils/constants");
+
+function assertProjectOwner(project, user) {
+  if (user.role !== ROLES.ADMIN && String(project.owner) !== String(user._id))
+    throw createHttpError.Forbidden("شما به این قسمت دسترسی ندارید");
+}
 
 class ProjectController extends Controller {
   async addNewProject(req, res) {
@@ -126,7 +132,7 @@ class ProjectController extends Controller {
   }
   async getProjectById(req, res) {
     const { id } = req.params;
-    await this.findProjectById(id);
+    await this.findOwnProject(id, req.user);
     const project = await ProjectModel.findById(id).populate([
       {
         path: "category",
@@ -173,9 +179,15 @@ class ProjectController extends Controller {
     if (!project) throw createHttpError.NotFound("پروژه یافت نشد.");
     return project;
   }
+  async findOwnProject(id, user) {
+    const project = await this.findProjectById(id);
+    assertProjectOwner(project, user);
+    return project;
+  }
   async changeProjectStatus(req, res) {
     const { id } = req.params;
     const { status } = req.body;
+    await this.findOwnProject(id, req.user);
 
     const updateResult = await ProjectModel.updateOne(
       { _id: id },
@@ -197,7 +209,7 @@ class ProjectController extends Controller {
   }
   async deleteProject(req, res) {
     const { id } = req.params;
-    const project = await this.findProjectById(id);
+    const project = await this.findOwnProject(id, req.user);
 
     if (project.freelancer)
       throw createHttpError.BadRequest("پروژه قابل حذف نیست");
@@ -213,7 +225,7 @@ class ProjectController extends Controller {
   }
   async updateProject(req, res) {
     const { id } = req.params;
-    await this.findProjectById(id);
+    await this.findOwnProject(id, req.user);
     const { title, description, tags, deadline, category, budget } = req.body;
     console.log(req.body);
     await addProjectSchema.validateAsync(req.body);
@@ -238,4 +250,5 @@ class ProjectController extends Controller {
 
 module.exports = {
   ProjectController: new ProjectController(),
+  assertProjectOwner,
 };
