@@ -59,6 +59,11 @@ class Application {
     );
     this.#app.use(express.json({ limit: "100kb" }));
     this.#app.use(express.urlencoded({ extended: true, limit: "100kb" }));
+    // Express 5 leaves req.body undefined when nothing was parsed; controllers destructure it, so keep Express 4's {}.
+    this.#app.use((req, res, next) => {
+      req.body ??= {};
+      next();
+    });
     this.#app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
   }
   initClientSession() {

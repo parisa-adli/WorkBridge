@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**18 of 47 phases done** (Parts A and B). Next: Phase 15 (Express 5).
+**19 of 47 phases done** (Parts A and B, Phase 15). Next: Phase 16 (Mongoose 9).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -37,7 +37,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 |---|---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
-| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 0/11 |
+| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 1/11 |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
@@ -264,14 +264,14 @@ Verify: tests pass; grep finds no leftover `statusStyle` arrays or role string l
 
 Dependency upgrades go server first, then client, and each gets its own phase so a regression points at one change. The phases that change API behavior (19, 20, 25) update server and client together.
 
-### Phase 15: Express 5 ⬜
+### Phase 15: Express 5 ✅
 **Goal:** server on Express 5 (PRD R4).
 
 Files: `server/package.json`, `server/app/server.js`, `server/app/router/**`, all controllers
 
-- [ ] Upgrade `express`; remove `express-async-handler` (Express 5 forwards async errors).
-- [ ] Fix route path syntax for `path-to-regexp` v8 and any writes to `req.query`.
-- [ ] Bump in-major patches for `cookie-parser`, `cors`, `jsonwebtoken`, `http-errors`.
+- [x] Upgrade `express`; remove `express-async-handler` (Express 5 forwards async errors).
+- [x] Fix route path syntax for `path-to-regexp` v8 and any writes to `req.query`.
+- [x] Bump in-major patches for `cookie-parser`, `cors`, `jsonwebtoken`, `http-errors`.
 
 Verify: all API tests pass unchanged; e2e passes.
 

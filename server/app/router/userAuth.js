@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const expressAsyncHandler = require("express-async-handler");
 const { rateLimit } = require("express-rate-limit");
 // const { uploadFile } = require("../../utils/multer");
 const { verifyAccessToken } = require("../http/middlewares/user.middleware");
@@ -16,30 +15,19 @@ const otpLimiter = () =>
     },
   });
 
-router.post("/get-otp", otpLimiter(), expressAsyncHandler(UserAuthController.getOtp));
-router.post("/check-otp", otpLimiter(), expressAsyncHandler(UserAuthController.checkOtp));
+router.post("/get-otp", otpLimiter(), UserAuthController.getOtp);
+router.post("/check-otp", otpLimiter(), UserAuthController.checkOtp);
 router.post(
   "/complete-profile",
   verifyAccessToken,
-  expressAsyncHandler(UserAuthController.completeProfile)
+  UserAuthController.completeProfile
 );
-router.get(
-  "/refresh-token",
-  expressAsyncHandler(UserAuthController.refreshToken)
-);
-router.patch(
-  "/update",
-  verifyAccessToken,
-  expressAsyncHandler(UserAuthController.updateProfile)
-);
+router.get("/refresh-token", UserAuthController.refreshToken);
+router.patch("/update", verifyAccessToken, UserAuthController.updateProfile);
 
-router.get(
-  "/profile",
-  verifyAccessToken,
-  expressAsyncHandler(UserAuthController.getUserProfile)
-);
+router.get("/profile", verifyAccessToken, UserAuthController.getUserProfile);
 
-router.post("/logout", expressAsyncHandler(UserAuthController.logout));
+router.post("/logout", UserAuthController.logout);
 
 module.exports = {
   userAuthRoutes: router,

@@ -1,4 +1,3 @@
-const expressAsyncHandler = require("express-async-handler");
 const {
   ProposalController,
 } = require("../http/controllers/proposal.controller");
@@ -10,22 +9,22 @@ const router = require("express").Router();
 router.get(
   "/list",
   authorize(ROLES.FREELANCER, ROLES.ADMIN),
-  expressAsyncHandler(ProposalController.getListOfProposals)
+  ProposalController.getListOfProposals
 );
 router.post(
   "/add",
   authorize(ROLES.FREELANCER, ROLES.ADMIN),
-  expressAsyncHandler(ProposalController.addNewProposal)
+  ProposalController.addNewProposal
 );
 router.get(
   "/:id",
   authorize(ROLES.FREELANCER, ROLES.ADMIN),
-  expressAsyncHandler(ProposalController.getProposalById)
+  ProposalController.getProposalById
 );
 router.patch(
   "/:id",
   authorize(ROLES.OWNER, ROLES.ADMIN),
-  expressAsyncHandler(ProposalController.changeProposalStatus)
+  ProposalController.changeProposalStatus
 );
 
 module.exports = {

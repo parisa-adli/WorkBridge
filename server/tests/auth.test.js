@@ -19,6 +19,12 @@ describe("POST /api/user/get-otp", () => {
     expect(res.body.message).toBe("شماره موبایل معتبر را وارد کنید");
   });
 
+  it("rejects a request with no body the same way", async () => {
+    const res = await request(app).post("/api/user/get-otp");
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("شماره موبایل معتبر را وارد کنید");
+  });
+
   it("creates a pending OWNER user with a 6-digit OTP", async () => {
     const res = await request(app).post("/api/user/get-otp").send({ phoneNumber: ` ${PHONE} ` });
 
