@@ -8,7 +8,9 @@ axios.defaults.adapter = adapter;
 
 let http;
 beforeAll(async () => {
-  http = (await import("./httpService")).default;
+  // Empty so a developer's client/.env cannot change the default under test.
+  vi.stubEnv("VITE_BASE_URL", "");
+  http =(await import("./httpService")).default;
 });
 
 const ok = async (config) => ({ data: { data: "ok" }, status: 200, statusText: "OK", headers: {}, config });
@@ -41,7 +43,7 @@ describe("httpService 401 handling", () => {
     expect(res.data.data).toBe("ok");
     expect(calledUrls()).toEqual([
       "/project/list",
-      "https://freelancer-bc.runflare.run/api/user/refresh-token",
+      "http://localhost:5000/api/user/refresh-token",
       "/project/list",
     ]);
   });
@@ -56,8 +58,20 @@ describe("httpService 401 handling", () => {
     });
     expect(calledUrls()).toEqual([
       "/project/list",
-      "https://freelancer-bc.runflare.run/api/user/refresh-token",
+      "http://localhost:5000/api/user/refresh-token",
       "/project/list",
     ]);
+  });
+});
+
+describe("httpService base URL", () => {
+  it("uses VITE_BASE_URL when set", async () => {
+    vi.resetModules();
+    vi.stubEnv("VITE_BASE_URL", "https://api.example.com/api");
+    adapter.mockReset().mockImplementation(ok);
+
+    await (await import("./httpService")).default.get("/project/list");
+
+    expect(adapter.mock.calls[0][0].baseURL).toBe("https://api.example.com/api");
   });
 });
