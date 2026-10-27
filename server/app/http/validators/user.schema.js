@@ -10,6 +10,7 @@ const getOtpSchema = Joi.object({
 
 const checkOtpSchema = Joi.object({
   otp: Joi.string()
+    .required()
     .min(5)
     .max(6)
     .error(createHttpError.BadRequest("کد ارسال شده صحیح نمیباشد")),

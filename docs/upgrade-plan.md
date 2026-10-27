@@ -161,14 +161,14 @@ Verify: the new tests pass; the app still loads (helmet doesn't break CORS with 
 
 Files: `server/app/http/controllers/userAuth.controller.js`, `server/app/models/user.js`, `server/app/router/userAuth.js`, `server/tests/auth.test.js`
 
-- [ ] Keep no OTP state on the controller instance; pass code and phone through local variables.
-- [ ] `crypto.randomInt` for codes; clear `otp` after a successful check; validate the phone with `getOtpSchema`.
-- [ ] Strip `otp` in `toJSON` and in the `check-otp`/`refresh-token` responses.
-- [ ] Log the code only when `NODE_ENV !== "production"`; return it in the response in non-production (PRD R1).
-- [ ] Client: `SendOTPForm` shows the returned code in its toast when present; `CheckOTPForm` shows the rate-limit message.
-- [ ] `express-rate-limit` on `get-otp` and `check-otp` (disabled or raised under test).
-- [ ] Logout cookie `secure` flag matches login.
-- [ ] Flip tests for #4, #5, #6; add tests for "no otp in response", rate limit, and two concurrent `get-otp` calls getting their own codes.
+- [x] Keep no OTP state on the controller instance; pass code and phone through local variables.
+- [x] `crypto.randomInt` for codes; clear `otp` after a successful check; validate the phone with `getOtpSchema`.
+- [x] Strip `otp` in `toJSON` and in the `check-otp`/`refresh-token` responses.
+- [x] Log the code only when `NODE_ENV !== "production"`; return it in the response in non-production (PRD R1).
+- [x] Client: `SendOTPForm` shows the returned code in its toast when present; `CheckOTPForm` shows the rate-limit message.
+- [x] `express-rate-limit` on `get-otp` and `check-otp` (disabled or raised under test).
+- [x] Logout cookie `secure` flag matches login.
+- [x] Flip tests for #4, #5, #6; add tests for "no otp in response", rate limit, and two concurrent `get-otp` calls getting their own codes.
 
 Verify: tests pass; the e2e OTP flow still passes.
 

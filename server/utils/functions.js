@@ -3,15 +3,6 @@ const JWT = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const { UserModel } = require("../app/models/user");
 
-function generateRandomNumber(length) {
-  if (length === 5) {
-    return Math.floor(10000 + Math.random() * 90000);
-  }
-  if (length === 6) {
-    return Math.floor(100000 + Math.random() * 900000);
-  }
-}
-
 function toPersianDigits(n) {
   const farsiDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
   return n.toString().replace(/\d/g, (x) => farsiDigits[parseInt(x)]);
@@ -111,7 +102,6 @@ function copyObject(object) {
 }
 
 module.exports = {
-  generateRandomNumber,
   toPersianDigits,
   setAccessToken,
   setRefreshToken,

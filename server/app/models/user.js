@@ -36,6 +36,7 @@ UserSchema.methods.toJSON = function () {
   obj.avatarUrl = this.avatarUrl;
   delete obj.password;
   delete obj.avatar;
+  delete obj.otp;
   return obj;
 };
 

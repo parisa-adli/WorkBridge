@@ -40,7 +40,7 @@ Dark mode lives in `context/DarkModeContext.jsx` and is stored via `useLocalStor
 
 - `app/router/router.js` mounts `/user`, `/category`, `/project`, `/proposal` and `/admin`. Project, proposal and admin routes require `verifyAccessToken` + `isVerifiedUser` (user `status`: 0 rejected, 1 pending, 2 verified). Per-route role checks use `authorize(...ROLES)` from `permission.guard.js`. Roles are in `utils/constants.js`.
 - Controllers (`app/http/controllers`) are classes extending `Controller` and wrapped in `express-async-handler`. They validate with Joi schemas from `app/http/validators`, throw `http-errors`, and reply with `{ statusCode, data: { message, ... } }`. The client relies on this `data` envelope.
-- Mongoose models: `user`, `project` (status `OPEN`/`CLOSED`), `proposal`, `category`. No SMS is sent: `sendOTP` only logs the code.
+- Mongoose models: `user`, `project` (status `OPEN`/`CLOSED`), `proposal`, `category`. No SMS is sent: outside production `sendOTP` logs the code and returns it in the `get-otp` response (the login toast shows it). `get-otp`/`check-otp` are rate-limited per IP (`OTP_RATE_LIMIT`, default 10 per 15 min).
 
 ## Upgrade progress
 

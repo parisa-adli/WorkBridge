@@ -8,6 +8,7 @@ Object.assign(process.env, {
   TOKEN_SECRET_KEY: "test-token-secret",
   ALLOW_CORS_ORIGIN: "http://localhost:3000",
   SERVER_URL: "http://localhost:5000",
+  OTP_RATE_LIMIT: "10000", // rateLimit.test.js lowers it before the app loads
 });
 
 vi.spyOn(console, "log").mockImplementation(() => {});
