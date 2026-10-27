@@ -5,6 +5,7 @@ const {
   setAccessToken,
   setRefreshToken,
   verifyRefreshToken,
+  cookieOptions,
 } = require("../../../utils/functions");
 const createError = require("http-errors");
 const { UserModel } = require("../../models/user");
@@ -192,18 +193,14 @@ class userAuthController extends Controller {
     });
   }
   logout(req, res) {
-    const cookieOptions = {
+    const options = {
+      ...cookieOptions(),
       maxAge: 1,
       expires: Date.now(),
-      httpOnly: true,
-      signed: true,
-      sameSite: "Lax",
-      secure: process.env.NODE_ENV === "development" ? false : true, // same as login
       path: "/",
-      domain: process.env.DOMAIN,
     };
-    res.cookie("accessToken", null, cookieOptions);
-    res.cookie("refreshToken", null, cookieOptions);
+    res.cookie("accessToken", null, options);
+    res.cookie("refreshToken", null, options);
 
     return res.status(HttpStatus.OK).json({
       StatusCode: HttpStatus.OK,

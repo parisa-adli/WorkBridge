@@ -6,6 +6,7 @@ const {
   updateCategorySchema,
 } = require("../validators/category.schema");
 const { CategoryModel } = require("../../models/category");
+const { findByIdOr404 } = require("../../../utils/functions");
 
 class CategoryController extends Controller {
   async getListOfCategories(req, res) {
@@ -47,11 +48,8 @@ class CategoryController extends Controller {
     if (category)
       throw createHttpError.BadRequest("دسته بندی با این عنوان وجود دارد.");
   }
-  async checkExistCategory(id) {
-    const category = await CategoryModel.findById(id);
-    if (!category)
-      throw createHttpError.BadRequest("دسته بندی با این عنوان وجود ندارد.");
-    return category;
+  checkExistCategory(id) {
+    return findByIdOr404(CategoryModel, id, "دسته بندی یافت نشد.");
   }
   async updateCategory(req, res) {
     const { id } = req.params;

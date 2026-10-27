@@ -189,8 +189,8 @@ Verify: tests pass; e2e still passes.
 
 Files: `server/utils/functions.js`, `project.controller.js`, `proposal.controller.js`, `category.controller.js`, `admin/user.controller.js`, `userAuth.controller.js`, tests
 
-- [ ] Shared helpers: `findByIdOr404`, `cookieOptions(env)`, one project filter/sort builder for both list endpoints; replace the copies.
-- [ ] Remove `sort=popular` (or define it — PRD open question 4; default: remove).
+- [x] Shared helpers: `findByIdOr404`, `cookieOptions(env)`, one project filter/sort builder for both list endpoints; replace the copies.
+- [x] Remove `sort=popular` (or define it — PRD open question 4; default: remove).
 
 Verify: tests pass unchanged, apart from the `sort=popular` case.
 

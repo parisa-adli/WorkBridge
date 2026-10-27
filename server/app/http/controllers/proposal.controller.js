@@ -1,13 +1,19 @@
 const Controller = require("./controller");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
-const mongoose = require("mongoose");
 const createHttpError = require("http-errors");
 const { ProposalModel } = require("../../models/proposal");
 const { addProposalSchema } = require("../validators/proposal.schema");
 const { ProjectModel } = require("../../models/project");
 const { assertProjectOwner } = require("./project.controller");
-const { copyObject } = require("../../../utils/functions");
+const {
+  copyObject,
+  findByIdOr404,
+  createdAtSort,
+} = require("../../../utils/functions");
 const { ROLES } = require("../../../utils/constants");
+
+const findProposal = (id) =>
+  findByIdOr404(ProposalModel, id, "پیشنهاد یافت نشد.");
 
 class ProposalController extends Controller {
   async addNewProposal(req, res) {
@@ -15,8 +21,7 @@ class ProposalController extends Controller {
     await addProposalSchema.validateAsync(req.body);
     const { description, price, duration, projectId } = req.body;
 
-    const project = await ProjectModel.findById(projectId);
-    if (!project) throw createHttpError.NotFound("پروژه یافت نشد.");
+    const project = await findByIdOr404(ProjectModel, projectId, "پروژه یافت نشد.");
     if (project.status !== "OPEN")
       throw createHttpError.BadRequest("پروژه بسته است");
     // shortcut: check-then-create can race on double submit; add a unique {project, user} index if that shows up.
@@ -46,22 +51,15 @@ class ProposalController extends Controller {
   }
   async getListOfProposals(req, res) {
     let dbQuery = {};
-    const { sort } = req.query;
 
     const user = req.user;
     if (user.role !== ROLES.ADMIN) {
       dbQuery["user"] = user._id;
     }
 
-    const sortQuery = {};
-
-    if (!sort) sortQuery["createdAt"] = 1;
-    if (sort) {
-      if (sort === "latest") sortQuery["createdAt"] = -1;
-      if (sort === "earliest") sortQuery["createdAt"] = 1;
-    }
-
-    const proposals = await ProposalModel.find(dbQuery).sort(sortQuery);
+    const proposals = await ProposalModel.find(dbQuery).sort(
+      createdAtSort(req.query.sort)
+    );
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -72,7 +70,7 @@ class ProposalController extends Controller {
   }
   async getProposalById(req, res) {
     const { id } = req.params;
-    const proposal = await this.findProposalById(id);
+    const proposal = await findProposal(id);
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: {
@@ -80,21 +78,17 @@ class ProposalController extends Controller {
       },
     });
   }
-  async findProposalById(id) {
-    if (!mongoose.isValidObjectId(id))
-      throw createHttpError.BadRequest("شناسه پروژه ارسال شده صحیح نمیباشد");
-    const proposal = await ProposalModel.findById(id);
-    if (!proposal) throw createHttpError.NotFound("پروژه یافت نشد.");
-    return proposal;
-  }
   async changeProposalStatus(req, res) {
     const { id } = req.params;
     let { status } = req.body;
     status = Number(status);
 
-    const proposal = await this.findProposalById(id);
-    const project = await ProjectModel.findById(proposal.project);
-    if (!project) throw createHttpError.NotFound("پروژه یافت نشد.");
+    const proposal = await findProposal(id);
+    const project = await findByIdOr404(
+      ProjectModel,
+      proposal.project,
+      "پروژه یافت نشد."
+    );
     assertProjectOwner(project, req.user);
 
     await ProposalModel.updateOne(

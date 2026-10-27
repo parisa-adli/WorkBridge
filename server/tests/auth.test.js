@@ -1,6 +1,7 @@
 const request = require("supertest");
 const { startApp, stopApp, clearDb, login } = require("./helpers");
 const { UserModel } = require("../app/models/user");
+const { cookieOptions } = require("../utils/functions");
 
 const PHONE = "09120000001";
 let app;
@@ -164,6 +165,18 @@ describe("session", () => {
     const res = await request(app).post("/api/user/logout");
     expect(res.headers["set-cookie"]).toHaveLength(2);
     expect(res.headers["set-cookie"].join(";")).not.toMatch(/Secure/);
+  });
+
+  it("cookieOptions is secure everywhere but development", () => {
+    expect(cookieOptions({ NODE_ENV: "development", DOMAIN: "x.ir" })).toEqual({
+      httpOnly: true,
+      signed: true,
+      sameSite: "Lax",
+      secure: false,
+      domain: "x.ir",
+    });
+    expect(cookieOptions({ NODE_ENV: "production" }).secure).toBe(true);
+    expect(cookieOptions({ NODE_ENV: "test" }).secure).toBe(true);
   });
 });
 

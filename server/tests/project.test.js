@@ -100,6 +100,23 @@ describe("GET project lists", () => {
     expect(res.body.data.projects.map((p) => p._id)).toEqual([mine._id]);
     expect(res.body.data.projects[0].owner.name).toBe("user 09120000011");
   });
+
+  it("/owner-projects shares the /list filters and sorts", async () => {
+    const first = await addProject();
+    const second = await addProject();
+    // raw driver write: mongoose timestamps would ignore a createdAt update
+    await ProjectModel.collection.updateOne({ _id: new ProjectModel.base.Types.ObjectId(first._id) }, { $set: { createdAt: new Date("2020-01-01") } });
+    const latest = await owner.agent.get("/api/project/owner-projects?sort=latest&category=web");
+    expect(latest.body.data.projects.map((p) => p._id)).toEqual([second._id, first._id]);
+
+    // sort=popular is gone: it falls back to oldest first
+    const popular = await owner.agent.get("/api/project/owner-projects?sort=popular");
+    expect(popular.body.data.projects.map((p) => p._id)).toEqual([first._id, second._id]);
+
+    const unknown = await owner.agent.get("/api/project/owner-projects?category=nope");
+    expect(unknown.status).toBe(200);
+    expect(unknown.body.data.projects).toEqual([]);
+  });
 });
 
 describe("PATCH /api/project/update/:id", () => {

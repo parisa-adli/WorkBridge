@@ -1,11 +1,13 @@
 const Controller = require("./controller");
 const { StatusCodes: HttpStatus } = require("http-status-codes");
-const mongoose = require("mongoose");
-const { CategoryModel } = require("../../models/category");
 const { ProjectModel } = require("../../models/project");
 const createHttpError = require("http-errors");
 const { addProjectSchema } = require("../validators/project.schema");
 const { ROLES } = require("../../../utils/constants");
+const {
+  findByIdOr404,
+  buildProjectQuery,
+} = require("../../../utils/functions");
 
 function assertProjectOwner(project, user) {
   if (user.role !== ROLES.ADMIN && String(project.owner) !== String(user._id))
@@ -40,45 +42,16 @@ class ProjectController extends Controller {
     });
   }
   async getListOfProjects(req, res) {
-    let dbQuery = {};
-    const { search, category, sort, status } = req.query;
+    const { filter, sort } = await buildProjectQuery(req.query);
 
-    // SEARCH
-    if (search) dbQuery["$text"] = { $search: search };
-
-    // STATUS
-    if (["OPEN", "CLOSED"].includes(status)) {
-      dbQuery["status"] = { $eq: status };
-    }
-    // CATEGORY
-    if (category && !category.includes("ALL")) {
-      const categories = category.split(",");
-      const categoryIds = [];
-      for (const item of categories) {
-        const category = await CategoryModel.findOne({ englishTitle: item });
-        if (category) categoryIds.push(category._id);
-      }
-      dbQuery["category"] = {
-        $in: categoryIds,
-      };
-    }
-
-    // SORT
-    const sortQuery = {};
-    if (!sort) sortQuery["createdAt"] = 1;
-    if (sort) {
-      if (sort === "latest") sortQuery["createdAt"] = -1;
-      if (sort === "earliest") sortQuery["createdAt"] = 1;
-    }
-
-    const projects = await ProjectModel.find(dbQuery)
+    const projects = await ProjectModel.find(filter)
       .select({
         owner: 0,
         freelancer: 0,
         proposals: 0,
       })
       .populate([{ path: "category", select: { title: 1, englishTitle: 1 } }])
-      .sort(sortQuery);
+      .sort(sort);
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -88,40 +61,15 @@ class ProjectController extends Controller {
     });
   }
   async getListOfOwnerProjects(req, res) {
-    let dbQuery = {};
-    const user = req.user;
-    dbQuery.owner = user._id;
+    const { filter, sort } = await buildProjectQuery(req.query);
 
-    const { search, category, sort } = req.query;
-
-    if (search) dbQuery["$text"] = { $search: search };
-    if (category) {
-      const categories = category.split(",");
-      const categoryIds = [];
-      for (const item of categories) {
-        const { _id } = await CategoryModel.findOne({ englishTitle: item });
-        categoryIds.push(_id);
-      }
-      dbQuery["category"] = {
-        $in: categoryIds,
-      };
-    }
-
-    const sortQuery = {};
-    if (!sort) sortQuery["createdAt"] = 1;
-    if (sort) {
-      if (sort === "latest") sortQuery["createdAt"] = -1;
-      if (sort === "earliest") sortQuery["createdAt"] = 1;
-      if (sort === "popular") sortQuery["likes"] = -1;
-    }
-
-    const projects = await ProjectModel.find(dbQuery)
+    const projects = await ProjectModel.find({ ...filter, owner: req.user._id })
       .populate([
         { path: "category", select: { title: 1, englishTitle: 1 } },
         { path: "owner", select: { name: 1 } },
         { path: "freelancer", select: { name: 1 } },
       ])
-      .sort(sortQuery);
+      .sort(sort);
 
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
@@ -172,15 +120,8 @@ class ProjectController extends Controller {
       },
     });
   }
-  async findProjectById(id) {
-    if (!mongoose.isValidObjectId(id))
-      throw createHttpError.BadRequest("شناسه پروژ ارسال شده صحیح نمیباشد");
-    const project = await ProjectModel.findById(id);
-    if (!project) throw createHttpError.NotFound("پروژه یافت نشد.");
-    return project;
-  }
   async findOwnProject(id, user) {
-    const project = await this.findProjectById(id);
+    const project = await findByIdOr404(ProjectModel, id, "پروژه یافت نشد.");
     assertProjectOwner(project, user);
     return project;
   }
