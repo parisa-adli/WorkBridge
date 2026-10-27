@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
 // const allRoutes = require("./router/router");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
@@ -36,12 +37,14 @@ class Application {
       .catch((err) => console.log("Failed to connect to MongoDB", err));
   }
   configServer() {
+    // The client runs on another origin, so uploaded files must be loadable cross-origin.
+    this.#app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
     this.#app.use(
       cors({ credentials: true, origin: process.env.ALLOW_CORS_ORIGIN })
     );
-    this.#app.use(express.json());
-    this.#app.use(express.urlencoded({ extended: true }));
-    this.#app.use(express.static(path.join(__dirname, "..")));
+    this.#app.use(express.json({ limit: "100kb" }));
+    this.#app.use(express.urlencoded({ extended: true, limit: "100kb" }));
+    this.#app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
   }
   initClientSession() {
     this.#app.use(cookieParser(process.env.COOKIE_PARSER_SECRET_KEY));

@@ -150,9 +150,9 @@ Verify: grep finds no references to removed names; all checks green.
 
 Files: `server/app/server.js`, `server/package.json`, `server/tests/security.test.js` (new)
 
-- [ ] Serve only `server/uploads/` statically (create the folder with a `.gitkeep`).
-- [ ] Add `helmet` and a JSON/urlencoded body size limit.
-- [ ] Tests: `GET /app/server.js` and `/package.json` return 404; an oversized body returns 413.
+- [x] Serve only `server/uploads/` statically (create the folder with a `.gitkeep`).
+- [x] Add `helmet` and a JSON/urlencoded body size limit.
+- [x] Tests: `GET /app/server.js` and `/package.json` return 404; an oversized body returns 413.
 
 Verify: the new tests pass; the app still loads (helmet doesn't break CORS with credentials).
 

@@ -36,7 +36,7 @@ Dark mode lives in `context/DarkModeContext.jsx` and is stored via `useLocalStor
 
 ## Server architecture (`server/`)
 
-`index.js` → `app/server.js` (an `Application` class: CORS with credentials, signed cookie-parser, routes under `/api`, and a central error handler that returns `{ statusCode, message }`).
+`index.js` → `app/server.js` (an `Application` class: helmet, CORS with credentials, 100kb body limit, static files only from `uploads/` at `/uploads`, signed cookie-parser, routes under `/api`, and a central error handler that returns `{ statusCode, message }`).
 
 - `app/router/router.js` mounts `/user`, `/category`, `/project`, `/proposal` and `/admin`. Project, proposal and admin routes require `verifyAccessToken` + `isVerifiedUser` (user `status`: 0 rejected, 1 pending, 2 verified). Per-route role checks use `authorize(...ROLES)` from `permission.guard.js`. Roles are in `utils/constants.js`.
 - Controllers (`app/http/controllers`) are classes extending `Controller` and wrapped in `express-async-handler`. They validate with Joi schemas from `app/http/validators`, throw `http-errors`, and reply with `{ statusCode, data: { message, ... } }`. The client relies on this `data` envelope.
