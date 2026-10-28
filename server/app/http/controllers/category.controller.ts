@@ -1,10 +1,7 @@
 import type { Request, Response } from "express";
 import { StatusCodes as HttpStatus } from "http-status-codes";
 import Controller from "./controller";
-import {
-  addCategorySchema,
-  updateCategorySchema,
-} from "../validators/category.schema";
+import type { AddCategoryBody, UpdateCategoryBody } from "../validators/category.schema";
 import { CategoryModel } from "../../models/category";
 import { findByIdOr404 } from "../../../utils/functions";
 import { apiError, sendData } from "../../../utils/apiResponse";
@@ -24,11 +21,9 @@ class CategoryController extends Controller {
 
     return sendData(res, HttpStatus.OK, { categories });
   }
-  async addNewCategory(req: Request, res: Response) {
-    console.log(req.body);
+  async addNewCategory(req: Request<object, unknown, AddCategoryBody>, res: Response) {
     // `parent` is validated but not saved: the schema field is `parentId` (current-state.md).
-    const { title, englishTitle, description, type } =
-      await addCategorySchema.validateAsync(req.body);
+    const { title, englishTitle, description, type } = req.body;
     await this.findCategoryWithTitle(englishTitle);
     const category = await CategoryModel.create({
       title,
@@ -52,11 +47,10 @@ class CategoryController extends Controller {
   checkExistCategory(id: string) {
     return findByIdOr404(CategoryModel, id, ERROR_CODES.CATEGORY_NOT_FOUND, "دسته بندی یافت نشد.");
   }
-  async updateCategory(req: Request<{ id: string }>, res: Response) {
+  async updateCategory(req: Request<{ id: string }, unknown, UpdateCategoryBody>, res: Response) {
     const { id } = req.params;
     const { title, englishTitle, type, description } = req.body;
     await this.checkExistCategory(id);
-    await updateCategorySchema.validateAsync(req.body);
     const updateResult = await CategoryModel.updateOne(
       { _id: id },
       {

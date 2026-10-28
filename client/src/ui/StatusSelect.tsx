@@ -1,5 +1,5 @@
 import type { UseFormRegister } from "react-hook-form";
-import type { Status } from "../types/api";
+import type { StatusInput } from "../schemas/status";
 import { STATUS_BADGES } from "../constants";
 import RHFSelect from "./RHFSelect";
 
@@ -11,7 +11,7 @@ const options = Object.entries(STATUS_BADGES).map(([value, { label }]) => ({
 function StatusSelect({
   register,
 }: {
-  register: UseFormRegister<{ status: Status }>;
+  register: UseFormRegister<StatusInput>;
 }) {
   return (
     <RHFSelect

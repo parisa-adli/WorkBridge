@@ -9,12 +9,10 @@ import useCreateProject from "./useCreateProject";
 import Loading from "../../ui/Loading";
 import useEditProject from "./useEditProject";
 import toast from "react-hot-toast";
-import { LIMITS } from "../../constants";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type DateObject from "react-date-object";
-import type { NewProject } from "../../services/projectService";
 import type { Project } from "../../types/api";
-
-type ProjectFormValues = Omit<NewProject, "tags" | "deadline">;
+import { projectSchema, type ProjectInput, type ProjectValues } from "../../schemas/project";
 
 type CreateProjectFormProps = {
   onClose: () => void;
@@ -34,7 +32,7 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
     tags: prevTags,
   } = projectToEdit;
 
-  let editValues: Partial<ProjectFormValues> = {};
+  let editValues: Partial<ProjectInput> = {};
 
   if (isEditSession) {
     editValues = {
@@ -50,7 +48,10 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
     formState: { errors },
     handleSubmit,
     reset,
-  } = useForm<ProjectFormValues>({ defaultValues: editValues });
+  } = useForm<ProjectInput, unknown, ProjectValues>({
+    defaultValues: editValues,
+    resolver: zodResolver(projectSchema),
+  });
 
   const [tags, setTags] = useState(prevTags || []);
   const [date, setDate] = useState<Date | DateObject | null>(
@@ -60,7 +61,7 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
   const { isCreating, createProject } = useCreateProject();
   const { isEditing, editProject } = useEditProject();
 
-  const onSubmit = (data: ProjectFormValues) => {
+  const onSubmit = (data: ProjectValues) => {
     if (!date) return toast.error("ددلاین ضروری است");
     const newProject = {
       ...data,
@@ -94,17 +95,6 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
         name="title"
         register={register}
         required
-        validationSchema={{
-          required: "عنوان ضروری است",
-          minLength: {
-            value: LIMITS.PROJECT_TITLE_MIN,
-            message: `حداقل ${LIMITS.PROJECT_TITLE_MIN} کاراکتر را وارد کنید`,
-          },
-          maxLength: {
-            value: LIMITS.PROJECT_TITLE_MAX,
-            message: `حداکثر ${LIMITS.PROJECT_TITLE_MAX} کاراکتر مجاز است`,
-          },
-        }}
         errors={errors}
       />
       <Textfield
@@ -112,13 +102,6 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
         name="description"
         register={register}
         required
-        validationSchema={{
-          required: "توضیحات ضروری است",
-          minLength: {
-            value: 15,
-            message: "حداقل 15 کاراکتر را وارد کنید",
-          },
-        }}
         errors={errors}
       />
       <Textfield
@@ -127,17 +110,6 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
         type="number"
         register={register}
         required
-        validationSchema={{
-          required: "بودجه ضروری است",
-          min: {
-            value: LIMITS.PROJECT_BUDGET_MIN,
-            message: "مبلغ وارد شده نامعتبر است",
-          },
-          max: {
-            value: LIMITS.PROJECT_BUDGET_MAX,
-            message: "مبلغ وارد شده نامعتبر است",
-          },
-        }}
         errors={errors}
       />
       <RHFSelect

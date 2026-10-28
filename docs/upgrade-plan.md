@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**28 of 47 phases done** (Parts A and B, Phases 15–24). Next: Phase 25 (Zod for projects, proposals, categories and admin).
+**29 of 47 phases done** (Parts A, B and C). Next: Phase 26 (i18n setup).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -37,7 +37,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 |---|---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
-| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 10/11 |
+| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
@@ -260,7 +260,7 @@ Verify: tests pass; grep finds no leftover `statusStyle` arrays or role string l
 
 ---
 
-## Part C: Stack upgrade, TypeScript, Zod ⬜
+## Part C: Stack upgrade, TypeScript, Zod ✅
 
 Dependency upgrades go server first, then client, and each gets its own phase so a regression points at one change. The phases that change API behavior (19, 20, 25) update server and client together.
 
@@ -370,15 +370,15 @@ Files: `client/src/features/**`, `pages/*`, `ui/*`, `App.jsx`, `main.jsx`, clien
 
 Verify: typecheck passes with `allowJs: false`; build, tests, e2e pass.
 
-### Phase 25: Zod for projects, proposals, categories and admin (server + client) ⬜
+### Phase 25: Zod for projects, proposals, categories and admin (server + client) ✅
 **Goal:** the rest of the API and its forms move to Zod together, and Joi is gone.
 
 Files: `server/app/http/validators/{project,proposal,category}.schema.ts`, project/proposal/category/admin controllers and routers, `client/src/schemas/*`, `CreateProjectForm`, `CreateProposal`, `ChangeProposalStatus`, `ChangeUserStatus`, `server/package.json`, tests on both sides
 
-- [ ] Server: port the remaining schemas; add schemas for routes that had none (project status, proposal status, list queries, route params).
-- [ ] Client: each form uses `zodResolver` with a schema mirroring the server's.
-- [ ] Remove `joi`.
-- [ ] Tests: server validation errors per route; client schema limits match the constants (PRD R8).
+- [x] Server: port the remaining schemas; add schemas for routes that had none (project status, proposal status, list queries, route params).
+- [x] Client: each form uses `zodResolver` with a schema mirroring the server's.
+- [x] Remove `joi`.
+- [x] Tests: server validation errors per route; client schema limits match the constants (PRD R8).
 
 Verify: each form shows the same Persian messages as before; tests and e2e pass.
 

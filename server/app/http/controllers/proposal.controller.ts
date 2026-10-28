@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { StatusCodes as HttpStatus } from "http-status-codes";
 import Controller from "./controller";
 import { ProposalModel } from "../../models/proposal";
-import { addProposalSchema } from "../validators/proposal.schema";
+import type { AddProposalBody, ChangeProposalStatusBody } from "../validators/proposal.schema";
 import { ProjectModel } from "../../models/project";
 import { assertProjectOwner } from "./project.controller";
 import {
@@ -21,9 +21,8 @@ const findProject = (id: unknown) =>
 
 // Proposal routes run after verifyAccessToken, which sets req.user.
 class ProposalController extends Controller {
-  async addNewProposal(req: Request, res: Response) {
+  async addNewProposal(req: Request<object, unknown, AddProposalBody>, res: Response) {
     const userId = req.user!._id;
-    await addProposalSchema.validateAsync(req.body);
     const { description, price, duration, projectId } = req.body;
 
     const project = await findProject(projectId);
@@ -71,9 +70,9 @@ class ProposalController extends Controller {
     const proposal = await findProposal(id);
     return sendData(res, HttpStatus.OK, { proposal });
   }
-  async changeProposalStatus(req: Request<{ id: string }>, res: Response) {
+  async changeProposalStatus(req: Request<{ id: string }, unknown, ChangeProposalStatusBody>, res: Response) {
     const { id } = req.params;
-    const status = Number(req.body.status);
+    const { status } = req.body;
 
     const proposal = await findProposal(id);
     const project = await findProject(proposal.project);

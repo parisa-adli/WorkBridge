@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import StatusSelect from "../../ui/StatusSelect";
 import useChangeProposalStatus from "./useChangeProposalStatus";
 import Loading from "../../ui/Loading";
 import type { Status } from "../../types/api";
+import { proposalStatusSchema, type StatusInput, type StatusValues } from "../../schemas/status";
 
 type ChangeProposalStatusProps = {
   proposalId: string;
@@ -11,12 +13,13 @@ type ChangeProposalStatusProps = {
 };
 
 function ChangeProposalStatus({ proposalId, onClose, proposalStatus }: ChangeProposalStatusProps) {
-  const { register, handleSubmit } = useForm<{ status: Status }>({
+  const { register, handleSubmit } = useForm<StatusInput, unknown, StatusValues>({
     defaultValues: { status: proposalStatus },
+    resolver: zodResolver(proposalStatusSchema),
   });
   const { changeProposalStatuscode, isUpdating } = useChangeProposalStatus();
 
-  const onSubmit = (data: { status: Status }) => {
+  const onSubmit = (data: StatusValues) => {
     changeProposalStatuscode({ id: proposalId, data }, { onSuccess: onClose });
   };
 

@@ -4,10 +4,7 @@ import Controller from "./controller";
 import { ProjectModel } from "../../models/project";
 import { ProposalModel } from "../../models/proposal";
 import type { UserDocument } from "../../models/user";
-import {
-  addProjectSchema,
-  changeProjectStatusSchema,
-} from "../validators/project.schema";
+import type { AddProjectBody, ChangeProjectStatusBody } from "../validators/project.schema";
 import { ROLES, PROJECT_STATUS } from "../../../utils/constants";
 import { findByIdOr404, buildProjectQuery } from "../../../utils/functions";
 import { apiError, sendData } from "../../../utils/apiResponse";
@@ -20,9 +17,8 @@ export function assertProjectOwner(project: { owner: unknown }, user: UserDocume
 
 // Project routes run after verifyAccessToken, which sets req.user.
 class ProjectController extends Controller {
-  async addNewProject(req: Request, res: Response) {
+  async addNewProject(req: Request<object, unknown, AddProjectBody>, res: Response) {
     const userId = req.user!._id;
-    await addProjectSchema.validateAsync(req.body);
     const { title, description, tags, category, budget, deadline } = req.body;
 
     const project = await ProjectModel.create({
@@ -118,9 +114,9 @@ class ProjectController extends Controller {
     assertProjectOwner(project, user);
     return project;
   }
-  async changeProjectStatus(req: Request<{ id: string }>, res: Response) {
+  async changeProjectStatus(req: Request<{ id: string }, unknown, ChangeProjectStatusBody>, res: Response) {
     const { id } = req.params;
-    const { status } = await changeProjectStatusSchema.validateAsync(req.body);
+    const { status } = req.body;
     await this.findOwnProject(id, req.user!);
 
     const updateResult = await ProjectModel.updateOne(
@@ -154,12 +150,10 @@ class ProjectController extends Controller {
       code: SUCCESS_CODES.PROJECT_DELETED,
     });
   }
-  async updateProject(req: Request<{ id: string }>, res: Response) {
+  async updateProject(req: Request<{ id: string }, unknown, AddProjectBody>, res: Response) {
     const { id } = req.params;
     await this.findOwnProject(id, req.user!);
     const { title, description, tags, deadline, category, budget } = req.body;
-    console.log(req.body);
-    await addProjectSchema.validateAsync(req.body);
     const updateResult = await ProjectModel.updateOne(
       { _id: id },
       {

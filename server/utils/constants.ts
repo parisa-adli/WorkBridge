@@ -1,5 +1,5 @@
 // Single source for roles, statuses and validation limits. Mirrors client/src/constants/index.js.
-export const MongoIDPattern = /^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/i;
+export const MongoIDPattern = /^[a-f\d]{24}$/i;
 export const ROLES = Object.freeze({
   ADMIN: "ADMIN",
   FREELANCER: "FREELANCER",
@@ -13,6 +13,13 @@ export const LIMITS = Object.freeze({
   PROJECT_TITLE_MAX: 30,
   PROJECT_BUDGET_MIN: 100000,
   PROJECT_BUDGET_MAX: 1000000000,
+  PROJECT_DESCRIPTION_MIN: 15,
+  PROJECT_TAGS_MAX: 20,
+  PROPOSAL_DESCRIPTION_MIN: 10,
+  PROPOSAL_PRICE_MIN: 10000,
+  PROPOSAL_PRICE_MAX: 1000000000,
+  PROPOSAL_DURATION_MIN: 1,
+  PROPOSAL_DURATION_MAX: 365,
   OTP_MIN: 5,
   OTP_MAX: 6,
   NAME_MIN: 5,

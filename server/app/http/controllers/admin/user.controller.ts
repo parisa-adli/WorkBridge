@@ -5,7 +5,7 @@ import Controller from "../controller";
 import { ProjectModel } from "../../../models/project";
 import { ProposalModel } from "../../../models/proposal";
 import { escapeRegex } from "../../../../utils/functions";
-import { verifyUserSchema } from "../../validators/user.schema";
+import type { VerifyUserBody } from "../../validators/user.schema";
 import { STATUS } from "../../../../utils/constants";
 import { apiError, sendData } from "../../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES, type SuccessCode } from "../../../../utils/errorCodes";
@@ -46,9 +46,9 @@ class UserController extends Controller {
       proposals,
     });
   }
-  async verifyUser(req: Request<{ userId: string }>, res: Response) {
+  async verifyUser(req: Request<{ userId: string }, unknown, VerifyUserBody>, res: Response) {
     const { userId } = req.params;
-    const { status } = await verifyUserSchema.validateAsync(req.body);
+    const { status } = req.body;
     const updateResult = await UserModel.updateOne(
       { _id: userId },
       { $set: { status } }

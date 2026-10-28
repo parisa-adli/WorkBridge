@@ -14,17 +14,18 @@ export function issue(code: ErrorCode, message: string) {
   return { error: message };
 }
 
-// Replaces req.body with the parsed (trimmed, stripped) data, or rejects with the first failing field.
-export function validate(schema: z.ZodType): RequestHandler {
+// Rejects with the first failing field. For the body, replaces req.body with the parsed (trimmed, stripped) data;
+// query and params are only checked (Express 5's req.query is read-only), so controllers still read the raw values.
+export function validate(schema: z.ZodType, part: "body" | "query" | "params" = "body"): RequestHandler {
   return (req, res, next) => {
-    const result = schema.safeParse(req.body);
+    const result = schema.safeParse(req[part]);
     if (!result.success) {
       const [first] = result.error.issues;
       // an unregistered message is a schema bug; BAD_REQUEST makes the server tests flag it
       const code = codeByMessage.get(first.message) ?? ERROR_CODES.BAD_REQUEST;
       throw apiError(400, code, first.message, { field: first.path.join(".") });
     }
-    req.body = result.data;
+    if (part === "body") req.body = result.data;
     next();
   };
 }

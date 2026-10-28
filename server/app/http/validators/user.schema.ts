@@ -1,9 +1,8 @@
-import Joi from "joi";
 import { z } from "zod";
 import { LIMITS, PHONE_PATTERN, ROLES, STATUS } from "../../../utils/constants";
-import { apiError } from "../../../utils/apiResponse";
 import { ERROR_CODES } from "../../../utils/errorCodes";
 import { issue } from "../middlewares/validate";
+import { numeric, searchQuery } from "./common.schema";
 
 const invalidPhone = issue(ERROR_CODES.INVALID_PHONE, "شماره موبایل وارد شده صحیح نمیباشد");
 const invalidOtp = issue(ERROR_CODES.INVALID_OTP, "کد ارسال شده صحیح نمیباشد");
@@ -50,10 +49,16 @@ export type CheckOtpBody = z.infer<typeof checkOtpSchema>;
 export type CompleteProfileBody = z.infer<typeof completeProfileSchema>;
 export type UpdateProfileBody = z.infer<typeof updateProfileSchema>;
 
-// Admin schemas move to Zod in Phase 25.
-export const verifyUserSchema = Joi.object({
-  status: Joi.number()
-    .required()
-    .valid(...Object.values(STATUS))
-    .error(apiError(400, ERROR_CODES.INVALID_USER_STATUS, "وضعیت کاربر صحیح نمی باشد")),
+export const verifyUserSchema = z.object({
+  status: numeric(
+    z.literal(Object.values(STATUS), issue(ERROR_CODES.INVALID_USER_STATUS, "وضعیت کاربر صحیح نمی باشد"))
+  ),
 });
+
+const invalidPage = issue(ERROR_CODES.INVALID_PAGINATION, "صفحه بندی صحیح نمی باشد");
+// a positive integer, as the query string sends it
+const pageNumber = z.string(invalidPage).regex(/^[1-9]\d*$/, invalidPage).optional();
+
+export const userListQuerySchema = z.object({ search: searchQuery, page: pageNumber, limit: pageNumber });
+
+export type VerifyUserBody = z.infer<typeof verifyUserSchema>;

@@ -1,21 +1,20 @@
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Textfield from "../../ui/Textfield";
 import Loading from "../../ui/Loading";
 import useCreateProposal from "./useCreateProposal";
-import type { NewProposal } from "../../services/proposalService";
-
-type ProposalFormValues = Omit<NewProposal, "projectId">;
+import { proposalSchema, type ProposalInput, type ProposalValues } from "../../schemas/proposal";
 
 function CreateProposal({ onClose, projectId }: { onClose: () => void; projectId: string }) {
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm<ProposalFormValues>();
+  } = useForm<ProposalInput, unknown, ProposalValues>({ resolver: zodResolver(proposalSchema) });
 
   const { isCreating, createProposal } = useCreateProposal();
 
-  const onSubmit = (data: ProposalFormValues) => {
+  const onSubmit = (data: ProposalValues) => {
     createProposal(
       { ...data, projectId },
       {
@@ -32,13 +31,6 @@ function CreateProposal({ onClose, projectId }: { onClose: () => void; projectId
           name="description"
           register={register}
           required
-          validationSchema={{
-            required: "عنوان ضروری است",
-            minLength: {
-              value: 10,
-              message: "حداقل 10 کاراکتر را وارد کنید",
-            },
-          }}
           errors={errors}
         />
         <Textfield
@@ -47,17 +39,6 @@ function CreateProposal({ onClose, projectId }: { onClose: () => void; projectId
           type="number"
           register={register}
           required
-          validationSchema={{
-            required: "قیمت ضروری است",
-            min: {
-              value: 10000,
-              message: "مبلغ وارد شده نامعتبر است",
-            },
-            max: {
-              value: 1000000000,
-              message: "مبلغ وارد شده نامعتبر است",
-            },
-          }}
           errors={errors}
         />
         <Textfield
@@ -66,17 +47,6 @@ function CreateProposal({ onClose, projectId }: { onClose: () => void; projectId
           type="number"
           register={register}
           required
-          validationSchema={{
-            required: "مدت زمان ضروری است",
-            min: {
-              value: 1,
-              message: "مدت زمان مجاز نمی باشد",
-            },
-            max: {
-              value: 365,
-              message: "مدت زمان مجاز نمی باشد",
-            },
-          }}
           errors={errors}
         />
         <div className="!mt-8">
