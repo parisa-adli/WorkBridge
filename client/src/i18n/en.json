@@ -36,6 +36,7 @@
     "admin": "Admin"
   },
   "auth": {
+    "logout": "Log out",
     "demoTab": "Demo login",
     "phoneTab": "Log in with phone",
     "email": "Email",

@@ -4,6 +4,7 @@ import UserAvatar from "../features/authentication/UserAvatar";
 import { useNavigate } from "react-router-dom";
 import { HiArrowLeftOnRectangle } from "react-icons/hi2";
 import useUser from "../features/authentication/useUser";
+import Logout from "../features/authentication/Logout";
 
 function HeaderMenu() {
   const { user } = useUser();
@@ -20,7 +21,11 @@ function HeaderMenu() {
       <li className="flex">
         <LanguageToggle />
       </li>
-      {!user && (
+      {user ? (
+        <li className="flex">
+          <Logout />
+        </li>
+      ) : (
         <li className="flex hover:text-rose-500">
           <button onClick={handleClick}>
             <HiArrowLeftOnRectangle className="h-5 w-5 text-secondary-500 hover:text-success ltr:-scale-x-100" />

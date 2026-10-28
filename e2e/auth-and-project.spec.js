@@ -28,20 +28,39 @@ async function loginWithOtp(page) {
   await page.getByRole("button", { name: "تایید", exact: true }).click();
 }
 
+const DEMO_ROLES = [
+  ["کارفرما", "demo-owner", "/owner"],
+  ["فریلنسر", "demo-freelancer", "/freelancer"],
+  ["مدیر", "demo-admin", "/admin"],
+];
+
+async function demoLogin(page, role, username, home) {
+  await page.goto(url("/auth"));
+  await expect(page.getByRole("tab", { name: "ورود نمایشی" })).toHaveAttribute("aria-selected", "true");
+  await page.getByLabel(role).check();
+  await expect(page.getByLabel("نام کاربری")).toHaveValue(username);
+  await expect(page.getByText(username, { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "ورود", exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`${home}/dashboard$`));
+}
+
 test.describe("demo login", () => {
-  for (const [role, username, home] of [
-    ["کارفرما", "demo-owner", "/owner"],
-    ["فریلنسر", "demo-freelancer", "/freelancer"],
-    ["مدیر", "demo-admin", "/admin"],
-  ]) {
+  for (const [role, username, home] of DEMO_ROLES) {
     test(`${username} lands on its dashboard`, async ({ page }) => {
-      await page.goto(url("/auth"));
-      await expect(page.getByRole("tab", { name: "ورود نمایشی" })).toHaveAttribute("aria-selected", "true");
-      await page.getByLabel(role).check();
-      await expect(page.getByLabel("نام کاربری")).toHaveValue(username);
-      await expect(page.getByText(username, { exact: true })).toBeVisible();
-      await page.getByRole("button", { name: "ورود", exact: true }).click();
-      await expect(page).toHaveURL(new RegExp(`${home}/dashboard$`));
+      await demoLogin(page, role, username, home);
+    });
+  }
+});
+
+test.describe("logout", () => {
+  for (const [role, username, home] of DEMO_ROLES) {
+    test(`${username} logs out, then ${home} redirects to auth`, async ({ page }) => {
+      await demoLogin(page, role, username, home);
+      await page.getByRole("button", { name: "خروج" }).click();
+      await expect(page).toHaveURL(url("/"));
+
+      await page.goto(url(home));
+      await expect(page).toHaveURL(url("/auth"));
     });
   }
 });

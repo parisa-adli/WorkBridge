@@ -78,8 +78,9 @@ describe("AuthContainer", () => {
     expect(screen.getByText(password)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "ورود" }));
     await waitFor(() => expect(demoLoginApiMock.mock.calls[0][0]).toEqual({ username, password }));
+    // the mutation resolves before the redirect renders, so wait for both under load
+    await waitFor(() => expect(screen.getByTestId("location")).toHaveTextContent(home));
     expect(toast.success).toHaveBeenCalledWith("welcome");
-    expect(screen.getByTestId("location")).toHaveTextContent(home);
   });
 
   it("shows the returned code in the send-OTP toast", async () => {
