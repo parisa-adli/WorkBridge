@@ -4,7 +4,7 @@ import { UserModel } from "../../../models/user";
 import Controller from "../controller";
 import { ProjectModel } from "../../../models/project";
 import { ProposalModel } from "../../../models/proposal";
-import { escapeRegex } from "../../../../utils/functions";
+import { escapeRegex, isDemoUser } from "../../../../utils/functions";
 import type { VerifyUserBody } from "../../validators/user.schema";
 import { STATUS } from "../../../../utils/constants";
 import { apiError, sendData } from "../../../../utils/apiResponse";
@@ -49,6 +49,10 @@ class UserController extends Controller {
   async verifyUser(req: Request<{ userId: string }, unknown, VerifyUserBody>, res: Response) {
     const { userId } = req.params;
     const { status } = req.body;
+    // demo accounts are shared by every visitor, so nobody may change their status, the demo admin included
+    const target = await UserModel.findById(userId, { username: 1 });
+    if (target && isDemoUser(target))
+      throw apiError(403, ERROR_CODES.DEMO_ACCOUNT_LOCKED, "حساب نمایشی قابل تغییر نیست");
     const updateResult = await UserModel.updateOne(
       { _id: userId },
       { $set: { status } }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { z } from "zod";
 import { LIMITS } from "../constants";
-import { checkOtpSchema, completeProfileSchema, sendOtpSchema } from "./auth";
+import { checkOtpSchema, completeProfileSchema, demoLoginSchema, sendOtpSchema } from "./auth";
 
 const firstError = (schema: z.ZodType, data: unknown) => schema.safeParse(data).error?.issues[0].message;
 
@@ -44,5 +44,12 @@ describe("auth schemas", () => {
     expect(firstError(completeProfileSchema, { ...valid, email: "a@b" })).toBe("ایمیل نامعتبر است");
     expect(firstError(completeProfileSchema, { ...valid, role: null })).toBe("انتخاب نقش ضروری است");
     expect(firstError(completeProfileSchema, { ...valid, role: "ADMIN" })).toBe("انتخاب نقش ضروری است");
+  });
+
+  it("demo login: every role, a required username and password", () => {
+    const valid = { role: "ADMIN", username: "demo-admin", password: "Admin@1234" };
+    expect(demoLoginSchema.safeParse(valid).success).toBe(true);
+    expect(firstError(demoLoginSchema, { ...valid, username: "" })).toBe("نام کاربری ضروری است");
+    expect(firstError(demoLoginSchema, { ...valid, password: "" })).toBe("رمز عبور ضروری است");
   });
 });

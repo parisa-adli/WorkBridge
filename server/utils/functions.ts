@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 import type { CookieOptions, Request, Response } from "express";
 import { UserModel } from "../app/models/user";
 import { CategoryModel } from "../app/models/category";
-import { PROJECT_STATUS } from "./constants";
+import { DEMO_USERNAMES, PROJECT_STATUS } from "./constants";
 
 export function toPersianDigits(n: number | string) {
   const farsiDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
@@ -155,4 +155,9 @@ export function hashPassword(password: string) {
 
 export function verifyPassword(password: string, stored: string) {
   return bcrypt.compare(password, stored);
+}
+
+// The shared demo accounts are locked: their role and status never change (PRD F1).
+export function isDemoUser(user: { username?: string | null }) {
+  return DEMO_USERNAMES.includes(user.username ?? "");
 }

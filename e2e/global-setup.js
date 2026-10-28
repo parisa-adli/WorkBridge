@@ -41,6 +41,22 @@ function start(args, cwd, env) {
   return child;
 }
 
+// Only the demo accounts, not `npm run seed`'s projects and categories, which the specs' fixed data would collide with.
+async function seedDemoUsers(mongoUri) {
+  const script = `import mongoose from "mongoose";
+import { seedDemoUsers } from "./utils/seedDemoUsers";
+(async () => {
+  await mongoose.connect(process.env.APP_DB);
+  await seedDemoUsers();
+  await mongoose.disconnect();
+})();`;
+  const child = start([path.join(root, "server/node_modules/tsx/dist/cli.mjs"), "-e", script], path.join(root, "server"), {
+    APP_DB: mongoUri,
+  });
+  const code = await new Promise((resolve) => child.on("close", resolve));
+  if (code !== 0) throw new Error(`seeding the demo users exited with ${code}`);
+}
+
 // Ports come from freePort, so another process can take one before the child binds it; retry with fresh ports.
 async function startApps(mongoUri, attempts = 3) {
   for (let attempt = 1; ; attempt++) {
@@ -60,6 +76,7 @@ async function startApps(mongoUri, attempts = 3) {
       TOKEN_SECRET_KEY: "e2e-token-secret",
       // Every signed-in spec logs in from the same IP; the default 10 per 15 min is too few for the suite.
       OTP_RATE_LIMIT: "1000",
+      DEMO_LOGIN_ENABLED: "true",
       SERVER_URL: serverUrl,
       CLIENT_URL: clientUrl,
       ALLOW_CORS_ORIGIN: clientUrl,
@@ -107,6 +124,7 @@ module.exports = async function globalSetup() {
     } finally {
       await client.close();
     }
+    await seedDemoUsers(mongoUri);
 
     const { serverUrl, clientUrl, kill } = await startApps(mongoUri);
     process.env.E2E_SERVER_URL = serverUrl;

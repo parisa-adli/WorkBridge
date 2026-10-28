@@ -13,9 +13,9 @@ export function checkOtp(data: { phoneNumber: string; otp: string }) {
     .then(({ data }) => data.data);
 }
 
-export function loginApi(data: { email: string; password: string }) {
+export function demoLoginApi(data: { username: string; password: string }) {
   return http
-    .post<ApiResponse<MessageData & { user: User }>>("/user/login", data)
+    .post<ApiResponse<MessageData & { user: User }>>("/user/demo-login", data)
     .then(({ data }) => data.data);
 }
 

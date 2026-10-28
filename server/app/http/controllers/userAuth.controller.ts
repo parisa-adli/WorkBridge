@@ -9,6 +9,7 @@ import {
   verifyRefreshToken,
   cookieOptions,
   verifyPassword,
+  isDemoUser,
 } from "../../../utils/functions";
 import { apiError, sendData } from "../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
@@ -17,7 +18,7 @@ import type {
   CheckOtpBody,
   CompleteProfileBody,
   GetOtpBody,
-  LoginBody,
+  DemoLoginBody,
   UpdateProfileBody,
 } from "../validators/user.schema";
 const CODE_EXPIRES = 90 * 1000; //90 seconds in miliseconds
@@ -68,12 +69,12 @@ class userAuthController extends Controller {
 
     return sendData(res, HttpStatus.OK, { ...welcome, user });
   }
-  async login(req: Request<object, unknown, LoginBody>, res: Response) {
-    const { email, password } = req.body;
+  async demoLogin(req: Request<object, unknown, DemoLoginBody>, res: Response) {
+    const { username, password } = req.body;
 
-    const user = await UserModel.findOne({ email: email.toLowerCase() });
+    const user = await UserModel.findOne({ username });
     if (!user?.password || !(await verifyPassword(password, user.password)))
-      throw apiError(401, ERROR_CODES.INVALID_CREDENTIALS, "ایمیل یا رمز عبور اشتباه است");
+      throw apiError(401, ERROR_CODES.INVALID_CREDENTIALS, "نام کاربری یا رمز عبور اشتباه است");
 
     await setAccessToken(res, user);
     await setRefreshToken(res, user);
@@ -130,6 +131,10 @@ class userAuthController extends Controller {
     // the route runs verifyAccessToken first, which sets req.user
     const user = req.user!;
     const { name, email, role } = req.body;
+
+    // complete-profile sets the role
+    if (isDemoUser(user))
+      throw apiError(403, ERROR_CODES.DEMO_ACCOUNT_LOCKED, "حساب نمایشی قابل تغییر نیست");
 
     if (!user.isVerifiedPhoneNumber)
       throw apiError(403, ERROR_CODES.PHONE_NOT_VERIFIED, "شماره موبایل خود را تایید کنید.");

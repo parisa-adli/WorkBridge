@@ -74,8 +74,8 @@ const PROJECTS = [
 // Every write is an upsert on a natural key, so running it again changes nothing.
 export async function seedDemoData() {
   await seedDemoUsers();
-  const owner = await UserModel.findOne({ email: DEMO_USERS.OWNER.email });
-  const freelancer = await UserModel.findOne({ email: DEMO_USERS.FREELANCER.email });
+  const owner = await UserModel.findOne({ username: DEMO_USERS.OWNER.username });
+  const freelancer = await UserModel.findOne({ username: DEMO_USERS.FREELANCER.username });
   if (!owner || !freelancer) throw new Error("demo users were not seeded");
 
   for (const category of CATEGORIES)

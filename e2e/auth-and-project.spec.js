@@ -28,6 +28,24 @@ async function loginWithOtp(page) {
   await page.getByRole("button", { name: "تایید", exact: true }).click();
 }
 
+test.describe("demo login", () => {
+  for (const [role, username, home] of [
+    ["کارفرما", "demo-owner", "/owner"],
+    ["فریلنسر", "demo-freelancer", "/freelancer"],
+    ["مدیر", "demo-admin", "/admin"],
+  ]) {
+    test(`${username} lands on its dashboard`, async ({ page }) => {
+      await page.goto(url("/auth"));
+      await expect(page.getByRole("tab", { name: "ورود نمایشی" })).toHaveAttribute("aria-selected", "true");
+      await page.getByLabel(role).check();
+      await expect(page.getByLabel("نام کاربری")).toHaveValue(username);
+      await expect(page.getByText(username, { exact: true })).toBeVisible();
+      await page.getByRole("button", { name: "ورود", exact: true }).click();
+      await expect(page).toHaveURL(new RegExp(`${home}/dashboard$`));
+    });
+  }
+});
+
 test.describe.serial("OTP login", () => {
   test("new user completes profile as OWNER and waits for approval", async ({ page }) => {
     await loginWithOtp(page);

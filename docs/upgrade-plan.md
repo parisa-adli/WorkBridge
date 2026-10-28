@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**36 of 49 phases done** (Parts A, B, C and D, and Phase 30). Next: Phase 31 (demo login).
+**37 of 49 phases done** (Parts A, B, C and D, and Phases 30–31). Next: Phase 32 (logout).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -39,7 +39,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
-| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 1/9 |
+| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 2/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
@@ -475,15 +475,15 @@ Files: `server/scripts/seed.ts` (new), `server/package.json`, models `project`, 
 
 Verify: run seed twice, no duplicates; switching language changes demo content without a refetch.
 
-### Phase 31: Demo login (F1 part 2) ⬜
+### Phase 31: Demo login (F1 part 2) ✅
 **Goal:** a visitor logs in as any role with one click.
 
 Files: `server/app/router/userAuth.js`, `userAuth.controller.js`, env validation (`DEMO_LOGIN_ENABLED`), `client/src/features/authentication/` (demo tab), `services/authService.js`, e2e
 
-- [ ] `POST /user/demo-login`: only seeded usernames, bcrypt/argon2 check, rate-limited, off when the flag is false, same cookies as OTP.
-- [ ] Demo accounts can't change their own role/status or demote other demo accounts.
-- [ ] Auth page tab with role picker, pre-filled credentials, credentials shown as text.
-- [ ] e2e: demo login per role lands on the right dashboard; OTP e2e still passes.
+- [x] `POST /user/demo-login`: only seeded usernames, bcrypt/argon2 check, rate-limited, off when the flag is false, same cookies as OTP.
+- [x] Demo accounts can't change their own role/status or demote other demo accounts.
+- [x] Auth page tab with role picker, pre-filled credentials, credentials shown as text.
+- [x] e2e: demo login per role lands on the right dashboard; OTP e2e still passes.
 
 Verify: tests and e2e pass; flag off returns 404.
 

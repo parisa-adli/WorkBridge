@@ -11,6 +11,7 @@ Object.assign(process.env, {
   TOKEN_SECRET_KEY: "test-token-secret",
   ALLOW_CORS_ORIGIN: "http://localhost:3000",
   SERVER_URL: "http://localhost:5000",
+  DEMO_LOGIN_ENABLED: "true", // demoLogin.test.ts turns it off per test
   OTP_RATE_LIMIT: "10000", // rateLimit.test.ts lowers it before the app loads
 });
 

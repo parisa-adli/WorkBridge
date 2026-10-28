@@ -2,15 +2,15 @@ import { UserModel } from "../app/models/user";
 import { DEMO_USERS, STATUS } from "./constants";
 import { hashPassword } from "./functions";
 
-// Upserts the verified demo accounts so the email login tab always works.
+// Upserts the verified demo accounts for the demo login tab. Keyed by username, so a real user's email is never taken over.
 export async function seedDemoUsers() {
   for (const [role, { username, name, biography, en, email, password }] of Object.entries(DEMO_USERS)) {
     await UserModel.updateOne(
-      { email },
+      { username },
       {
         $set: {
-          username,
           name,
+          email,
           biography,
           translations: { en },
           role,

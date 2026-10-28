@@ -3,7 +3,7 @@ const { MongoClient } = require("mongodb");
 
 // Baseline of the Tailwind 3 styles for Phase 28b to compare against.
 // Update with `npm run e2e -- screenshots --update-snapshots` only when a visual change is intended.
-const OWNER = { email: "owner@workbridge.dev", password: "Owner@1234" };
+const OWNER = { username: "demo-owner", password: "Owner@1234" };
 const url = (p) => `${process.env.E2E_CLIENT_URL}${p}`;
 
 const PAGES = [
@@ -18,7 +18,7 @@ test.beforeAll(async () => {
   const mongo = await MongoClient.connect(process.env.E2E_MONGO_URI);
   try {
     const db = mongo.db();
-    const owner = await db.collection("users").findOne({ email: OWNER.email });
+    const owner = await db.collection("users").findOne({ username: OWNER.username });
     const category = await db.collection("categories").findOne({ englishTitle: "programming" });
     const at = new Date("2026-01-01T00:00:00Z");
     await db.collection("projects").deleteMany({ owner: owner._id });
@@ -57,7 +57,7 @@ for (const language of ["fa", "en"]) {
           { language, dark: theme === "dark" }
         );
         // page.request shares the page's cookie jar, so the session cookies reach the client.
-        if (owner) expect((await page.request.post(`${process.env.E2E_SERVER_URL}/api/user/login`, { data: OWNER })).ok()).toBe(true);
+        if (owner) expect((await page.request.post(`${process.env.E2E_SERVER_URL}/api/user/demo-login`, { data: OWNER })).ok()).toBe(true);
 
         await page.goto(url(path));
         await expect(page.locator("html")).toHaveAttribute("lang", language);

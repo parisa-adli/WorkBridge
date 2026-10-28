@@ -130,7 +130,7 @@ From PRD F9. Every page is redesigned on the Phase 29 components, in fa/en × li
 |---|---|---|---|
 | 0 | 29 | 404 and not-access (reference page) | `*`, `/not-access` |
 | 1 | 39 | Home | `/` |
-| 2 | 39 | Auth (OTP tab and demo email tab) | `/auth` |
+| 2 | 39 | Auth (OTP tab and demo login tab) | `/auth` |
 | 3 | 39 | Complete profile | `/complete-profile` |
 | 4 | 40 | App layout: sidebar (drawer on mobile) and dashboard header | all role routes |
 | 5 | 40 | Owner dashboard | `/owner/dashboard` |

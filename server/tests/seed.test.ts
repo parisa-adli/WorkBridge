@@ -48,8 +48,8 @@ describe("seedDemoData", () => {
   it("returns translations.en from the API", async () => {
     await seedDemoData();
     const agent = request.agent(app);
-    const { email, password } = DEMO_USERS.OWNER;
-    await agent.post("/api/user/login").send({ email, password }).expect(200);
+    const { username, password } = DEMO_USERS.OWNER;
+    await agent.post("/api/user/demo-login").send({ username, password }).expect(200);
 
     const res = await agent.get("/api/project/owner-projects").expect(200);
     const project = res.body.data.projects.find((p: { title: string }) => p.title === "طراحی لوگوی استارتاپ");
@@ -68,8 +68,8 @@ describe("seedDemoData", () => {
   it("drops the English version when the owner edits a project", async () => {
     await seedDemoData();
     const agent = request.agent(app);
-    const { email, password } = DEMO_USERS.OWNER;
-    await agent.post("/api/user/login").send({ email, password }).expect(200);
+    const { username, password } = DEMO_USERS.OWNER;
+    await agent.post("/api/user/demo-login").send({ username, password }).expect(200);
     const project = (await ProjectModel.findOne({ title: "طراحی لوگوی استارتاپ" }))!;
 
     await agent

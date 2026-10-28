@@ -1,11 +1,11 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AuthContainer from "./AuthContainer";
 import useUser from "./useUser";
-import { checkOtp, getOtp, loginApi } from "../../services/authService";
+import { checkOtp, demoLoginApi, getOtp } from "../../services/authService";
 import i18n from "../../i18n";
 
 vi.mock("./useUser");
@@ -14,15 +14,20 @@ vi.mock("react-hot-toast");
 
 const getOtpMock = vi.mocked(getOtp);
 const checkOtpMock = vi.mocked(checkOtp);
-const loginApiMock = vi.mocked(loginApi);
+const demoLoginApiMock = vi.mocked(demoLoginApi);
 // the tests stub only the fields each case reads
 type OtpResponse = Awaited<ReturnType<typeof getOtp>>;
+
+function Location() {
+  return <span data-testid="location">{useLocation().pathname}</span>;
+}
 
 function renderAuth() {
   render(
     <QueryClientProvider client={new QueryClient()}>
       <MemoryRouter>
         <AuthContainer />
+        <Location />
       </MemoryRouter>
     </QueryClientProvider>
   );
@@ -46,31 +51,35 @@ describe("AuthContainer", () => {
     vi.useRealTimers();
   });
 
-  it("defaults to the email tab pre-filled with the owner demo account", () => {
+  it("defaults to the demo tab pre-filled with the owner demo account, also shown as text", () => {
     renderAuth();
-    expect(screen.getByRole("tab", { name: "ورود با ایمیل" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "ورود نمایشی" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByLabelText("کارفرما")).toBeChecked();
-    expect(screen.getByLabelText(/ایمیل/)).toHaveValue("owner@workbridge.dev");
+    expect(screen.getByLabelText(/نام کاربری/)).toHaveValue("demo-owner");
     expect(screen.getByLabelText(/رمز عبور/)).toHaveValue("Owner@1234");
+    expect(screen.getByText("demo-owner")).toBeInTheDocument();
+    expect(screen.getByText("Owner@1234")).toBeInTheDocument();
   });
 
-  it("switches to the freelancer demo account and logs in with it", async () => {
-    loginApiMock.mockResolvedValue({
+  it.each([
+    ["فریلنسر", "FREELANCER", "demo-freelancer", "Freelancer@1234", "/freelancer"],
+    ["مدیر", "ADMIN", "demo-admin", "Admin@1234", "/admin"],
+  ])("picking %s swaps the credentials and logs in with them", async (label, role, username, password, home) => {
+    demoLoginApiMock.mockResolvedValue({
       message: "welcome",
       code: "LOGGED_IN",
-      user: { role: "FREELANCER" } as Awaited<ReturnType<typeof loginApi>>["user"],
+      user: { role } as Awaited<ReturnType<typeof demoLoginApi>>["user"],
     });
     renderAuth();
-    fireEvent.click(screen.getByLabelText("فریلنسر"));
-    expect(screen.getByLabelText(/ایمیل/)).toHaveValue("freelancer@workbridge.dev");
+    fireEvent.click(screen.getByLabelText(label));
+    expect(screen.getByLabelText(/نام کاربری/)).toHaveValue(username);
+    expect(screen.getByLabelText(/رمز عبور/)).toHaveValue(password);
+    expect(screen.getByText(username)).toBeInTheDocument();
+    expect(screen.getByText(password)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "ورود" }));
-    await waitFor(() =>
-      expect(loginApiMock.mock.calls[0][0]).toEqual({
-        email: "freelancer@workbridge.dev",
-        password: "Freelancer@1234",
-      })
-    );
+    await waitFor(() => expect(demoLoginApiMock.mock.calls[0][0]).toEqual({ username, password }));
     expect(toast.success).toHaveBeenCalledWith("welcome");
+    expect(screen.getByTestId("location")).toHaveTextContent(home);
   });
 
   it("shows the returned code in the send-OTP toast", async () => {
@@ -144,8 +153,9 @@ describe("AuthContainer", () => {
   it("reads in English after a language switch", async () => {
     await i18n.changeLanguage("en");
     renderAuth();
-    expect(screen.getByRole("tab", { name: "Log in with email" })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByLabelText(/^Email/)).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Demo login" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByLabelText("Admin")).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Username/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Log in" })).toBeInTheDocument();
   });
 });

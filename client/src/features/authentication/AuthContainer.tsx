@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import SendOTPForm from "./SendOTPForm";
-import EmailLoginForm from "./EmailLoginForm";
+import DemoLoginForm from "./DemoLoginForm";
 import CheckOTPForm from "./CheckOTPForm";
 import toast from "react-hot-toast";
 import { getOtp } from "../../services/authService";
@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 function AuthContainer() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [tab, setTab] = useState<"email" | "phone">("email");
+  const [tab, setTab] = useState<"demo" | "phone">("demo");
   const [step, setStep] = useState(1);
   const {
     handleSubmit,
@@ -80,7 +80,7 @@ function AuthContainer() {
   };
 
   const tabs = [
-    { id: "email", label: t("auth.emailTab") },
+    { id: "demo", label: t("auth.demoTab") },
     { id: "phone", label: t("auth.phoneTab") },
   ] as const;
 
@@ -104,7 +104,7 @@ function AuthContainer() {
           </button>
         ))}
       </div>
-      {tab === "email" ? <EmailLoginForm /> : renderStep()}
+      {tab === "demo" ? <DemoLoginForm /> : renderStep()}
     </div>
   );
 }

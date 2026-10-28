@@ -9,13 +9,13 @@ import type { AxiosError } from "axios";
 import Textfield from "../../ui/Textfield";
 import RadioInputGroup from "../../ui/RadioInputGroup";
 import Loading from "../../ui/Loading";
-import { loginApi } from "../../services/authService";
+import { demoLoginApi } from "../../services/authService";
 import { DEMO_USERS, ROLES } from "../../constants";
-import { loginSchema, type LoginValues } from "../../schemas/auth";
+import { demoLoginSchema, type DemoLoginValues } from "../../schemas/auth";
 import type { ApiErrorResponse } from "../../types/api";
 import redirectByRole from "../../utils/redirectByRole";
 
-function EmailLoginForm() {
+function DemoLoginForm() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const {
@@ -24,16 +24,16 @@ function EmailLoginForm() {
     watch,
     setValue,
     formState: { errors },
-  } = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<DemoLoginValues>({
+    resolver: zodResolver(demoLoginSchema),
     defaultValues: { role: ROLES.OWNER, ...DEMO_USERS[ROLES.OWNER] },
   });
 
-  const { isPending, mutateAsync } = useMutation({ mutationFn: loginApi });
+  const { isPending, mutateAsync } = useMutation({ mutationFn: demoLoginApi });
 
-  const onSubmit = async ({ email, password }: LoginValues) => {
+  const onSubmit = async ({ username, password }: DemoLoginValues) => {
     try {
-      const { user, message } = await mutateAsync({ email, password });
+      const { user, message } = await mutateAsync({ username, password });
       toast.success(message);
       redirectByRole(navigate, user.role);
     } catch (error) {
@@ -43,10 +43,12 @@ function EmailLoginForm() {
 
   // picking a role swaps in that role's demo account
   const fillDemoUser = (e: ChangeEvent<HTMLInputElement>) => {
-    const { email, password } = DEMO_USERS[e.target.value as LoginValues["role"]];
-    setValue("email", email);
+    const { username, password } = DEMO_USERS[e.target.value as DemoLoginValues["role"]];
+    setValue("username", username);
     setValue("password", password);
   };
+
+  const shown = DEMO_USERS[watch("role")];
 
   return (
     <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
@@ -60,10 +62,11 @@ function EmailLoginForm() {
           options: [
             { value: ROLES.OWNER, label: t("roles.owner") },
             { value: ROLES.FREELANCER, label: t("roles.freelancer") },
+            { value: ROLES.ADMIN, label: t("roles.admin") },
           ],
         }}
       />
-      <Textfield label={t("auth.email")} name="email" type="email" register={register} required errors={errors} />
+      <Textfield label={t("auth.username")} name="username" register={register} required errors={errors} />
       <Textfield
         label={t("auth.password")}
         name="password"
@@ -72,6 +75,12 @@ function EmailLoginForm() {
         required
         errors={errors}
       />
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm text-text-muted">
+        <dt>{t("auth.username")}</dt>
+        <dd className="font-mono"><bdi>{shown.username}</bdi></dd>
+        <dt>{t("auth.password")}</dt>
+        <dd className="font-mono"><bdi>{shown.password}</bdi></dd>
+      </dl>
       {isPending ? (
         <Loading />
       ) : (
@@ -83,4 +92,4 @@ function EmailLoginForm() {
   );
 }
 
-export default EmailLoginForm;
+export default DemoLoginForm;

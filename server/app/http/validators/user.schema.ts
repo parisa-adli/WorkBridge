@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LIMITS, PHONE_PATTERN, ROLES, STATUS } from "../../../utils/constants";
+import { DEMO_USERNAMES, LIMITS, PHONE_PATTERN, ROLES, STATUS } from "../../../utils/constants";
 import { ERROR_CODES } from "../../../utils/errorCodes";
 import { issue } from "../middlewares/validate";
 import { numeric, searchQuery } from "./common.schema";
@@ -28,8 +28,9 @@ export const checkOtpSchema = z.object({
 
 const passwordRequired = issue(ERROR_CODES.PASSWORD_REQUIRED, "رمز عبور را وارد کنید");
 
-export const loginSchema = z.object({
-  email: z.email(invalidEmail),
+// only the seeded demo accounts can log in with a password (PRD F1)
+export const demoLoginSchema = z.object({
+  username: z.enum(DEMO_USERNAMES, issue(ERROR_CODES.INVALID_USERNAME, "نام کاربری صحیح نمی باشد")),
   password: z.string(passwordRequired).min(1, passwordRequired).max(100, passwordRequired),
 });
 
@@ -52,7 +53,7 @@ export const updateProfileSchema = z.object({
 });
 
 export type GetOtpBody = z.infer<typeof getOtpSchema>;
-export type LoginBody = z.infer<typeof loginSchema>;
+export type DemoLoginBody = z.infer<typeof demoLoginSchema>;
 export type CheckOtpBody = z.infer<typeof checkOtpSchema>;
 export type CompleteProfileBody = z.infer<typeof completeProfileSchema>;
 export type UpdateProfileBody = z.infer<typeof updateProfileSchema>;
