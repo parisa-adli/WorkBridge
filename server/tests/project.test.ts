@@ -85,7 +85,7 @@ describe("POST /api/project/add", () => {
 });
 
 describe("GET project lists", () => {
-  it("/list filters by status and hides owner, freelancer and proposals", async () => {
+  it("/list filters by status, names the owner and hides freelancer and proposals", async () => {
     const open = await addProject();
     const closed = await addProject(otherOwner.agent);
     await otherOwner.agent.patch(`/api/project/${closed._id}`).send({ status: "CLOSED" }).expect(200);
@@ -95,7 +95,7 @@ describe("GET project lists", () => {
     expect(res.status).toBe(200);
     expect(res.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([open._id]);
     const [p] = res.body.data.projects;
-    expect(p.owner).toBeUndefined();
+    expect(p.owner).toMatchObject({ _id: String(owner.user._id), name: owner.user.name });
     expect(p.freelancer).toBeUndefined();
     expect(p.proposals).toBeUndefined();
     expect(p.category).toMatchObject({ englishTitle: "web" });

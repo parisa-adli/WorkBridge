@@ -19,6 +19,7 @@ function ProjectsTable() {
           <th>#</th>
           <th>{t("project.title")}</th>
           <th>{t("project.category")}</th>
+          <th>{t("roles.owner")}</th>
           <th>{t("project.budget")}</th>
           <th>{t("project.deadline")}</th>
           <th>{t("common.status")}</th>

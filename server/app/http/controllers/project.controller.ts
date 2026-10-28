@@ -45,11 +45,13 @@ class ProjectController extends Controller {
 
     const projects = await ProjectModel.find(filter)
       .select({
-        owner: 0,
         freelancer: 0,
         proposals: 0,
       })
-      .populate([{ path: "category", select: { title: 1, englishTitle: 1 } }])
+      .populate([
+        { path: "category", select: { title: 1, englishTitle: 1 } },
+        { path: "owner", select: { name: 1 } },
+      ])
       .sort(sort);
 
     return sendData(res, HttpStatus.OK, { projects });

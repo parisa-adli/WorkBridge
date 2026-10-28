@@ -109,6 +109,9 @@ describe("GET /api/proposal/list", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.proposals.map((p: { _id: string }) => p._id)).toEqual([String(mine._id)]);
+    const [p] = res.body.data.proposals;
+    expect(p.user).toMatchObject({ _id: String(freelancer.user._id), name: freelancer.user.name });
+    expect(p.project.owner).toMatchObject({ _id: String(owner.user._id), name: owner.user.name });
   });
 });
 
