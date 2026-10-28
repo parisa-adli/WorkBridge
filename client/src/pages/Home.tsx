@@ -1,98 +1,27 @@
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { HiArrowLeft } from "react-icons/hi";
+import { FaLinkedin } from "react-icons/fa";
 import MainHeader from "../ui/MainHeader";
+import Skeleton from "../ui/Skeleton";
+import usePublicStats from "../hooks/usePublicStats";
+import { categoryName } from "../utils/localized";
 import { toPersianNumbers } from "../utils/toPersianNumber";
-import {
-  FaInstagram,
-  FaTelegramPlane,
-  FaLinkedin,
-} from "react-icons/fa";
 
-const categories = [
-  {
-    id: 1,
-    title: "home.categories.development",
-    skills: 985,
-    image_url: "Images/categories/development.svg",
-  },
-  {
-    id: 2,
-    title: "home.categories.design",
-    skills: 515,
-    image_url: "Images/categories/design.svg",
-  },
-  {
-    id: 3,
-    title: "home.categories.marketing",
-    skills: 486,
-    image_url: "Images/categories/marketing.svg",
-  },
-  {
-    id: 4,
-    title: "home.categories.writing",
-    skills: 1118,
-    image_url: "Images/categories/writing.svg",
-  },
-  {
-    id: 5,
-    title: "home.categories.music",
-    skills: 567,
-    image_url: "Images/categories/music.svg",
-  },
-  {
-    id: 6,
-    title: "home.categories.video",
-    skills: 231,
-    image_url: "Images/categories/video.svg",
-  },
-  {
-    id: 7,
-    title: "home.categories.architecture",
-    skills: 732,
-    image_url: "Images/categories/Architecture.svg",
-  },
-  {
-    id: 8,
-    title: "home.categories.finance",
-    skills: 963,
-    image_url: "Images/categories/Finance.svg",
-  },
-];
-const Achievement = [
-  {
-    id: 1,
-    title: "home.stats.freelancers",
-    numbers: 7423,
-    image_url: "Images/freelancer.svg",
-  },
-  {
-    id: 2,
-    title: "home.stats.postedProjects",
-    numbers: 8325,
-    image_url: "Images/projects.svg",
-  },
-  {
-    id: 3,
-    title: "home.stats.completedProjects",
-    numbers: 6274,
-    image_url: "Images/completed.svg",
-  },
-  {
-    id: 4,
-    title: "home.stats.companies",
-    numbers: 3560,
-    image_url: "Images/companies.svg",
-  },
-];
-const BORDER_COLORS: Record<number, string> = {
-  1: "border-t-[#FFDB7D]",
-  2: "border-t-[#FFDAD3]",
-  3: "border-t-[#D0E1FF]",
-  4: "border-t-[#DAF3E1]",
-};
+// Images exist only for these englishTitles; other categories get the generic projects icon.
+const CATEGORY_IMAGES = ["development", "design", "marketing", "writing", "music", "video", "architecture", "finance"];
+const categoryImage = (englishTitle: string) =>
+  CATEGORY_IMAGES.includes(englishTitle) ? `Images/categories/${englishTitle}.svg` : "Images/projects.svg";
+
+const ACHIEVEMENTS = [
+  { key: "freelancers", image_url: "Images/freelancer.svg", border: "border-t-[#FFDB7D]" },
+  { key: "owners", image_url: "Images/companies.svg", border: "border-t-[#FFDAD3]" },
+  { key: "openProjects", image_url: "Images/projects.svg", border: "border-t-[#D0E1FF]" },
+] as const;
 
 function Home() {
   const { t } = useTranslation();
+  const { stats, isLoading } = usePublicStats();
   return (
     <div className="bg-secondary-0">
       <MainHeader />
@@ -125,26 +54,31 @@ function Home() {
         <p className="text-xs md:text-lg text-secondary-500">
           {t("home.skillsCount")}
         </p>
-        <section className="grid xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-8 gap-5">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className="grid grid-cols-4 items-center p-3 border rounded-lg  gap-x-2">
-              <div className="col-span-1 aspect-square shrink-0  min-w-10">
-                <img
-                  className="object-contain w-full h-full"
-                  src={category.image_url}
-                  alt={t(category.title)}
-                />
-              </div>
-              <p className="col-span-3 flex flex-col items-start gap-2 text-nowrap text-sm lg:text-lg text-secondary-800">
-                {t(category.title)}
-                <span className="flex items-center gap-x-2 text-secondary-400 text-xs ">
-                  {t("home.projectsCount", { n: toPersianNumbers(category.skills) })} <HiArrowLeft className="ltr:-scale-x-100" />
-                </span>
-              </p>
-            </div>
-          ))}
+        <section
+          aria-busy={isLoading}
+          className="grid xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-8 gap-5">
+          {isLoading
+            ? Array.from({ length: 4 }, (_, i) => <Skeleton key={i} className="h-20 w-full" />)
+            : stats?.categories.map((category) => (
+                <Link
+                  to="/auth"
+                  key={category._id}
+                  className="grid grid-cols-4 items-center p-3 border rounded-lg  gap-x-2">
+                  <div className="col-span-1 aspect-square shrink-0  min-w-10">
+                    <img
+                      className="object-contain w-full h-full"
+                      src={categoryImage(category.englishTitle)}
+                      alt=""
+                    />
+                  </div>
+                  <p className="col-span-3 flex flex-col items-start gap-2 text-nowrap text-sm lg:text-lg text-secondary-800">
+                    {categoryName(category)}
+                    <span className="flex items-center gap-x-2 text-secondary-400 text-xs ">
+                      {t("home.projectsCount", { n: toPersianNumbers(category.projects) })} <HiArrowLeft className="ltr:-scale-x-100" />
+                    </span>
+                  </p>
+                </Link>
+              ))}
         </section>
       </div>
       <div
@@ -171,9 +105,9 @@ function Home() {
             <p className="text-sm text-secondary-500 leading-relaxed">
               {t("home.needProjectText")}
             </p>
-            <button className="bg-primary-800 text-secondary-50 py-1 px-4 rounded-md">
+            <Link to="/auth" className="inline-block bg-primary-800 text-secondary-50 py-1 px-4 rounded-md">
               {t("home.view")}
-            </button>
+            </Link>
           </div>
           <div
             className="
@@ -205,9 +139,9 @@ function Home() {
             <p className="text-sm text-secondary-500 leading-relaxed">
               {t("home.findJobText")}
             </p>
-            <button className="bg-primary-800 text-secondary-50 py-1 px-4 rounded-md">
+            <Link to="/auth" className="inline-block bg-primary-800 text-secondary-50 py-1 px-4 rounded-md">
               {t("home.view")}
-            </button>
+            </Link>
           </div>
           <div
             className="
@@ -233,26 +167,32 @@ function Home() {
         <p className="text-xs md:text-lg text-secondary-500">
           {t("home.achievementsText")}
         </p>
-        <section className="grid xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-8 gap-5">
-          {Achievement.map((arch) => (
+        <section
+          aria-busy={isLoading}
+          className="grid xs:grid-cols-2 sm:grid-cols-3 pt-8 gap-5">
+          {ACHIEVEMENTS.map((arch) => (
             <div
-              key={arch.id}
+              key={arch.key}
               className={`flex flex-col items-center rounded-lg p-4 shadow-lg border-t-2 bg-secondary-50
-                 ${BORDER_COLORS[arch.id] ?? "border-t-transparent"}
+                 ${arch.border}
               `}
             >
               <div className="aspect-square flex items-center justify-center mb-2">
                 <img
                   className="object-contain"
                   src={arch.image_url}
-                  alt={t(arch.title)}
+                  alt=""
                 />
               </div>
-              <p className="text-secondary-800 font-bold ">
-                {toPersianNumbers(arch.numbers)}
-              </p>
+              {isLoading ? (
+                <Skeleton className="h-6 w-12" />
+              ) : (
+                <p className="text-secondary-800 font-bold ">
+                  {toPersianNumbers(stats?.[arch.key] ?? 0)}
+                </p>
+              )}
               <p className=" text-nowrap text-sm lg:text-lg text-secondary-500">
-                {t(arch.title)}
+                {t(`home.stats.${arch.key}`)}
               </p>
             </div>
           ))}
@@ -260,7 +200,7 @@ function Home() {
       </div>
 
       <footer className="bg-secondary-50 text-secondary-900 mt-16">
-        <div className="container xl:max-w-(--breakpoint-lg) px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="container xl:max-w-(--breakpoint-lg) px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-2 space-y-4">
             <h3 className="text-xl font-extrabold text-primary-900">
               {t("app.name")}
@@ -270,17 +210,12 @@ function Home() {
             </p>
 
             <div className="flex items-center gap-3">
-              <a className="footer-social">
-                <FaInstagram />
-              </a>
-              <a className="footer-social">
-                <FaTelegramPlane />
-              </a>
               <a
                 className="footer-social"
                 href="https://www.linkedin.com/in/parisa-adli/"
                 target="_blank"
                 rel="noreferrer"
+                aria-label="LinkedIn"
               >
                 <FaLinkedin />
               </a>
@@ -289,28 +224,15 @@ function Home() {
           <div>
             <h4 className="footer-title">{t("home.footer.clients")}</h4>
             <ul className="footer-list">
-              <li>{t("home.footer.postProject")}</li>
-              <li>{t("home.footer.findFreelancer")}</li>
-              <li>{t("home.footer.manageProjects")}</li>
-              <li>{t("home.footer.clientGuide")}</li>
+              <li><Link to="/auth">{t("home.footer.postProject")}</Link></li>
+              <li><Link to="/auth">{t("home.footer.manageProjects")}</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="footer-title">{t("home.footer.freelancers")}</h4>
             <ul className="footer-list">
-              <li>{t("home.footer.findProject")}</li>
-              <li>{t("home.footer.buildProfile")}</li>
-              <li>{t("home.footer.rules")}</li>
-              <li>{t("home.footer.freelancerGuide")}</li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="footer-title">{t("home.footer.support")}</h4>
-            <ul className="footer-list">
-              <li>{t("home.footer.contact")}</li>
-              <li>{t("home.footer.faq")}</li>
-              <li>{t("home.footer.terms")}</li>
-              <li>{t("home.footer.privacy")}</li>
+              <li><Link to="/auth">{t("home.footer.findProject")}</Link></li>
+              <li><Link to="/auth">{t("home.footer.buildProfile")}</Link></li>
             </ul>
           </div>
         </div>

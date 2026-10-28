@@ -187,7 +187,7 @@
     "subtitle": "A platform for clients and freelancers",
     "intro": "A smart platform connecting clients and freelancers in today's fast-moving world. Clients define their projects in a few clicks, and skilled, precise and committed freelancers deliver them. From the first proposal to final delivery, everything is simple, transparent and trackable.",
     "popularCategories": "Popular categories",
-    "skillsCount": "Choose from more than 1,300 professional skills",
+    "skillsCount": "Browse projects by category",
     "projectsCount": "{{n}} projects",
     "needProjectTitle": "I need a project done",
     "needProjectText": "Hand your project to a creative community on your budget and get results",
@@ -198,38 +198,18 @@
     "achievementsText": "At Freelancer App we believe talent knows no borders, and opportunities shouldn't either",
     "footerText": "Freelancer App is a safe, professional place for clients and freelancers to work together, where projects are defined transparently and delivered with quality.",
     "copyright": "© {{year}} FreelancerApp. All rights reserved.",
-    "categories": {
-      "development": "Programming",
-      "design": "Design & creative",
-      "marketing": "Digital marketing",
-      "writing": "Writing & translation",
-      "music": "Music & video",
-      "video": "Video & animation",
-      "architecture": "Architecture",
-      "finance": "Finance & accounting"
-    },
     "stats": {
       "freelancers": "Freelancers",
-      "postedProjects": "Posted projects",
-      "completedProjects": "Completed projects",
-      "companies": "Registered companies"
+      "owners": "Clients",
+      "openProjects": "Open projects"
     },
     "footer": {
       "clients": "Clients",
       "postProject": "Post a project",
-      "findFreelancer": "Find a freelancer",
       "manageProjects": "Manage projects",
-      "clientGuide": "Client guide",
       "freelancers": "Freelancers",
       "findProject": "Find a project",
-      "buildProfile": "Build a profile",
-      "rules": "Collaboration rules",
-      "freelancerGuide": "Freelancer guide",
-      "support": "Support",
-      "contact": "Contact us",
-      "faq": "FAQ",
-      "terms": "Terms and conditions",
-      "privacy": "Privacy"
+      "buildProfile": "Build a profile"
     }
   },
   "server": {

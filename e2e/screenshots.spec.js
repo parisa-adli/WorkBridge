@@ -5,6 +5,16 @@ const { MongoClient } = require("mongodb");
 // Update with `npm run e2e -- screenshots --update-snapshots` only when a visual change is intended.
 const OWNER = { username: "demo-owner", password: "Owner@1234" };
 const url = (p) => `${process.env.E2E_CLIENT_URL}${p}`;
+const HOME_STATS = {
+  freelancers: 12,
+  owners: 7,
+  openProjects: 31,
+  categories: [
+    { _id: "c1", title: "برنامه نویسی", englishTitle: "development", projects: 18 },
+    { _id: "c2", title: "طراحی", englishTitle: "design", projects: 9 },
+    { _id: "c3", title: "ترجمه", englishTitle: "translation", projects: 4 },
+  ],
+};
 
 const PAGES = [
   { name: "home", path: "/" },
@@ -58,6 +68,8 @@ for (const language of ["fa", "en"]) {
         );
         // page.request shares the page's cookie jar, so the session cookies reach the client.
         if (owner) expect((await page.request.post(`${process.env.E2E_SERVER_URL}/api/user/demo-login`, { data: OWNER })).ok()).toBe(true);
+        // The home counts depend on what other specs created, so pin them.
+        await page.route("**/api/stats/public", (route) => route.fulfill({ json: { statusCode: 200, data: HOME_STATS } }));
 
         await page.goto(url(path));
         await expect(page.locator("html")).toHaveAttribute("lang", language);

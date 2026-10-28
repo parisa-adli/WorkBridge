@@ -43,6 +43,14 @@ export type Category = Timestamps & {
   parentId: string | null;
 };
 
+// GET /stats/public
+export type PublicStats = {
+  freelancers: number;
+  owners: number;
+  openProjects: number;
+  categories: (Pick<Category, "_id" | "title" | "englishTitle"> & { projects: number })[];
+};
+
 export type Proposal = Timestamps & Translations<{ description: string }> & {
   _id: string;
   price: number;

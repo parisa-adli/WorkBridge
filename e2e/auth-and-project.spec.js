@@ -67,6 +67,23 @@ test.describe("logout", () => {
   }
 });
 
+test("home shows the database's counts", async ({ page }) => {
+  const fa = (n) => n.toLocaleString("fa-IR", { useGrouping: false });
+  const db = mongo.db();
+  const freelancers = await users().countDocuments({ role: "FREELANCER", status: 2 });
+  const openProjects = await db.collection("projects").countDocuments({ status: "OPEN" });
+  const category = await db.collection("categories").findOne({ englishTitle: "programming" });
+  const inCategory = await db.collection("projects").countDocuments({ category: category._id });
+
+  await page.goto(url("/"));
+  await expect(page.getByRole("link", { name: new RegExp(`برنامه نویسی\\s*${fa(inCategory)} پروژه`) })).toHaveAttribute("href", "/auth");
+  // the number sits just before its label in the achievements section
+  const stat = (label) =>
+    page.locator("section").last().getByText(label, { exact: true }).locator("xpath=preceding-sibling::p[1]");
+  await expect(stat("فریلنسرها")).toHaveText(fa(freelancers));
+  await expect(stat("پروژه های باز")).toHaveText(fa(openProjects));
+});
+
 test("owner accepts a proposal, the freelancer sees it accepted", async ({ page }) => {
   const db = mongo.db();
   const [owner, freelancer, category] = await Promise.all([

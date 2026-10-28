@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**43 of 49 phases done** (Parts A, B, C and D, and Phases 30–37). Next: Phase 38 (real home page stats).
+**44 of 49 phases done** (Parts A, B, C, D and E). Next: Phase 39 (re-skin public and auth pages).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -39,7 +39,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
-| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 8/9 |
+| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
@@ -460,7 +460,7 @@ Verify: tests pass; the reference page passes an axe check in both themes.
 
 ---
 
-## Part E: Features ⬜
+## Part E: Features ✅
 
 Every feature is built on the new components and in both languages, with server tests and, where it is a user flow, an e2e test.
 
@@ -538,10 +538,10 @@ Files: the four list endpoints, the shared filter builder, client list hooks, `u
 
 Verify: server tests for paging bounds; admin user count is no longer capped at 20.
 
-### Phase 38: Real home page stats (F8) ⬜
+### Phase 38: Real home page stats (F8) ✅
 Files: `server/app/router/stats.ts` (new), router, `pages/Home.tsx`
 
-- [ ] `GET /stats/public` (no auth); Home uses it with a skeleton; remove hardcoded numbers; make or remove dead CTAs and footer links.
+- [x] `GET /stats/public` (no auth); Home uses it with a skeleton; remove hardcoded numbers; make or remove dead CTAs and footer links.
 
 Verify: server test for the counts; Home shows seeded numbers.
 
