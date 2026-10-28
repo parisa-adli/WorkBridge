@@ -64,6 +64,8 @@ export const LIMITS = Object.freeze({
   CATEGORY_TITLE_MAX: 100,
   CATEGORY_DESCRIPTION_MIN: 3,
   CATEGORY_DESCRIPTION_MAX: 200,
+  PAGE_SIZE: 10,
+  PAGE_SIZE_MAX: 100,
 });
 
 // The category model's type enum; labels are `category.types.<type>` keys.

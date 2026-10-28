@@ -11,6 +11,7 @@ function FilterDropDown({ options, filterField, label }: FilterDropDownProps) {
 
   function handlerChange(e: ChangeEvent<HTMLSelectElement>) {
     searchParams.set(filterField, e.target.value);
+    searchParams.delete("page"); // a new filter starts on its first page
     setSearchParams(searchParams);
   }
   return (

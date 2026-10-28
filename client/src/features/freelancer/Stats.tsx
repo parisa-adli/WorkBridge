@@ -9,9 +9,11 @@ import Stat from "../../ui/Stat";
 import { STATUS } from "../../constants";
 import type { Proposal } from "../../types/api";
 
-function Stats({ proposals }: { proposals: Proposal[] }) {
+// shortcut: accepted proposals and the wallet cover the first PAGE_SIZE_MAX proposals only;
+// move them to a stats endpoint if a freelancer outgrows that.
+function Stats({ proposals, total }: { proposals: Proposal[]; total: number }) {
   const { t } = useTranslation();
-  const numOfProposals = proposals.length;
+  const numOfProposals = total;
   const acceptedProposals = proposals.filter((p) => p.status === STATUS.ACCEPTED)
   const balance = acceptedProposals
         .reduce((acc, curr) => acc + curr.price, 0);

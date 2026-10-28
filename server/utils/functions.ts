@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 import type { CookieOptions, Request, Response } from "express";
 import { UserModel } from "../app/models/user";
 import { CategoryModel } from "../app/models/category";
-import { DEMO_USERNAMES, PROJECT_STATUS } from "./constants";
+import { DEMO_USERNAMES, LIMITS, PROJECT_STATUS } from "./constants";
 
 export function toPersianDigits(n: number | string) {
   const farsiDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
@@ -63,7 +63,16 @@ export function escapeRegex(text: unknown) {
 }
 
 export function createdAtSort(sort: unknown) {
-  return { createdAt: sort === "latest" ? -1 : 1 } as const;
+  const order = sort === "latest" ? -1 : 1;
+  // _id breaks createdAt ties, so a document can't show up on two pages
+  return { createdAt: order, _id: order } as const;
+}
+
+// page and limit are validated by pageQuery in the route's query schema
+export function pagination({ page, limit }: { page?: unknown; limit?: unknown }) {
+  const p = Number(page) || 1;
+  const l = Number(limit) || LIMITS.PAGE_SIZE;
+  return { page: p, limit: l, skip: (p - 1) * l };
 }
 
 type ProjectQuery = { search?: unknown; category?: unknown; sort?: unknown; status?: unknown };

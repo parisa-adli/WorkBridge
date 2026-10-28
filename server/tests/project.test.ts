@@ -93,8 +93,8 @@ describe("GET project lists", () => {
     const res = await freelancer.agent.get("/api/project/list?status=OPEN");
 
     expect(res.status).toBe(200);
-    expect(res.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([open._id]);
-    const [p] = res.body.data.projects;
+    expect(res.body.data.items.map((p: { _id: string }) => p._id)).toEqual([open._id]);
+    const [p] = res.body.data.items;
     expect(p.owner).toMatchObject({ _id: String(owner.user._id), name: owner.user.name });
     expect(p.freelancer).toBeUndefined();
     expect(p.proposals).toBeUndefined();
@@ -108,7 +108,7 @@ describe("GET project lists", () => {
     const res = await freelancer.agent.get("/api/project/list?search=LANDING");
 
     expect(res.status).toBe(200);
-    expect(res.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([match._id]);
+    expect(res.body.data.items.map((p: { _id: string }) => p._id)).toEqual([match._id]);
   });
 
   it("/list?search treats regex characters literally", async () => {
@@ -117,10 +117,10 @@ describe("GET project lists", () => {
 
     const res = await freelancer.agent.get(`/api/project/list?search=${encodeURIComponent("++ (")}`);
     expect(res.status).toBe(200);
-    expect(res.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([match._id]);
+    expect(res.body.data.items.map((p: { _id: string }) => p._id)).toEqual([match._id]);
 
     const dot = await freelancer.agent.get("/api/project/list?search=.*");
-    expect(dot.body.data.projects).toEqual([]);
+    expect(dot.body.data.items).toEqual([]);
   });
 
   it("/owner-projects returns only the caller's projects", async () => {
@@ -130,8 +130,8 @@ describe("GET project lists", () => {
     const res = await owner.agent.get("/api/project/owner-projects");
 
     expect(res.status).toBe(200);
-    expect(res.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([mine._id]);
-    expect(res.body.data.projects[0].owner.name).toBe("user 09120000011");
+    expect(res.body.data.items.map((p: { _id: string }) => p._id)).toEqual([mine._id]);
+    expect(res.body.data.items[0].owner.name).toBe("user 09120000011");
   });
 
   it("/owner-projects shares the /list filters and sorts", async () => {
@@ -140,11 +140,11 @@ describe("GET project lists", () => {
     // raw driver write: mongoose timestamps would ignore a createdAt update
     await ProjectModel.collection.updateOne({ _id: new ProjectModel.base.Types.ObjectId(first._id) }, { $set: { createdAt: new Date("2020-01-01") } });
     const latest = await owner.agent.get("/api/project/owner-projects?sort=latest&category=web");
-    expect(latest.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([second._id, first._id]);
+    expect(latest.body.data.items.map((p: { _id: string }) => p._id)).toEqual([second._id, first._id]);
 
     // sort=popular is gone: it falls back to oldest first
     const popular = await owner.agent.get("/api/project/owner-projects?sort=popular");
-    expect(popular.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([first._id, second._id]);
+    expect(popular.body.data.items.map((p: { _id: string }) => p._id)).toEqual([first._id, second._id]);
 
   });
 

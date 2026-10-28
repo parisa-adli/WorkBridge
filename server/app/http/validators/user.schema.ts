@@ -2,7 +2,7 @@ import { z } from "zod";
 import { DEMO_USERNAMES, LIMITS, PHONE_PATTERN, ROLES, STATUS } from "../../../utils/constants";
 import { ERROR_CODES } from "../../../utils/errorCodes";
 import { issue } from "../middlewares/validate";
-import { numeric, searchQuery } from "./common.schema";
+import { numeric, pageQuery, searchQuery } from "./common.schema";
 
 const invalidPhone = issue(ERROR_CODES.INVALID_PHONE, "شماره موبایل وارد شده صحیح نمیباشد");
 const invalidOtp = issue(ERROR_CODES.INVALID_OTP, "کد ارسال شده صحیح نمیباشد");
@@ -64,10 +64,6 @@ export const verifyUserSchema = z.object({
   ),
 });
 
-const invalidPage = issue(ERROR_CODES.INVALID_PAGINATION, "صفحه بندی صحیح نمی باشد");
-// a positive integer, as the query string sends it
-const pageNumber = z.string(invalidPage).regex(/^[1-9]\d*$/, invalidPage).optional();
-
-export const userListQuerySchema = z.object({ search: searchQuery, page: pageNumber, limit: pageNumber });
+export const userListQuerySchema = z.object({ search: searchQuery, ...pageQuery });
 
 export type VerifyUserBody = z.infer<typeof verifyUserSchema>;

@@ -13,6 +13,7 @@ function Filter({ options, filterField }: FilterProps) {
 
   function handleClick(value: string) {
     searchParams.set(filterField, value);
+    searchParams.delete("page"); // a new filter starts on its first page
     setSearchParams(searchParams);
   }
   return (

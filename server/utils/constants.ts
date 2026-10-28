@@ -54,5 +54,7 @@ export const LIMITS = Object.freeze({
   NAME_MAX: 100,
   PROFILE_NAME_MAX: 50,
   BIOGRAPHY_MAX: 30,
+  PAGE_SIZE: 10,
+  PAGE_SIZE_MAX: 100,
 });
 export const PHONE_PATTERN = /^09[0-9]{9}$/;

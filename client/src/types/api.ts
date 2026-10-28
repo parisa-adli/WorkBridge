@@ -7,6 +7,8 @@ export type ApiResponse<T> = { statusCode: number; data: T };
 export type ApiErrorResponse = { statusCode: number; code: string; message: string; field?: string };
 // The payload of every mutation that answers with a toast.
 export type MessageData = { message: string; code: string };
+// The payload of the paged list endpoints (project/list, project/owner-projects, proposal/list, admin/user/list).
+export type Page<T> = { items: T[]; total: number; page: number; limit: number };
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 export type Status = (typeof STATUS)[keyof typeof STATUS];

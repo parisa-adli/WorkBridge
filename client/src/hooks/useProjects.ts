@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getProjectsApi } from "../services/projectService";
 import { useLocation } from "react-router-dom";
+import { LIMITS } from "../constants";
 
 export default function useProjects() {
   const { search } = useLocation();
@@ -13,7 +14,7 @@ export default function useProjects() {
     queryFn: () => getProjectsApi(search),
   });
 
-  const { projects = [] } = data || {};
+  const { items: projects = [], total = 0, page = 1, limit = LIMITS.PAGE_SIZE } = data || {};
 
-  return { projects, isLoading };
+  return { projects, total, page, limit, isLoading };
 }

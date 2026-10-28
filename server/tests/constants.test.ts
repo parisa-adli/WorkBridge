@@ -63,6 +63,8 @@ describe("constants", () => {
       NAME_MAX: 100,
       PROFILE_NAME_MAX: 50,
       BIOGRAPHY_MAX: 30,
+      PAGE_SIZE: 10,
+      PAGE_SIZE_MAX: 100,
     });
     expect(PHONE_PATTERN.source).toBe("^09[0-9]{9}$");
   });

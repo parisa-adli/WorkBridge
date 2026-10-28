@@ -1,5 +1,5 @@
 import http from "./httpService";
-import type { ApiResponse, MessageData, Project, Proposal, Role, Status, Translations, User } from "../types/api";
+import type { ApiResponse, MessageData, Page, Project, Proposal, Role, Status, Translations, User } from "../types/api";
 
 export function getOtp(data: { phoneNumber: string }) {
   return http
@@ -52,9 +52,9 @@ export function logoutApi() {
     .then(({ data }) => data.data);
 }
 
-export function getUsersApi() {
+export function getUsersApi(qs: string) {
   return http
-    .get<ApiResponse<{ users: User[] }>>("/admin/user/list")
+    .get<ApiResponse<Page<User>>>(`/admin/user/list${qs}`)
     .then(({ data }) => data.data);
 }
 

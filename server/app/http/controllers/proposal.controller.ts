@@ -5,7 +5,7 @@ import { ProposalModel } from "../../models/proposal";
 import type { AddProposalBody, ChangeProposalStatusBody } from "../validators/proposal.schema";
 import { ProjectModel } from "../../models/project";
 import { assertProjectOwner } from "./project.controller";
-import { findByIdOr404, createdAtSort } from "../../../utils/functions";
+import { findByIdOr404, createdAtSort, pagination } from "../../../utils/functions";
 import { ROLES, STATUS, PROJECT_STATUS } from "../../../utils/constants";
 import { apiError, sendData } from "../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES, type SuccessCode } from "../../../utils/errorCodes";
@@ -55,18 +55,24 @@ class ProposalController extends Controller {
       dbQuery["user"] = user._id;
     }
 
-    const proposals = await ProposalModel.find(dbQuery)
-      .populate([
-        { path: "user", select: { name: 1, translations: 1 } },
-        {
-          path: "project",
-          select: { owner: 1, title: 1, translations: 1 },
-          populate: { path: "owner", select: { name: 1, translations: 1 } },
-        },
-      ])
-      .sort(createdAtSort(req.query.sort));
+    const { page, limit, skip } = pagination(req.query);
+    const [items, total] = await Promise.all([
+      ProposalModel.find(dbQuery)
+        .populate([
+          { path: "user", select: { name: 1, translations: 1 } },
+          {
+            path: "project",
+            select: { owner: 1, title: 1, translations: 1 },
+            populate: { path: "owner", select: { name: 1, translations: 1 } },
+          },
+        ])
+        .sort(createdAtSort(req.query.sort))
+        .skip(skip)
+        .limit(limit),
+      ProposalModel.countDocuments(dbQuery),
+    ]);
 
-    return sendData(res, HttpStatus.OK, { proposals });
+    return sendData(res, HttpStatus.OK, { items, total, page, limit });
   }
   async getProposalById(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;

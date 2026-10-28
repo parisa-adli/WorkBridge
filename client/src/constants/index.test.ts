@@ -55,6 +55,8 @@ describe("constants", () => {
       CATEGORY_TITLE_MAX: 100,
       CATEGORY_DESCRIPTION_MIN: 3,
       CATEGORY_DESCRIPTION_MAX: 200,
+      PAGE_SIZE: 10,
+      PAGE_SIZE_MAX: 100,
     });
     expect(CATEGORY_TYPES).toEqual(["project", "post", "comment", "ticket"]);
     expect(PHONE_PATTERN.source).toBe("^09[0-9]{9}$");

@@ -52,7 +52,7 @@ describe("seedDemoData", () => {
     await agent.post("/api/user/demo-login").send({ username, password }).expect(200);
 
     const res = await agent.get("/api/project/owner-projects").expect(200);
-    const project = res.body.data.projects.find((p: { title: string }) => p.title === "طراحی لوگوی استارتاپ");
+    const project = res.body.data.items.find((p: { title: string }) => p.title === "طراحی لوگوی استارتاپ");
     expect(project.translations.en).toEqual({
       title: "Startup logo design",
       description: "We want a logo and a color guide for an education startup.",

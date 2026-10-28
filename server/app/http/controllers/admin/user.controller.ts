@@ -4,7 +4,7 @@ import { UserModel } from "../../../models/user";
 import Controller from "../controller";
 import { ProjectModel } from "../../../models/project";
 import { ProposalModel } from "../../../models/proposal";
-import { escapeRegex, isDemoUser } from "../../../../utils/functions";
+import { createdAtSort, escapeRegex, isDemoUser, pagination } from "../../../../utils/functions";
 import type { VerifyUserBody } from "../../validators/user.schema";
 import { STATUS } from "../../../../utils/constants";
 import { apiError, sendData } from "../../../../utils/apiResponse";
@@ -13,24 +13,21 @@ import { ERROR_CODES, SUCCESS_CODES, type SuccessCode } from "../../../../utils/
 class UserController extends Controller {
   // ADMIN ROUTES :
   async getAllUsers(req: Request, res: Response) {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
+    const { page, limit, skip } = pagination(req.query);
     const { search } = req.query;
     const searchTerm = new RegExp(escapeRegex(search), "i");
-    const users = await UserModel.find({
+    const filter = {
       $or: [
         { name: searchTerm },
         { email: searchTerm },
         { phoneNumber: searchTerm },
       ],
-    })
-      .limit(limit)
-      .skip(skip)
-      .sort({
-        createdAt: -1,
-      });
-    return sendData(res, HttpStatus.OK, { users });
+    };
+    const [items, total] = await Promise.all([
+      UserModel.find(filter).sort(createdAtSort("latest")).skip(skip).limit(limit),
+      UserModel.countDocuments(filter),
+    ]);
+    return sendData(res, HttpStatus.OK, { items, total, page, limit });
   }
   async userProfile(req: Request<{ userId: string }>, res: Response) {
     const { userId } = req.params;

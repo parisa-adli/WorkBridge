@@ -7,9 +7,11 @@ import {
 import Stat from "../../ui/Stat";
 import type { Project } from "../../types/api";
 
-function Stats({ projects }: { projects: Project[] }) {
+// shortcut: assigned projects and proposals are counted over the first PAGE_SIZE_MAX projects only;
+// move them to a stats endpoint if an owner outgrows that.
+function Stats({ projects, total }: { projects: Project[]; total: number }) {
   const { t } = useTranslation();
-  const numOfProjects = projects.length;
+  const numOfProjects = total;
   const numOfAcceptedProjects = projects.filter(
     (project) => project.freelancer
   ).length;

@@ -23,7 +23,7 @@ describe("admin user management", () => {
   it("lists users", async () => {
     const res = await admin.agent.get("/api/admin/user/list");
     expect(res.status).toBe(200);
-    expect(res.body.data.users.map((u: { phoneNumber: string }) => u.phoneNumber).sort()).toEqual(["09120000031", "09120000032"]);
+    expect(res.body.data.items.map((u: { phoneNumber: string }) => u.phoneNumber).sort()).toEqual(["09120000031", "09120000032"]);
   });
 
   it("verifying a pending user lets them use verified routes", async () => {
@@ -64,13 +64,13 @@ describe("admin user management", () => {
   it("searches users by name, email or phone", async () => {
     const res = await admin.agent.get("/api/admin/user/list?search=0032");
     expect(res.status).toBe(200);
-    expect(res.body.data.users.map((u: { phoneNumber: string }) => u.phoneNumber)).toEqual(["09120000032"]);
+    expect(res.body.data.items.map((u: { phoneNumber: string }) => u.phoneNumber)).toEqual(["09120000032"]);
   });
 
   it.each(["(", ".*"])("treats search %s literally instead of as a regex", async (search) => {
     const res = await admin.agent.get(`/api/admin/user/list?search=${encodeURIComponent(search)}`);
     expect(res.status).toBe(200);
-    expect(res.body.data.users).toEqual([]);
+    expect(res.body.data.items).toEqual([]);
   });
 
   it("returns a user's profile with project titles on proposals and no otp", async () => {
