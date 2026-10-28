@@ -18,6 +18,7 @@ const otpLimiter = () =>
 
 router.post("/get-otp", otpLimiter(), expressAsyncHandler(UserAuthController.getOtp));
 router.post("/check-otp", otpLimiter(), expressAsyncHandler(UserAuthController.checkOtp));
+router.post("/login", otpLimiter(), expressAsyncHandler(UserAuthController.login));
 router.post(
   "/complete-profile",
   verifyAccessToken,

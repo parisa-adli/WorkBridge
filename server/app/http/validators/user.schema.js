@@ -21,6 +21,17 @@ const checkOtpSchema = Joi.object({
     .error(createHttpError.BadRequest("شماره موبایل وارد شده صحیح نمیباشد")),
 });
 
+const loginSchema = Joi.object({
+  email: Joi.string()
+    .required()
+    .email()
+    .error(createHttpError.BadRequest("ایمیل وارد شده صحیح نمی باشد")),
+  password: Joi.string()
+    .required()
+    .max(100)
+    .error(createHttpError.BadRequest("رمز عبور را وارد کنید")),
+});
+
 const completeProfileSchema = Joi.object({
   name: Joi.string()
     .min(5)
@@ -67,5 +78,6 @@ module.exports = {
   getOtpSchema,
   completeProfileSchema,
   checkOtpSchema,
+  loginSchema,
   updateProfileSchema,
 };

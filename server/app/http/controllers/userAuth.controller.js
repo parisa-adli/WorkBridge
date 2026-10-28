@@ -6,6 +6,7 @@ const {
   setRefreshToken,
   verifyRefreshToken,
   cookieOptions,
+  verifyPassword,
 } = require("../../../utils/functions");
 const createError = require("http-errors");
 const { UserModel } = require("../../models/user");
@@ -16,6 +17,7 @@ const {
   updateProfileSchema,
   checkOtpSchema,
   getOtpSchema,
+  loginSchema,
 } = require("../validators/user.schema");
 
 const showOtp = () => process.env.NODE_ENV !== "production";
@@ -69,6 +71,24 @@ class userAuthController extends Controller {
       statusCode: HttpStatus.OK,
       data: {
         message: WELLCOME_MESSAGE,
+        user,
+      },
+    });
+  }
+  async login(req, res) {
+    await loginSchema.validateAsync(req.body);
+    const { email, password } = req.body;
+
+    const user = await UserModel.findOne({ email: email.toLowerCase() });
+    if (!user?.password || !(await verifyPassword(password, user.password)))
+      throw createError.Unauthorized("ایمیل یا رمز عبور اشتباه است");
+
+    await setAccessToken(res, user);
+    await setRefreshToken(res, user);
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: {
+        message: "به سایت freelancer خوش آمدید",
         user,
       },
     });

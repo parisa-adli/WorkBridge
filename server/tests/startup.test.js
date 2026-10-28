@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const Application = require("../app/server");
+const { UserModel } = require("../app/models/user");
 
 let listen, exit, error;
 
@@ -42,6 +43,7 @@ describe("Application.start", () => {
   it("listens only after Mongo connects", async () => {
     const order = [];
     vi.spyOn(mongoose, "connect").mockImplementationOnce(async () => order.push("connect"));
+    vi.spyOn(UserModel, "updateOne").mockResolvedValue({}); // demo-user seeding, no real DB here
     listen.mockImplementation(() => order.push("listen"));
     await new Application().start();
 

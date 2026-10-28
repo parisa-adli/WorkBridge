@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+const { promisify } = require("util");
 const createError = require("http-errors");
 const JWT = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
@@ -131,7 +133,25 @@ function copyObject(object) {
   return JSON.parse(JSON.stringify(object));
 }
 
+const scrypt = promisify(crypto.scrypt);
+
+// Stored as "salt:hash" (hex).
+async function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  return `${salt}:${(await scrypt(password, salt, 64)).toString("hex")}`;
+}
+
+async function verifyPassword(password, stored) {
+  const [salt, hash] = stored.split(":");
+  if (!salt || !hash) return false;
+  const actual = await scrypt(password, salt, 64);
+  const expected = Buffer.from(hash, "hex");
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
+}
+
 module.exports = {
+  hashPassword,
+  verifyPassword,
   toPersianDigits,
   cookieOptions,
   findByIdOr404,
