@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const { test, expect } = require("@playwright/test");
 const { MongoClient } = require("mongodb");
 
@@ -110,6 +112,31 @@ test("owner accepts a proposal, the freelancer sees it accepted", async ({ page 
   await expect(page.getByRole("heading", { name: title })).toBeVisible();
   await expect(page.getByText("بسته", { exact: true })).toBeVisible();
   await expect(page.getByText("تایید شده", { exact: true })).toBeVisible();
+});
+
+test("admin edits the profile and uploads an avatar, the header updates", async ({ page }) => {
+  const PNG = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(64)]);
+  await demoLogin(page, "مدیر", "demo-admin", "/admin");
+  const header = page.getByRole("link", { name: "مدیر نمونه" });
+  await expect(header.getByText("من", { exact: true })).toBeVisible(); // initials before any upload
+  await header.click();
+  await expect(page).toHaveURL(url("/admin/profile"));
+  await expect(page.getByLabel("شماره موبایل")).toBeDisabled();
+
+  await page.getByLabel("نام و نام خانوادگی").fill("مدیر ویرایش شده");
+  await page.getByRole("button", { name: "ذخیره تغییرات" }).click();
+  await expect(page.getByRole("link", { name: "مدیر ویرایش شده" })).toBeVisible();
+
+  await page.locator('input[type="file"]').setInputFiles({ name: "a.png", mimeType: "image/png", buffer: PNG });
+  await expect(page.getByRole("link", { name: "مدیر ویرایش شده" }).locator("img")).toHaveAttribute(
+    "src",
+    new RegExp(`^${process.env.E2E_SERVER_URL}/uploads/[a-f0-9]{24}-\\d+\\.png$`)
+  );
+
+  // put the seeded account back and drop the uploaded file
+  const { avatar } = await users().findOne({ username: "demo-admin" });
+  fs.rmSync(path.join(__dirname, "..", "server", avatar), { force: true });
+  await users().updateOne({ username: "demo-admin" }, { $set: { name: "مدیر نمونه" }, $unset: { avatar: "" } });
 });
 
 test.describe.serial("OTP login", () => {

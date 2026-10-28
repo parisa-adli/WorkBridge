@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { z } from "zod";
 import { LIMITS } from "../constants";
-import { checkOtpSchema, completeProfileSchema, demoLoginSchema, sendOtpSchema } from "./auth";
+import { checkOtpSchema, completeProfileSchema, demoLoginSchema, profileSchema, sendOtpSchema } from "./auth";
 
 const firstError = (schema: z.ZodType, data: unknown) => schema.safeParse(data).error?.issues[0].message;
 
@@ -44,6 +44,18 @@ describe("auth schemas", () => {
     expect(firstError(completeProfileSchema, { ...valid, email: "a@b" })).toBe("ایمیل نامعتبر است");
     expect(firstError(completeProfileSchema, { ...valid, role: null })).toBe("انتخاب نقش ضروری است");
     expect(firstError(completeProfileSchema, { ...valid, role: "ADMIN" })).toBe("انتخاب نقش ضروری است");
+  });
+
+  it("profile: name follows NAME_MIN..PROFILE_NAME_MAX, biography up to BIOGRAPHY_MAX", () => {
+    const valid = { name: "a".repeat(LIMITS.NAME_MIN), email: "a@b.com", biography: "" };
+    expect(profileSchema.safeParse(valid).success).toBe(true);
+    expect(profileSchema.safeParse({ ...valid, name: "a".repeat(LIMITS.PROFILE_NAME_MAX) }).success).toBe(true);
+    expect(firstError(profileSchema, { ...valid, name: "" })).toBe("نام و نام خانوادگی ضروری است");
+    expect(firstError(profileSchema, { ...valid, name: "a".repeat(LIMITS.PROFILE_NAME_MAX + 1) })).toBe(
+      "نام کاربری وارد شده صحیح نمی باشد"
+    );
+    expect(profileSchema.safeParse({ ...valid, biography: "a".repeat(LIMITS.BIOGRAPHY_MAX) }).success).toBe(true);
+    expect(profileSchema.safeParse({ ...valid, biography: "a".repeat(LIMITS.BIOGRAPHY_MAX + 1) }).success).toBe(false);
   });
 
   it("demo login: every role, a required username and password", () => {

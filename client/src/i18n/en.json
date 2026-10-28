@@ -106,6 +106,13 @@
     "changeStatus": "Change proposal status",
     "list": "Proposals"
   },
+  "profile": {
+    "title": "Profile",
+    "changeAvatar": "Change profile picture",
+    "avatarHint": "jpg, png or webp, up to 2 MB",
+    "biography": "Field of expertise",
+    "save": "Save changes"
+  },
   "user": {
     "resource": "User",
     "name": "Name",
@@ -264,6 +271,8 @@
     "INVALID_CATEGORY_ENGLISH_TITLE": "Invalid category English title",
     "INVALID_CATEGORY_DESCRIPTION": "Invalid category description",
     "INVALID_CATEGORY_TYPE": "Invalid category type",
+    "INVALID_AVATAR_TYPE": "The image must be a jpg, png or webp file",
+    "AVATAR_TOO_LARGE": "The image must be 2 MB or smaller",
     "OTP_SENT": "Verification code sent to {{phoneNumber}}",
     "OTP_VERIFIED": "Code verified, welcome to Freelancer",
     "OTP_VERIFIED_COMPLETE_PROFILE": "Code verified, please complete your profile",
@@ -285,6 +294,7 @@
     "PROPOSAL_PENDING": "Proposal set to pending",
     "CATEGORY_CREATED": "Category created",
     "CATEGORY_UPDATED": "Category updated",
-    "CATEGORY_DELETED": "Category deleted"
+    "CATEGORY_DELETED": "Category deleted",
+    "AVATAR_UPDATED": "Your profile picture was updated"
   }
 }

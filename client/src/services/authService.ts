@@ -31,6 +31,21 @@ export function getUser() {
     .then(({ data }) => data.data);
 }
 
+export function updateProfileApi(data: { name: string; email: string; biography?: string }) {
+  return http
+    .patch<ApiResponse<MessageData>>("/user/update", data)
+    .then(({ data }) => data.data);
+}
+
+// The server reads the file as the raw body and checks its type and size (jpg/png/webp, 2 MB).
+export function updateAvatarApi(file: File) {
+  return http
+    .patch<ApiResponse<MessageData & { avatarUrl: string }>>("/user/avatar", file, {
+      headers: { "Content-Type": file.type },
+    })
+    .then(({ data }) => data.data);
+}
+
 export function logoutApi() {
   return http
     .post<ApiResponse<MessageData>>("/user/logout")

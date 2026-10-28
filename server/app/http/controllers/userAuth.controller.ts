@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import fs from "fs/promises";
+import path from "path";
 import type { Request, Response } from "express";
 import { StatusCodes as HttpStatus } from "http-status-codes";
 import Controller from "./controller";
@@ -10,6 +12,7 @@ import {
   cookieOptions,
   verifyPassword,
   isDemoUser,
+  imageExtension,
 } from "../../../utils/functions";
 import { apiError, sendData } from "../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
@@ -24,6 +27,8 @@ import type {
 const CODE_EXPIRES = 90 * 1000; //90 seconds in miliseconds
 
 const showOtp = () => process.env.NODE_ENV !== "production";
+// server/, the folder that holds uploads/ (served at /uploads by app/server.ts)
+const SERVER_ROOT = path.join(__dirname, "..", "..", "..");
 
 class userAuthController extends Controller {
   // The routes validate each body (validate(schema) in router/userAuth.ts) before these handlers run.
@@ -178,6 +183,25 @@ class userAuthController extends Controller {
     return sendData(res, HttpStatus.OK, {
       message: "اطلاعات با موفقیت آپدیت شد",
       code: SUCCESS_CODES.PROFILE_UPDATED,
+    });
+  }
+  async updateAvatar(req: Request, res: Response) {
+    // the route runs verifyAccessToken first, which sets req.user, then reads the image into req.body
+    const { _id: userId, avatar: oldAvatar } = req.user!;
+    const extension = imageExtension(req.body);
+    if (!extension)
+      throw apiError(400, ERROR_CODES.INVALID_AVATAR_TYPE, "فرمت تصویر باید jpg، png یا webp باشد");
+
+    const avatar = `uploads/${userId}-${Date.now()}.${extension}`;
+    await fs.writeFile(path.join(SERVER_ROOT, avatar), req.body);
+    const user = await UserModel.findByIdAndUpdate(userId, { $set: { avatar } }, { returnDocument: "after" });
+    if (oldAvatar) await fs.rm(path.join(SERVER_ROOT, oldAvatar), { force: true });
+
+    return sendData(res, HttpStatus.OK, {
+      message: "تصویر پروفایل با موفقیت آپدیت شد",
+      code: SUCCESS_CODES.AVATAR_UPDATED,
+      // the model's virtual: SERVER_URL + avatar
+      avatarUrl: user!.get("avatarUrl") as string,
     });
   }
   async refreshToken(req: Request, res: Response) {

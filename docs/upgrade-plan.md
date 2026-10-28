@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**39 of 49 phases done** (Parts A, B, C and D, and Phases 30–33). Next: Phase 34 (profile page and avatar).
+**40 of 49 phases done** (Parts A, B, C and D, and Phases 30–34). Next: Phase 35 (admin category management).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -39,7 +39,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
-| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 4/9 |
+| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 5/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
@@ -506,12 +506,12 @@ Files: `proposal.controller.ts`, `project.controller.ts`, project router (freela
 
 Verify: server tests for each rule; e2e: owner accepts, freelancer sees it accepted.
 
-### Phase 34: Profile page and avatar (F3) ⬜
+### Phase 34: Profile page and avatar (F3) ✅
 Files: `server/app/router/userAuth.ts` (multer), `userAuth.controller.ts`, `server/uploads/`, `client/src/pages/Profile.tsx` (new), routes under each role, `UserAvatar`
 
-- [ ] `/<role>/profile` form via `/user/profile` + `PATCH /user/update`; phone read-only.
-- [ ] Avatar upload: jpg/png/webp ≤ 2 MB validated on the server, stored in `uploads/`; initials fallback.
-- [ ] Tests: oversized and wrong-type uploads rejected.
+- [x] `/<role>/profile` form via `/user/profile` + `PATCH /user/update`; phone read-only.
+- [x] Avatar upload: jpg/png/webp ≤ 2 MB validated on the server, stored in `uploads/`; initials fallback.
+- [x] Tests: oversized and wrong-type uploads rejected.
 
 Verify: tests pass; header updates after saving.
 

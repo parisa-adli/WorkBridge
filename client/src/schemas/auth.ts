@@ -36,6 +36,19 @@ export const completeProfileSchema = z.object({
 
 export type CompleteProfileValues = z.infer<typeof completeProfileSchema>;
 
+// The profile page (PATCH /user/update): name and email required, a short biography.
+export const profileSchema = z.object({
+  name: z
+    .string()
+    .min(1, msg("validation.fullNameRequired"))
+    .min(LIMITS.NAME_MIN, invalidName)
+    .max(LIMITS.PROFILE_NAME_MAX, invalidName),
+  email: z.string().min(1, msg("validation.emailRequired")).pipe(z.email(msg("validation.invalidEmail"))),
+  biography: z.string().max(LIMITS.BIOGRAPHY_MAX, msg("validation.maxChars", { max: LIMITS.BIOGRAPHY_MAX })),
+});
+
+export type ProfileValues = z.infer<typeof profileSchema>;
+
 // The demo tab; the server accepts only the seeded demo usernames.
 export const demoLoginSchema = z.object({
   role: z.enum([ROLES.OWNER, ROLES.FREELANCER, ROLES.ADMIN]),

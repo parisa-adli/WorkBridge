@@ -106,6 +106,13 @@
     "changeStatus": "تغییر وضعیت درخواست",
     "list": "لیست پروپوزال ها"
   },
+  "profile": {
+    "title": "پروفایل",
+    "changeAvatar": "تغییر تصویر پروفایل",
+    "avatarHint": "jpg، png یا webp، حداکثر ۲ مگابایت",
+    "biography": "حوزه تخصصی",
+    "save": "ذخیره تغییرات"
+  },
   "user": {
     "resource": "کاربری",
     "name": "نام",
@@ -264,6 +271,8 @@
     "INVALID_CATEGORY_ENGLISH_TITLE": "عنوان انگلیسی دسته بندی معتبر نیست",
     "INVALID_CATEGORY_DESCRIPTION": "توضیحات دسته بندی معتبر نیست",
     "INVALID_CATEGORY_TYPE": "نوع دسته بندی معتبر نیست",
+    "INVALID_AVATAR_TYPE": "فرمت تصویر باید jpg، png یا webp باشد",
+    "AVATAR_TOO_LARGE": "حجم تصویر نباید بیشتر از ۲ مگابایت باشد",
     "OTP_SENT": "کد تائید برای شماره موبایل {{phoneNumber}} ارسال گردید",
     "OTP_VERIFIED": "کد تایید شد، به سایت freelancer خوش آمدید",
     "OTP_VERIFIED_COMPLETE_PROFILE": "کد تایید شد، لطفا اطلاعات خود را تکمیل کنید",
@@ -285,6 +294,7 @@
     "PROPOSAL_PENDING": "وضعیت پروپوزال در انتظار تایید است",
     "CATEGORY_CREATED": "دسته بندی با موفقیت افزوده شد",
     "CATEGORY_UPDATED": "دسته بندی با موفقیت به روزرسانی شد",
-    "CATEGORY_DELETED": "دسته بندی با موفقیت حذف شد"
+    "CATEGORY_DELETED": "دسته بندی با موفقیت حذف شد",
+    "AVATAR_UPDATED": "تصویر پروفایل با موفقیت آپدیت شد"
   }
 }

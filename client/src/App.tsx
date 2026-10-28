@@ -22,6 +22,7 @@ import ProtectedRoute from "./ui/ProtectedRoute";
 import AdminLayout from "./features/admin/AdminLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import Users from "./pages/Users";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ function App() {
             >
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<OwnerDashboard />} />
+              <Route path="profile" element={<Profile />} />
               <Route path="projects" element={<Projects />} />
               <Route path="projects/:id" element={<Project />} />
             </Route>
@@ -58,6 +60,7 @@ function App() {
             >
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<FreelancerDashboard />} />
+              <Route path="profile" element={<Profile />} />
               <Route path="proposals" element={<Proposals />} />
               <Route path="projects" element={<SubmittedProjects />} />
               <Route path="projects/:id" element={<FreelancerProject />} />
@@ -72,6 +75,7 @@ function App() {
             >
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="profile" element={<Profile />} />
               <Route path="users" element={<Users />} />
               <Route path="proposals" element={<Proposals />} />
               <Route path="projects" element={<SubmittedProjects />} />

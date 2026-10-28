@@ -71,6 +71,9 @@ export const ERROR_CODES = codes([
   "INVALID_CATEGORY_ENGLISH_TITLE",
   "INVALID_CATEGORY_DESCRIPTION",
   "INVALID_CATEGORY_TYPE",
+  // avatar
+  "INVALID_AVATAR_TYPE",
+  "AVATAR_TOO_LARGE",
 ]);
 
 // Codes sent next to a success `message` (the ones the client shows in a toast).
@@ -97,6 +100,7 @@ export const SUCCESS_CODES = codes([
   "CATEGORY_CREATED",
   "CATEGORY_UPDATED",
   "CATEGORY_DELETED",
+  "AVATAR_UPDATED",
 ]);
 
 export type ErrorCode = keyof typeof ERROR_CODES;

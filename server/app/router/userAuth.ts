@@ -1,6 +1,5 @@
-import { Router, type RequestHandler } from "express";
+import { Router, raw, type RequestHandler } from "express";
 import { rateLimit } from "express-rate-limit";
-// const { uploadFile } = require("../../utils/multer");
 import { verifyAccessToken } from "../http/middlewares/user.middleware";
 import { UserAuthController } from "../http/controllers/userAuth.controller";
 import { ERROR_CODES } from "../../utils/errorCodes";
@@ -58,6 +57,20 @@ router.patch(
   validate(updateProfileSchema),
   UserAuthController.updateProfile
 );
+
+// The image is the raw body (Content-Type image/jpeg, png or webp); other types are left unparsed and rejected
+// by the controller, which also checks the file's magic bytes.
+const avatarBody = raw({ type: ["image/jpeg", "image/png", "image/webp"], limit: "2mb" });
+const readAvatar: RequestHandler = (req, res, next) =>
+  avatarBody(req, res, (err?: { type?: string }) =>
+    next(
+      err?.type === "entity.too.large"
+        ? apiError(413, ERROR_CODES.AVATAR_TOO_LARGE, "حجم تصویر نباید بیشتر از ۲ مگابایت باشد")
+        : err
+    )
+  );
+
+router.patch("/avatar", verifyAccessToken, readAvatar, UserAuthController.updateAvatar);
 
 router.get("/profile", verifyAccessToken, UserAuthController.getUserProfile);
 
