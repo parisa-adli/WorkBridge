@@ -26,6 +26,13 @@ export const checkOtpSchema = z.object({
   phoneNumber: phoneNumber.optional(),
 });
 
+const passwordRequired = issue(ERROR_CODES.PASSWORD_REQUIRED, "رمز عبور را وارد کنید");
+
+export const loginSchema = z.object({
+  email: z.email(invalidEmail),
+  password: z.string(passwordRequired).min(1, passwordRequired).max(100, passwordRequired),
+});
+
 export const completeProfileSchema = z.object({
   name: z.string(invalidName).min(LIMITS.NAME_MIN, invalidName).max(LIMITS.NAME_MAX, invalidName).optional(),
   email: z.email(invalidEmail).optional(),
@@ -45,6 +52,7 @@ export const updateProfileSchema = z.object({
 });
 
 export type GetOtpBody = z.infer<typeof getOtpSchema>;
+export type LoginBody = z.infer<typeof loginSchema>;
 export type CheckOtpBody = z.infer<typeof checkOtpSchema>;
 export type CompleteProfileBody = z.infer<typeof completeProfileSchema>;
 export type UpdateProfileBody = z.infer<typeof updateProfileSchema>;

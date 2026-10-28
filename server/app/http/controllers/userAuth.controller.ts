@@ -8,6 +8,7 @@ import {
   setRefreshToken,
   verifyRefreshToken,
   cookieOptions,
+  verifyPassword,
 } from "../../../utils/functions";
 import { apiError, sendData } from "../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
@@ -16,6 +17,7 @@ import type {
   CheckOtpBody,
   CompleteProfileBody,
   GetOtpBody,
+  LoginBody,
   UpdateProfileBody,
 } from "../validators/user.schema";
 const CODE_EXPIRES = 90 * 1000; //90 seconds in miliseconds
@@ -66,6 +68,21 @@ class userAuthController extends Controller {
 
     return sendData(res, HttpStatus.OK, { ...welcome, user });
   }
+  async login(req: Request<object, unknown, LoginBody>, res: Response) {
+    const { email, password } = req.body;
+
+    const user = await UserModel.findOne({ email: email.toLowerCase() });
+    if (!user?.password || !(await verifyPassword(password, user.password)))
+      throw apiError(401, ERROR_CODES.INVALID_CREDENTIALS, "ایمیل یا رمز عبور اشتباه است");
+
+    await setAccessToken(res, user);
+    await setRefreshToken(res, user);
+    return sendData(res, HttpStatus.OK, {
+      message: "به سایت freelancer خوش آمدید",
+      code: SUCCESS_CODES.LOGGED_IN,
+      user,
+    });
+  }
   async saveUser(phoneNumber: string, code: number) {
     const otp = {
       code,
@@ -97,7 +114,7 @@ class userAuthController extends Controller {
   }
   sendOTP(phoneNumber: string, code: number, res: Response) {
     // no SMS provider: outside production, print the code and return it so login still works (PRD R1)
-    if (showOtp()) console.log(`OTP for ${phoneNumber}: ${code}`);
+    if (showOtp()) console.log(`[dev OTP] ${phoneNumber}: ${code}`);
     return sendData(res, HttpStatus.OK, {
       message: `کد تائید برای شماره موبایل ${toPersianDigits(
         phoneNumber

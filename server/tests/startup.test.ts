@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import type { MockInstance } from "vitest";
 import Application from "../app/server";
+import { UserModel } from "../app/models/user";
 
 let listen: MockInstance<typeof express.application.listen>;
 let exit: MockInstance<typeof process.exit>;
@@ -49,6 +50,7 @@ describe("Application.start", () => {
       order.push("connect");
       return mongoose;
     });
+    vi.spyOn(UserModel, "updateOne").mockResolvedValue({} as never); // demo-user seeding, no real DB here
     listen.mockImplementation(() => {
       order.push("listen");
       return undefined as never;

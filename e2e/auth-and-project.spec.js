@@ -17,6 +17,7 @@ test.afterAll(async () => {
 // The server prints the OTP instead of sending SMS, so read it from the database.
 async function loginWithOtp(page) {
   await page.goto(url("/auth"));
+  await page.getByRole("tab", { name: "ورود با موبایل" }).click();
   await page.getByLabel("شماره موبایل").fill(PHONE);
   await page.getByRole("button", { name: "ارسال کد تایید" }).click();
   await expect(page.getByText("کد تایید را وارد کنید")).toBeVisible();

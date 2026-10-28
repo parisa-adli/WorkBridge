@@ -9,6 +9,7 @@ import {
   checkOtpSchema,
   completeProfileSchema,
   getOtpSchema,
+  loginSchema,
   updateProfileSchema,
 } from "../http/validators/user.schema";
 
@@ -28,6 +29,7 @@ const otpLimiter = () =>
 
 router.post("/get-otp", otpLimiter(), validate(getOtpSchema), UserAuthController.getOtp);
 router.post("/check-otp", otpLimiter(), validate(checkOtpSchema), UserAuthController.checkOtp);
+router.post("/login", otpLimiter(), validate(loginSchema), UserAuthController.login);
 router.post(
   "/complete-profile",
   verifyAccessToken,

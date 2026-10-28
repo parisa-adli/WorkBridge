@@ -13,6 +13,12 @@ export function checkOtp(data: { phoneNumber: string; otp: string }) {
     .then(({ data }) => data.data);
 }
 
+export function loginApi(data: { email: string; password: string }) {
+  return http
+    .post<ApiResponse<MessageData & { user: User }>>("/user/login", data)
+    .then(({ data }) => data.data);
+}
+
 export function completeProfile(data: { name: string; email: string; role: Role }) {
   return http
     .post<ApiResponse<MessageData & { user: User }>>("/user/complete-profile", data)

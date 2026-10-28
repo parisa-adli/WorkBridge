@@ -66,6 +66,17 @@ describe("POST /api/user/get-otp", () => {
     expect(res.body.data.code).toBe(SUCCESS_CODES.OTP_SENT);
   });
 
+  it("logs the phone number and code to the console outside production", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    try {
+      const res = await request(app).post("/api/user/get-otp").send({ phoneNumber: PHONE });
+      expect(res.status).toBe(200);
+      expect(log).toHaveBeenCalledWith(`[dev OTP] ${PHONE}: ${res.body.data.otp}`);
+    } finally {
+      log.mockRestore();
+    }
+  });
+
   it("does not return the code in production", async () => {
     process.env.NODE_ENV = "production";
     try {

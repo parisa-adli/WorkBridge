@@ -8,6 +8,11 @@ export const ROLES = Object.freeze({
 // User verification and proposal review share these codes (ACCEPTED = a verified user).
 export const STATUS = Object.freeze({ REJECTED: 0, PENDING: 1, ACCEPTED: 2 });
 export const PROJECT_STATUS = Object.freeze({ OPEN: "OPEN", CLOSED: "CLOSED" });
+// Public demo accounts for the email login tab (pre-filled in the client); seeded on startup.
+export const DEMO_USERS = Object.freeze({
+  OWNER: { name: "کارفرمای نمونه", email: "owner@workbridge.dev", password: "Owner@1234" },
+  FREELANCER: { name: "فریلنسر نمونه", email: "freelancer@workbridge.dev", password: "Freelancer@1234" },
+});
 export const LIMITS = Object.freeze({
   PROJECT_TITLE_MIN: 10,
   PROJECT_TITLE_MAX: 30,

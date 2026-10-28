@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import createError from "http-errors";
 import path from "path";
 import { allRoutes } from "./router/router";
+import { seedDemoUsers } from "../utils/seedDemoUsers";
 import { apiError, type ApiErrorResponse } from "../utils/apiResponse";
 import { ERROR_CODES, type ErrorCode } from "../utils/errorCodes";
 dotenv.config();
@@ -35,6 +36,7 @@ class Application {
       if (missing.length)
         throw new Error(`Missing required env vars: ${missing.join(", ")}`);
       await this.connectToDB();
+      await seedDemoUsers();
       this.createServer();
     } catch (err) {
       console.error("Server failed to start:", (err as Error).message);

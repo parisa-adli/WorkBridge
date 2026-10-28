@@ -34,3 +34,12 @@ export const completeProfileSchema = z.object({
 });
 
 export type CompleteProfileValues = z.infer<typeof completeProfileSchema>;
+
+// The email tab; the server only checks the email format and that a password is sent.
+export const loginSchema = z.object({
+  role: z.enum([ROLES.OWNER, ROLES.FREELANCER]),
+  email: z.string().min(1, "ایمیل ضروری است").pipe(z.email("ایمیل وارد شده صحیح نمی باشد")),
+  password: z.string().min(1, "رمز عبور ضروری است"),
+});
+
+export type LoginValues = z.infer<typeof loginSchema>;

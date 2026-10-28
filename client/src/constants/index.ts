@@ -13,6 +13,12 @@ export const ROLE_HOME = Object.freeze({
   [ROLES.FREELANCER]: "/freelancer",
 });
 
+// Public demo accounts pre-filled in the email login tab. Mirrors DEMO_USERS in server/utils/constants.ts.
+export const DEMO_USERS = Object.freeze({
+  [ROLES.OWNER]: { email: "owner@workbridge.dev", password: "Owner@1234" },
+  [ROLES.FREELANCER]: { email: "freelancer@workbridge.dev", password: "Freelancer@1234" },
+});
+
 // User verification and proposal review share these codes (ACCEPTED = a verified user).
 export const STATUS = Object.freeze({ REJECTED: 0, PENDING: 1, ACCEPTED: 2 });
 

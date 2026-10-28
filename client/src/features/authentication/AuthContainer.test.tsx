@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AuthContainer from "./AuthContainer";
 import useUser from "./useUser";
-import { checkOtp, getOtp } from "../../services/authService";
+import { checkOtp, getOtp, loginApi } from "../../services/authService";
 
 vi.mock("./useUser");
 vi.mock("../../services/authService");
@@ -13,6 +13,7 @@ vi.mock("react-hot-toast");
 
 const getOtpMock = vi.mocked(getOtp);
 const checkOtpMock = vi.mocked(checkOtp);
+const loginApiMock = vi.mocked(loginApi);
 // the tests stub only the fields each case reads
 type OtpResponse = Awaited<ReturnType<typeof getOtp>>;
 
@@ -27,6 +28,7 @@ function renderAuth() {
 }
 
 async function sendOtp() {
+  fireEvent.click(screen.getByRole("tab", { name: "ورود با موبایل" }));
   fireEvent.change(screen.getByLabelText("شماره موبایل"), {
     target: { value: "09120000001" },
   });
@@ -41,6 +43,33 @@ describe("AuthContainer", () => {
   });
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  it("defaults to the email tab pre-filled with the owner demo account", () => {
+    renderAuth();
+    expect(screen.getByRole("tab", { name: "ورود با ایمیل" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByLabelText("کارفرما")).toBeChecked();
+    expect(screen.getByLabelText(/ایمیل/)).toHaveValue("owner@workbridge.dev");
+    expect(screen.getByLabelText(/رمز عبور/)).toHaveValue("Owner@1234");
+  });
+
+  it("switches to the freelancer demo account and logs in with it", async () => {
+    loginApiMock.mockResolvedValue({
+      message: "welcome",
+      code: "LOGGED_IN",
+      user: { role: "FREELANCER" } as Awaited<ReturnType<typeof loginApi>>["user"],
+    });
+    renderAuth();
+    fireEvent.click(screen.getByLabelText("فریلنسر"));
+    expect(screen.getByLabelText(/ایمیل/)).toHaveValue("freelancer@workbridge.dev");
+    fireEvent.click(screen.getByRole("button", { name: "ورود" }));
+    await waitFor(() =>
+      expect(loginApiMock.mock.calls[0][0]).toEqual({
+        email: "freelancer@workbridge.dev",
+        password: "Freelancer@1234",
+      })
+    );
+    expect(toast.success).toHaveBeenCalledWith("welcome");
   });
 
   it("shows the returned code in the send-OTP toast", async () => {
@@ -72,6 +101,7 @@ describe("AuthContainer", () => {
 
   it("shows the phone error and sends nothing for a malformed number", async () => {
     renderAuth();
+    fireEvent.click(screen.getByRole("tab", { name: "ورود با موبایل" }));
     fireEvent.change(screen.getByLabelText("شماره موبایل"), { target: { value: "0912" } });
     fireEvent.click(screen.getByRole("button", { name: "ارسال کد تایید" }));
     expect(await screen.findByText("شماره موبایل وارد شده صحیح نمیباشد")).toBeInTheDocument();

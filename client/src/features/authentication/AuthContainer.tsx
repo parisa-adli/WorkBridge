@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import SendOTPForm from "./SendOTPForm";
+import EmailLoginForm from "./EmailLoginForm";
 import CheckOTPForm from "./CheckOTPForm";
 import toast from "react-hot-toast";
 import { getOtp } from "../../services/authService";
@@ -14,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 
 function AuthContainer() {
   const navigate = useNavigate();
+  const [tab, setTab] = useState<"email" | "phone">("email");
   const [step, setStep] = useState(1);
   const {
     handleSubmit,
@@ -75,7 +77,34 @@ function AuthContainer() {
     }
   };
 
-  return <div className="w-full sm:max-w-sm">{renderStep()}</div>;
+  const tabs = [
+    { id: "email", label: "ورود با ایمیل" },
+    { id: "phone", label: "ورود با موبایل" },
+  ] as const;
+
+  return (
+    <div className="w-full sm:max-w-sm">
+      <div role="tablist" className="flex gap-x-2 mb-8 border-b border-secondary-200">
+        {tabs.map(({ id, label }) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={tab === id}
+            onClick={() => setTab(id)}
+            className={`flex-1 py-2 -mb-px border-b-2 ${
+              tab === id
+                ? "border-primary-900 text-primary-900 font-bold"
+                : "border-transparent text-secondary-500"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {tab === "email" ? <EmailLoginForm /> : renderStep()}
+    </div>
+  );
 }
 
 export default AuthContainer;
