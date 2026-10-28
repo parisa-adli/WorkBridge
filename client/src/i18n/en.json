@@ -24,7 +24,8 @@
     "dashboard": "Dashboard",
     "users": "Users",
     "projects": "Projects",
-    "proposals": "Proposals"
+    "proposals": "Proposals",
+    "categories": "Categories"
   },
   "dashboard": {
     "title": "Overview",
@@ -113,6 +114,26 @@
     "biography": "Field of expertise",
     "save": "Save changes"
   },
+  "category": {
+    "resource": "Category",
+    "list": "Categories",
+    "title": "Persian title",
+    "englishTitle": "English title",
+    "type": "Type",
+    "parent": "Parent category",
+    "noParent": "None",
+    "add": "Add category",
+    "addNew": "Add a new category",
+    "edit": "Edit {{title}}",
+    "delete": "Delete {{title}}",
+    "childrenWarning": "Its subcategories ({{count}}) will be deleted too.",
+    "types": {
+      "project": "Project",
+      "post": "Post",
+      "comment": "Comment",
+      "ticket": "Ticket"
+    }
+  },
   "user": {
     "resource": "User",
     "name": "Name",
@@ -157,7 +178,8 @@
     "durationRequired": "Duration is required",
     "invalidDuration": "The duration is not allowed",
     "invalidProposalStatus": "Invalid proposal status",
-    "invalidUserStatus": "Invalid user status"
+    "invalidUserStatus": "Invalid user status",
+    "invalidCategoryType": "The category type is not valid"
   },
   "home": {
     "subtitle": "A platform for clients and freelancers",
@@ -266,6 +288,7 @@
     "CATEGORY_NOT_CREATED": "The category was not created",
     "CATEGORY_NOT_UPDATED": "The category was not updated",
     "CATEGORY_NOT_DELETED": "The category was not deleted",
+    "CATEGORY_IN_USE": "Projects use this category, so it can't be deleted",
     "DUPLICATE_CATEGORY": "A category with this title already exists.",
     "INVALID_CATEGORY_TITLE": "Invalid category title",
     "INVALID_CATEGORY_ENGLISH_TITLE": "Invalid category English title",

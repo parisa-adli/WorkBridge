@@ -38,6 +38,7 @@ export type Category = Timestamps & {
   englishTitle: string;
   description: string;
   type: string;
+  parentId: string | null;
 };
 
 export type Proposal = Timestamps & Translations<{ description: string }> & {

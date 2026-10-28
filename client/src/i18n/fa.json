@@ -24,7 +24,8 @@
     "dashboard": "داشبورد",
     "users": "کاربران",
     "projects": "پروژه ها",
-    "proposals": "درخواست ها"
+    "proposals": "درخواست ها",
+    "categories": "دسته بندی ها"
   },
   "dashboard": {
     "title": "آمار کلی",
@@ -113,6 +114,26 @@
     "biography": "حوزه تخصصی",
     "save": "ذخیره تغییرات"
   },
+  "category": {
+    "resource": "دسته بندی",
+    "list": "لیست دسته بندی ها",
+    "title": "عنوان فارسی",
+    "englishTitle": "عنوان انگلیسی",
+    "type": "نوع",
+    "parent": "دسته بندی والد",
+    "noParent": "بدون والد",
+    "add": "افزودن دسته بندی",
+    "addNew": "افزودن دسته بندی جدید",
+    "edit": "ویرایش {{title}}",
+    "delete": "حذف {{title}}",
+    "childrenWarning": "زیر دسته های آن ({{count}}) هم حذف می شوند.",
+    "types": {
+      "project": "پروژه",
+      "post": "پست",
+      "comment": "نظر",
+      "ticket": "تیکت"
+    }
+  },
   "user": {
     "resource": "کاربری",
     "name": "نام",
@@ -157,7 +178,8 @@
     "durationRequired": "مدت زمان ضروری است",
     "invalidDuration": "مدت زمان مجاز نمی باشد",
     "invalidProposalStatus": "وضعیت پروپوزال صحیح نمی باشد",
-    "invalidUserStatus": "وضعیت کاربر صحیح نمی باشد"
+    "invalidUserStatus": "وضعیت کاربر صحیح نمی باشد",
+    "invalidCategoryType": "نوع دسته بندی صحیح نمی باشد"
   },
   "home": {
     "subtitle": "پلتفرمی برای کارفرما و فریلنسر",
@@ -266,6 +288,7 @@
     "CATEGORY_NOT_CREATED": "دسته بندی ثبت نشد",
     "CATEGORY_NOT_UPDATED": "به روزرسانی انجام نشد",
     "CATEGORY_NOT_DELETED": "حذف دسته بندی انجام نشد",
+    "CATEGORY_IN_USE": "این دسته بندی در پروژه ها استفاده شده و قابل حذف نیست",
     "DUPLICATE_CATEGORY": "دسته بندی با این عنوان وجود دارد.",
     "INVALID_CATEGORY_TITLE": "عنوان دسته بندی معتبر نیست",
     "INVALID_CATEGORY_ENGLISH_TITLE": "عنوان انگلیسی دسته بندی معتبر نیست",

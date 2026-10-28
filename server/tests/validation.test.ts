@@ -83,7 +83,7 @@ const cases: Case[] = [
   ["post", "/api/admin/category/add", { ...category, englishTitle: undefined }, "englishTitle", ERROR_CODES.INVALID_CATEGORY_ENGLISH_TITLE, "عنوان انگلیسی دسته بندی صیحیح نمی باشد"],
   ["post", "/api/admin/category/add", { ...category, description: "x".repeat(201) }, "description", ERROR_CODES.INVALID_CATEGORY_DESCRIPTION, "توضیحات دسته بندی صحیح نمی باشد"],
   ["post", "/api/admin/category/add", { ...category, type: "product" }, "type", ...categoryType],
-  ["post", "/api/admin/category/add", { ...category, parent: "123" }, "parent", ...invalidId],
+  ["post", "/api/admin/category/add", { ...category, parentId: "123" }, "parentId", ...invalidId],
   ["patch", `/api/admin/category/update/${ID}`, { ...category, type: undefined }, "type", ...categoryType],
   ["patch", "/api/admin/category/update/123", category, "id", ...invalidId],
   ["delete", "/api/admin/category/remove/123", null, "id", ...invalidId],

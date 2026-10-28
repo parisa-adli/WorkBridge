@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**40 of 49 phases done** (Parts A, B, C and D, and Phases 30–34). Next: Phase 35 (admin category management).
+**41 of 49 phases done** (Parts A, B, C and D, and Phases 30–35). Next: Phase 36 (admin user profile view).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -39,7 +39,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
-| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 5/9 |
+| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 6/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
@@ -515,11 +515,11 @@ Files: `server/app/router/userAuth.ts` (multer), `userAuth.controller.ts`, `serv
 
 Verify: tests pass; header updates after saving.
 
-### Phase 35: Admin category management (F4) ⬜
+### Phase 35: Admin category management (F4) ✅
 Files: `category.controller.ts`, category schemas, `client/src/features/admin/categories/` (new), `services/categoryService.ts`, `App.tsx` route
 
-- [ ] Fix `type: "project"` on update and `parentId` on create.
-- [ ] List + create/edit/delete modals; delete warns about children and is blocked when projects use the category.
+- [x] Fix `type: "project"` on update and `parentId` on create.
+- [x] List + create/edit/delete modals; delete warns about children and is blocked when projects use the category.
 
 Verify: server tests for the two fixes and the delete block.
 

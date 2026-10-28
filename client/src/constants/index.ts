@@ -60,6 +60,13 @@ export const LIMITS = Object.freeze({
   NAME_MAX: 100,
   PROFILE_NAME_MAX: 50,
   BIOGRAPHY_MAX: 30,
+  CATEGORY_TITLE_MIN: 3,
+  CATEGORY_TITLE_MAX: 100,
+  CATEGORY_DESCRIPTION_MIN: 3,
+  CATEGORY_DESCRIPTION_MAX: 200,
 });
+
+// The category model's type enum; labels are `category.types.<type>` keys.
+export const CATEGORY_TYPES = ["project", "post", "comment", "ticket"] as const;
 
 export const PHONE_PATTERN = /^09[0-9]{9}$/;

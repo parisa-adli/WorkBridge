@@ -3,6 +3,7 @@ import { StatusCodes as HttpStatus } from "http-status-codes";
 import Controller from "./controller";
 import type { AddCategoryBody, UpdateCategoryBody } from "../validators/category.schema";
 import { CategoryModel } from "../../models/category";
+import { ProjectModel } from "../../models/project";
 import { findByIdOr404 } from "../../../utils/functions";
 import { apiError, sendData } from "../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
@@ -22,14 +23,15 @@ class CategoryController extends Controller {
     return sendData(res, HttpStatus.OK, { categories });
   }
   async addNewCategory(req: Request<object, unknown, AddCategoryBody>, res: Response) {
-    // `parent` is validated but not saved: the schema field is `parentId` (current-state.md).
-    const { title, englishTitle, description, type } = req.body;
+    const { title, englishTitle, description, type, parentId } = req.body;
     await this.findCategoryWithTitle(englishTitle);
+    if (parentId) await this.checkExistCategory(parentId);
     const category = await CategoryModel.create({
       title,
       englishTitle,
       description,
       type,
+      parentId: parentId || null,
     });
 
     if (!category)
@@ -67,6 +69,11 @@ class CategoryController extends Controller {
   async removeCategory(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
     const category = await this.checkExistCategory(id);
+    // children go with their parent, so a project on any of them blocks the delete
+    const children = await CategoryModel.find({ parentId: id }, { _id: 1 }).lean();
+    const inUse = await ProjectModel.exists({ category: { $in: [id, ...children.map((c) => c._id)] } });
+    if (inUse)
+      throw apiError(409, ERROR_CODES.CATEGORY_IN_USE, "این دسته بندی در پروژه ها استفاده شده و قابل حذف نیست");
     const deleteResult = await CategoryModel.deleteMany({
       $or: [{ _id: category._id }, { parentId: category._id }],
     });

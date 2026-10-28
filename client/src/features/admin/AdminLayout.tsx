@@ -5,6 +5,7 @@ import { IoIosApps } from "react-icons/io";
 import { MdOutlinePostAdd } from "react-icons/md";
 import { FaUser } from "react-icons/fa6";
 import { AiFillDashboard } from "react-icons/ai";
+import { BiCategory } from "react-icons/bi";
 
 function AdminLayout() {
   const { t } = useTranslation();
@@ -18,6 +19,11 @@ function AdminLayout() {
       <CustomNavLink to="users">
         <FaUser />
         <span>{t("nav.users")}</span>
+      </CustomNavLink>
+
+      <CustomNavLink to="categories">
+        <BiCategory />
+        <span>{t("nav.categories")}</span>
       </CustomNavLink>
 
       <CustomNavLink to="projects">
