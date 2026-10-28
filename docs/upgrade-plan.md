@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**32 of 49 phases done** (Parts A, B and C, Phases 26, 27a and 27b). Next: Phase 28a (Playwright screenshot baseline).
+**33 of 49 phases done** (Parts A, B and C, Phases 26, 27a, 27b and 28a). Next: Phase 28b (Tailwind 4, tokens and logical utilities).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -38,7 +38,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
-| D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ⬜ 3/6 |
+| D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ⬜ 4/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
@@ -424,14 +424,14 @@ Files: the project, proposal, owner, freelancer and admin features, `pages/*`, `
 
 Verify: the parity check passes in CI; every screen of each role reads in English (layout may still be LTR-broken until Phase 28b).
 
-### Phase 28a: Playwright screenshot baseline ⬜
+### Phase 28a: Playwright screenshot baseline ✅
 **Goal:** a screenshot baseline on the current Tailwind 3 styles, so Phase 28b can be compared against it.
 
 Files: `e2e/` (screenshot specs and baselines), CI
 
-- [ ] Screenshot specs for 3–4 key pages (e.g. home, auth, owner projects table, a dashboard) in fa/en × light/dark.
-- [ ] Baselines committed; the specs run in CI and are stable across two runs (no flaky dates or data).
-- [ ] No app code changes.
+- [x] Screenshot specs for 3–4 key pages (e.g. home, auth, owner projects table, a dashboard) in fa/en × light/dark.
+- [x] Baselines committed; the specs run in CI and are stable across two runs (no flaky dates or data).
+- [x] No app code changes.
 
 Verify: the screenshot specs pass twice in a row locally and in CI.
 
