@@ -42,9 +42,10 @@ export type Proposal = Timestamps & {
   price: number;
   duration: number;
   description: string;
-  // populated with { _id, name } inside a single project
+  // populated with { _id, name } inside a single project and in the list
   user: string | UserRef;
-  project: string;
+  // populated with the project's owner in the list
+  project: string | { _id: string; owner: UserRef };
   status: Status;
 };
 
