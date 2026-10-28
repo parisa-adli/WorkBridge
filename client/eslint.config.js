@@ -34,10 +34,10 @@ export default [
     },
   },
   {
-    // UI text goes through t(); a warning until Phase 27b extracts the remaining features
+    // UI text goes through t()
     files: ["src/**/*.tsx"],
     ignores: ["**/*.test.tsx"],
-    rules: { "react/jsx-no-literals": ["warn", { allowedStrings: ["-", "*"] }] },
+    rules: { "react/jsx-no-literals": ["error", { allowedStrings: ["-", "*", "#"] }] },
   },
   ...tseslint.configs.recommended.map((config) => ({
     ...config,

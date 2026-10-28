@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Empty from "../../../ui/Empty";
 import Loading from "../../../ui/Loading";
 import Table from "../../../ui/Table";
@@ -5,22 +6,23 @@ import useUsers from "../useUsers";
 import UserRow from "./UserRow";
 
 function UsersTable() {
+  const { t } = useTranslation();
   const { isLoading, users } = useUsers();
 
   if (isLoading) return <Loading />;
-  if (!users.length) return <Empty resourceName="کاربری" />;
+  if (!users.length) return <Empty resourceName={t("user.resource")} />;
 
   return (
     <Table>
       <Table.Header>
         <tr className="title-row">
           <th>#</th>
-          <th>نام</th>
-          <th>ایمیل</th>
-          <th>شماره موبایل</th>
-          <th>نقش</th>
-          <th>وضعیت</th>
-          <th>عملیات</th>
+          <th>{t("user.name")}</th>
+          <th>{t("auth.email")}</th>
+          <th>{t("auth.phoneNumber")}</th>
+          <th>{t("user.role")}</th>
+          <th>{t("common.status")}</th>
+          <th>{t("common.actions")}</th>
         </tr>
       </Table.Header>
       <Table.Body>

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   HiCollection,
   HiCurrencyDollar,
@@ -7,6 +8,7 @@ import Stat from "../../ui/Stat";
 import type { Project } from "../../types/api";
 
 function Stats({ projects }: { projects: Project[] }) {
+  const { t } = useTranslation();
   const numOfProjects = projects.length;
   const numOfAcceptedProjects = projects.filter(
     (project) => project.freelancer
@@ -20,19 +22,19 @@ function Stats({ projects }: { projects: Project[] }) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <Stat
         color="primary"
-        title="پروژه ها"
+        title={t("stats.projects")}
         value={numOfProjects}
         icon={<HiOutlineViewGrid className="w-20 h-20" />}
       />
       <Stat
         color="green"
-        title="پروژه های واگذار شده"
+        title={t("stats.assignedProjects")}
         value={numOfAcceptedProjects}
         icon={<HiCurrencyDollar className="w-20 h-20" />}
       />
       <Stat
         color="sky"
-        title="درخواست ها"
+        title={t("stats.proposals")}
         value={numOfProposals}
         icon={<HiCollection className="w-20 h-20" />}
       />

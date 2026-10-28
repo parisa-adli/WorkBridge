@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**31 of 49 phases done** (Parts A, B and C, Phases 26 and 27a). Next: Phase 27b (remaining feature strings; i18n lint rule as error).
+**32 of 49 phases done** (Parts A, B and C, Phases 26, 27a and 27b). Next: Phase 28a (Playwright screenshot baseline).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -38,7 +38,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
-| D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ⬜ 2/6 |
+| D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ⬜ 3/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
@@ -413,14 +413,14 @@ Files: `ui/*`, the three role layouts, `features/authentication/*`, `fa.json`, `
 
 Verify: login and navigation read in English; Persian is unchanged; tests and e2e pass.
 
-### Phase 27b: Remaining feature strings; i18n lint rule as error ⬜
+### Phase 27b: Remaining feature strings; i18n lint rule as error ✅
 **Goal:** no hardcoded UI strings are left; the lint rule blocks new literals.
 
 Files: the project, proposal, owner, freelancer and admin features, `pages/*`, `constants/` (status labels become keys), `schemas/*` (validation messages), `fa.json`, `en.json`, `client/eslint.config.js`
 
-- [ ] Extract every remaining component, page, status label and validation message; fill `en`.
-- [ ] The JSX-literal lint rule is an error; lint passes.
-- [ ] Client schema tests still assert the Persian messages; e2e still passes in Persian.
+- [x] Extract every remaining component, page, status label and validation message; fill `en`.
+- [x] The JSX-literal lint rule is an error; lint passes.
+- [x] Client schema tests still assert the Persian messages; e2e still passes in Persian.
 
 Verify: the parity check passes in CI; every screen of each role reads in English (layout may still be LTR-broken until Phase 28b).
 

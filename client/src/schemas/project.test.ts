@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { z } from "zod";
 import { LIMITS } from "../constants";
+import i18n from "../i18n";
 import { projectSchema } from "./project";
 import { proposalSchema } from "./proposal";
 import { proposalStatusSchema, userStatusSchema } from "./status";
@@ -78,5 +79,15 @@ describe("status schemas", () => {
     expect(userStatusSchema.parse({ status: 0 })).toEqual({ status: 0 });
     expect(firstError(proposalStatusSchema, { status: "3" })).toBe("وضعیت پروپوزال صحیح نمی باشد");
     expect(firstError(userStatusSchema, { status: "x" })).toBe("وضعیت کاربر صحیح نمی باشد");
+  });
+});
+
+describe("messages", () => {
+  it("are translated when a parse fails, in the active language", async () => {
+    await i18n.changeLanguage("en");
+    expect(firstError(projectSchema, { title: "a", description: "a".repeat(LIMITS.PROJECT_DESCRIPTION_MIN), budget: "1", category: "id" })).toBe(
+      `Enter at least ${LIMITS.PROJECT_TITLE_MIN} characters`
+    );
+    expect(firstError(proposalStatusSchema, { status: "3" })).toBe("Invalid proposal status");
   });
 });

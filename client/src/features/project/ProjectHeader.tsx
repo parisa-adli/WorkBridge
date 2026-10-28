@@ -1,8 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { HiArrowRight } from "react-icons/hi";
 import useMoveBack from "../../hooks/useMoveBack";
 import type { Project } from "../../types/api";
 
 function ProjectHeader({ project }: { project: Project }) {
+  const { t } = useTranslation();
   const moveBack = useMoveBack();
 
   return (
@@ -14,7 +16,7 @@ function ProjectHeader({ project }: { project: Project }) {
         <HiArrowRight className="w-6 h-6 text-secondary-50" />
       </button>
       <h1 className="font-black text-secondary-700 text-xl">
-        لیست درخواست های {project.title}
+        {t("project.proposalsOf", { title: project.title })}
       </h1>
     </div>
   );

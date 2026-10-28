@@ -22,21 +22,22 @@ export const DEMO_USERS = Object.freeze({
 // User verification and proposal review share these codes (ACCEPTED = a verified user).
 export const STATUS = Object.freeze({ REJECTED: 0, PENDING: 1, ACCEPTED: 2 });
 
+// Badge labels are translation keys.
 export const STATUS_BADGES = Object.freeze({
-  [STATUS.REJECTED]: { label: "رد شده", className: "badge--danger" },
-  [STATUS.PENDING]: { label: "در انتظار تایید", className: "badge--secondary" },
-  [STATUS.ACCEPTED]: { label: "تایید شده", className: "badge--success" },
+  [STATUS.REJECTED]: { label: "status.rejected", className: "badge--danger" },
+  [STATUS.PENDING]: { label: "status.pending", className: "badge--secondary" },
+  [STATUS.ACCEPTED]: { label: "status.accepted", className: "badge--success" },
 });
 
 export const PROJECT_STATUS = Object.freeze({ OPEN: "OPEN", CLOSED: "CLOSED" });
 
 export const PROJECT_STATUS_BADGES = Object.freeze({
-  [PROJECT_STATUS.OPEN]: { label: "باز", className: "badge--success" },
-  [PROJECT_STATUS.CLOSED]: { label: "بسته", className: "badge--danger" },
+  [PROJECT_STATUS.OPEN]: { label: "projectStatus.open", className: "badge--success" },
+  [PROJECT_STATUS.CLOSED]: { label: "projectStatus.closed", className: "badge--danger" },
 });
 
 export const UNKNOWN_STATUS = Object.freeze({
-  label: "نامشخص",
+  label: "status.unknown",
   className: "badge--secondary",
 });
 

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Textfield from "../../ui/Textfield";
@@ -6,6 +7,7 @@ import useCreateProposal from "./useCreateProposal";
 import { proposalSchema, type ProposalInput, type ProposalValues } from "../../schemas/proposal";
 
 function CreateProposal({ onClose, projectId }: { onClose: () => void; projectId: string }) {
+  const { t } = useTranslation();
   const {
     handleSubmit,
     register,
@@ -27,14 +29,14 @@ function CreateProposal({ onClose, projectId }: { onClose: () => void; projectId
     <div>
       <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
         <Textfield
-          label="توضیحات"
+          label={t("common.description")}
           name="description"
           register={register}
           required
           errors={errors}
         />
         <Textfield
-          label="قیمت"
+          label={t("proposal.price")}
           name="price"
           type="number"
           register={register}
@@ -42,7 +44,7 @@ function CreateProposal({ onClose, projectId }: { onClose: () => void; projectId
           errors={errors}
         />
         <Textfield
-          label="مدت زمان"
+          label={t("proposal.duration")}
           name="duration"
           type="number"
           register={register}
@@ -54,7 +56,7 @@ function CreateProposal({ onClose, projectId }: { onClose: () => void; projectId
             <Loading />
           ) : (
             <button type="submit" className="btn btn--primary w-full">
-              تایید
+              {t("common.confirm")}
             </button>
           )}
         </div>

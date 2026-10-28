@@ -34,7 +34,7 @@ The data flow is layered, and each feature follows it:
 
 List filtering and sorting are driven by URL query params: `useProjects` passes `location.search` directly to `/project/list`.
 
-**i18n:** `react-i18next`, `fa` (default) and `en` in `src/i18n/`. UI text goes through `t()` (`react/jsx-no-literals` flags literals). The `httpService` interceptor translates every server `message` by its `code` (`server.<CODE>` keys; fa keeps the server's Persian text), so toasts need nothing extra; a new server code needs a key in both locales and in the copied list in `src/i18n/serverCodes.test.ts`.
+**i18n:** `react-i18next`, `fa` (default) and `en` in `src/i18n/`. UI text goes through `t()` (`react/jsx-no-literals` fails lint on literals; it does not check attributes, so `title`/`label`/`alt` need `t()` too). Status badge labels in `constants/` are keys, translated where rendered. Client schema messages use `msg(key)` from `schemas/message.ts`, translated when a parse fails. The `httpService` interceptor translates every server `message` by its `code` (`server.<CODE>` keys; fa keeps the server's Persian text), so toasts need nothing extra; a new server code needs a key in both locales and in the copied list in `src/i18n/serverCodes.test.ts`.
 
 Dark mode lives in `context/DarkModeContext.tsx` and is stored via `useLocalStorageState`. Persian numbers and dates come from `utils/`.
 

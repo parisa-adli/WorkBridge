@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
 import Modal from "../../../ui/Modal";
@@ -8,6 +9,7 @@ import StatusBadge from "../../../ui/StatusBadge";
 import type { User } from "../../../types/api";
 
 function UserRow({ user, index }: { user: User; index: number }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { status } = user;
 
@@ -23,7 +25,7 @@ function UserRow({ user, index }: { user: User; index: number }) {
       </td>
       <td>
         <Modal
-          title="تغییر وضعیت کاربر"
+          title={t("user.changeStatus")}
           open={open}
           onClose={() => setOpen(false)}
         >

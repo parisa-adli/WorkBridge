@@ -4,17 +4,16 @@ import type { StatusInput } from "../schemas/status";
 import { STATUS_BADGES } from "../constants";
 import RHFSelect from "./RHFSelect";
 
-const options = Object.entries(STATUS_BADGES).map(([value, { label }]) => ({
-  value: Number(value),
-  label,
-}));
-
 function StatusSelect({
   register,
 }: {
   register: UseFormRegister<StatusInput>;
 }) {
   const { t } = useTranslation();
+  const options = Object.entries(STATUS_BADGES).map(([value, { label }]) => ({
+    value: Number(value),
+    label: t(label),
+  }));
   return (
     <RHFSelect
       name="status"

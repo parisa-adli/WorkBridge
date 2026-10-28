@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import Table from "../../ui/Table";
 import { toPersianNumbersWithComma } from "../../utils/toPersianNumber";
@@ -9,6 +10,7 @@ import StatusBadge from "../../ui/StatusBadge";
 import type { Proposal, UserRef } from "../../types/api";
 
 function ProposalRow({ proposal, index }: { proposal: Proposal; index: number }) {
+  const { t } = useTranslation();
   const { status } = proposal;
   const [open, setOpen] = useState(false);
 
@@ -20,14 +22,14 @@ function ProposalRow({ proposal, index }: { proposal: Proposal; index: number })
       <td>
         <p>{truncateText(proposal.description, 50)}</p>
       </td>
-      <td>{proposal.duration} روز</td>
+      <td>{t("proposal.days", { days: proposal.duration })}</td>
       <td>{toPersianNumbersWithComma(proposal.price)}</td>
       <td>
         <StatusBadge status={status} />
       </td>
       <td>
         <Modal
-          title="تغییر وضعیت درخواست"
+          title={t("proposal.changeStatus")}
           open={open}
           onClose={() => setOpen(false)}
         >

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import StatusSelect from "../../ui/StatusSelect";
@@ -13,6 +14,7 @@ type ChangeProposalStatusProps = {
 };
 
 function ChangeProposalStatus({ proposalId, onClose, proposalStatus }: ChangeProposalStatusProps) {
+  const { t } = useTranslation();
   const { register, handleSubmit } = useForm<StatusInput, unknown, StatusValues>({
     defaultValues: { status: proposalStatus },
     resolver: zodResolver(proposalStatusSchema),
@@ -32,7 +34,7 @@ function ChangeProposalStatus({ proposalId, onClose, proposalStatus }: ChangePro
             <Loading />
           ) : (
             <button type="submit" className="btn btn--primary w-full">
-              تایید
+              {t("common.confirm")}
             </button>
           )}
         </div>

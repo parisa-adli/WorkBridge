@@ -12,7 +12,11 @@
     "status": "Status",
     "changeStatus": "Change status",
     "notFound": "{{name}} not found.",
-    "confirmDelete": "Are you sure you want to delete {{name}}?"
+    "confirmDelete": "Are you sure you want to delete {{name}}?",
+    "actions": "Actions",
+    "all": "All",
+    "description": "Description",
+    "back": "Back"
   },
   "nav": {
     "home": "Home",
@@ -44,6 +48,143 @@
     "fullName": "Full name",
     "profilePending": "Your profile is awaiting approval",
     "profileNotVerified": "Your profile has not been approved yet"
+  },
+  "status": {
+    "rejected": "Rejected",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "unknown": "Unknown"
+  },
+  "projectStatus": {
+    "open": "Open",
+    "closed": "Closed"
+  },
+  "stats": {
+    "users": "Users",
+    "projects": "Projects",
+    "proposals": "Proposals",
+    "assignedProjects": "Assigned projects",
+    "acceptedProposals": "Accepted proposals",
+    "wallet": "Wallet"
+  },
+  "project": {
+    "resource": "Project",
+    "title": "Project title",
+    "category": "Category",
+    "budget": "Budget",
+    "deadline": "Deadline",
+    "tag": "Tags",
+    "tags": "Tags",
+    "freelancer": "Freelancer",
+    "proposals": "Proposals",
+    "yourProjects": "Your projects",
+    "add": "Add project",
+    "addNew": "Add a new project",
+    "edit": "Edit {{title}}",
+    "delete": "Delete {{title}}",
+    "list": "Projects",
+    "proposalsOf": "Proposals for {{title}}",
+    "sortLatest": "Sort (newest)",
+    "sortEarliest": "Sort (oldest)",
+    "allCategories": "Category (all)"
+  },
+  "proposal": {
+    "resource": "Proposal",
+    "deliveryTime": "Delivery time",
+    "cost": "Cost",
+    "price": "Price",
+    "duration": "Duration",
+    "days": "{{days}} days",
+    "send": "Send a proposal for {{title}}",
+    "changeStatus": "Change proposal status",
+    "list": "Proposals"
+  },
+  "user": {
+    "resource": "User",
+    "name": "Name",
+    "role": "Role",
+    "changeStatus": "Change user status",
+    "list": "Users"
+  },
+  "pages": {
+    "notFound": "The page you were looking for was not found",
+    "notAccess": "You do not have access to this page",
+    "backHome": "Back to home"
+  },
+  "validation": {
+    "phoneRequired": "Enter a valid phone number",
+    "invalidPhone": "The phone number is not valid",
+    "invalidOtp": "The code is not correct",
+    "invalidName": "The name is not valid",
+    "fullNameRequired": "Full name is required",
+    "emailRequired": "Email is required",
+    "invalidEmail": "The email is not valid",
+    "invalidLoginEmail": "The email is not valid",
+    "roleRequired": "Choose a role",
+    "passwordRequired": "Password is required",
+    "titleRequired": "Title is required",
+    "proposalDescriptionRequired": "Description is required",
+    "descriptionRequired": "Description is required",
+    "minChars": "Enter at least {{min}} characters",
+    "maxChars": "At most {{max}} characters are allowed",
+    "budgetRequired": "Budget is required",
+    "invalidAmount": "The amount is not valid",
+    "invalidCategory": "The selected category is not valid",
+    "deadlineRequired": "Deadline is required",
+    "priceRequired": "Price is required",
+    "durationRequired": "Duration is required",
+    "invalidDuration": "The duration is not allowed",
+    "invalidProposalStatus": "Invalid proposal status",
+    "invalidUserStatus": "Invalid user status"
+  },
+  "home": {
+    "subtitle": "A platform for clients and freelancers",
+    "intro": "A smart platform connecting clients and freelancers in today's fast-moving world. Clients define their projects in a few clicks, and skilled, precise and committed freelancers deliver them. From the first proposal to final delivery, everything is simple, transparent and trackable.",
+    "popularCategories": "Popular categories",
+    "skillsCount": "Choose from more than 1,300 professional skills",
+    "projectsCount": "{{n}} projects",
+    "needProjectTitle": "I need a project done",
+    "needProjectText": "Hand your project to a creative community on your budget and get results",
+    "findJobTitle": "Find your next opportunity!",
+    "findJobText": "Earn, find clients and build your freelance career",
+    "view": "View",
+    "achievements": "Our achievements",
+    "achievementsText": "At Freelancer App we believe talent knows no borders, and opportunities shouldn't either",
+    "footerText": "Freelancer App is a safe, professional place for clients and freelancers to work together, where projects are defined transparently and delivered with quality.",
+    "copyright": "© {{year}} FreelancerApp. All rights reserved.",
+    "categories": {
+      "development": "Programming",
+      "design": "Design & creative",
+      "marketing": "Digital marketing",
+      "writing": "Writing & translation",
+      "music": "Music & video",
+      "video": "Video & animation",
+      "architecture": "Architecture",
+      "finance": "Finance & accounting"
+    },
+    "stats": {
+      "freelancers": "Freelancers",
+      "postedProjects": "Posted projects",
+      "completedProjects": "Completed projects",
+      "companies": "Registered companies"
+    },
+    "footer": {
+      "clients": "Clients",
+      "postProject": "Post a project",
+      "findFreelancer": "Find a freelancer",
+      "manageProjects": "Manage projects",
+      "clientGuide": "Client guide",
+      "freelancers": "Freelancers",
+      "findProject": "Find a project",
+      "buildProfile": "Build a profile",
+      "rules": "Collaboration rules",
+      "freelancerGuide": "Freelancer guide",
+      "support": "Support",
+      "contact": "Contact us",
+      "faq": "FAQ",
+      "terms": "Terms and conditions",
+      "privacy": "Privacy"
+    }
   },
   "server": {
     "BAD_REQUEST": "Invalid request",

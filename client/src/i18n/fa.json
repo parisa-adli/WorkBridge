@@ -12,7 +12,11 @@
     "status": "وضعیت",
     "changeStatus": "تغییر وضعیت",
     "notFound": "{{name}} یافت نشد.",
-    "confirmDelete": "آیا از حذف {{name}} مطمئن هستید؟"
+    "confirmDelete": "آیا از حذف {{name}} مطمئن هستید؟",
+    "actions": "عملیات",
+    "all": "همه",
+    "description": "توضیحات",
+    "back": "برگشت"
   },
   "nav": {
     "home": "خانه",
@@ -44,6 +48,143 @@
     "fullName": "نام و نام خانوادگی",
     "profilePending": "پروفایل شما در انتظار تایید است",
     "profileNotVerified": "پروفایل شما هنوز تایید نشده است"
+  },
+  "status": {
+    "rejected": "رد شده",
+    "pending": "در انتظار تایید",
+    "accepted": "تایید شده",
+    "unknown": "نامشخص"
+  },
+  "projectStatus": {
+    "open": "باز",
+    "closed": "بسته"
+  },
+  "stats": {
+    "users": "کاربر ها",
+    "projects": "پروژه ها",
+    "proposals": "درخواست ها",
+    "assignedProjects": "پروژه های واگذار شده",
+    "acceptedProposals": "درخواست های تایید شده",
+    "wallet": "کیف پول"
+  },
+  "project": {
+    "resource": "پروژه",
+    "title": "عنوان پروژه",
+    "category": "دسته بندی",
+    "budget": "بودجه",
+    "deadline": "ددلاین",
+    "tag": "تگ",
+    "tags": "تگ ها",
+    "freelancer": "فریلنسر",
+    "proposals": "درخواست ها",
+    "yourProjects": "پروژه های شما",
+    "add": "اضافه کردن پروژه",
+    "addNew": "اضافه کردن پروژه جدید",
+    "edit": "ویرایش {{title}}",
+    "delete": "حذف {{title}}",
+    "list": "لیست پروژه ها",
+    "proposalsOf": "لیست درخواست های {{title}}",
+    "sortLatest": "مرتب سازی (جدید ترین)",
+    "sortEarliest": "مرتب سازی (قدیمی ترین)",
+    "allCategories": "دسته بندی (همه)"
+  },
+  "proposal": {
+    "resource": "درخواستی",
+    "deliveryTime": "زمان تحویل",
+    "cost": "هزینه",
+    "price": "قیمت",
+    "duration": "مدت زمان",
+    "days": "{{days}} روز",
+    "send": "درخواست انجام پروژه {{title}}",
+    "changeStatus": "تغییر وضعیت درخواست",
+    "list": "لیست پروپوزال ها"
+  },
+  "user": {
+    "resource": "کاربری",
+    "name": "نام",
+    "role": "نقش",
+    "changeStatus": "تغییر وضعیت کاربر",
+    "list": "لیست کاربران"
+  },
+  "pages": {
+    "notFound": "صفحه ای که دنبالش بودید، پیدا نشد",
+    "notAccess": "شما به این صفحه دسترسی ندارید",
+    "backHome": "بازگشت به خانه"
+  },
+  "validation": {
+    "phoneRequired": "شماره موبایل معتبر را وارد کنید",
+    "invalidPhone": "شماره موبایل وارد شده صحیح نمیباشد",
+    "invalidOtp": "کد ارسال شده صحیح نمیباشد",
+    "invalidName": "نام کاربری وارد شده صحیح نمی باشد",
+    "fullNameRequired": "نام و نام خانوادگی ضروری است",
+    "emailRequired": "ایمیل ضروری است",
+    "invalidEmail": "ایمیل نامعتبر است",
+    "invalidLoginEmail": "ایمیل وارد شده صحیح نمی باشد",
+    "roleRequired": "انتخاب نقش ضروری است",
+    "passwordRequired": "رمز عبور ضروری است",
+    "titleRequired": "عنوان ضروری است",
+    "proposalDescriptionRequired": "عنوان ضروری است",
+    "descriptionRequired": "توضیحات ضروری است",
+    "minChars": "حداقل {{min}} کاراکتر را وارد کنید",
+    "maxChars": "حداکثر {{max}} کاراکتر مجاز است",
+    "budgetRequired": "بودجه ضروری است",
+    "invalidAmount": "مبلغ وارد شده نامعتبر است",
+    "invalidCategory": "دسته بندی مورد نظر  صحیح نمی باشد",
+    "deadlineRequired": "ددلاین ضروری است",
+    "priceRequired": "قیمت ضروری است",
+    "durationRequired": "مدت زمان ضروری است",
+    "invalidDuration": "مدت زمان مجاز نمی باشد",
+    "invalidProposalStatus": "وضعیت پروپوزال صحیح نمی باشد",
+    "invalidUserStatus": "وضعیت کاربر صحیح نمی باشد"
+  },
+  "home": {
+    "subtitle": "پلتفرمی برای کارفرما و فریلنسر",
+    "intro": "پلتفرمی هوشمند برای اتصال کارفرماها و فریلنسرها در دنیای پرسرعت امروز، ما بستری فراهم کرده‌ایم که کارفرماها بتوانند پروژه‌های خود را با چند کلیک تعریف کنند و فریلنسرهای متخصص، دقیق و متعهد آن‌ها را اجرا کنند. از ثبت درخواست تا تحویل نهایی، همه چیز ساده، شفاف و قابل پیگیری است.",
+    "popularCategories": "دسته بندی های محبوب",
+    "skillsCount": "از میان بیش از ۱۳۰۰ مهارت حرفه‌ای انتخاب کن",
+    "projectsCount": "{{n}} پروژه",
+    "needProjectTitle": "نیاز به اجرای یک پروژه دارم",
+    "needProjectText": "پروژه‌ات رو با بودجه دلخواهت به جامعه‌ای خلاق بسپار و نتیجه بگیر",
+    "findJobTitle": "فرصت شغلی بعدی‌ات رو پیدا کن!",
+    "findJobText": "درآمد کسب کن، مشتری پیدا کن و مسیر حرفه‌ای فریلنسری‌ات رو بساز",
+    "view": "مشاهده",
+    "achievements": "دستاوردهای ما",
+    "achievementsText": "ما در فریلنسر اپ، باور داریم که استعداد مرز نمی‌شناسد و فرصت‌ها هم نباید محدود باشند",
+    "footerText": "فریلنسر اپ بستری امن و حرفه‌ای برای ارتباط بین کارفرماها و فریلنسرهاست؛ جایی که پروژه‌ها با شفافیت تعریف و با کیفیت اجرا می‌شوند.",
+    "copyright": "© {{year}} FreelancerApp تمام حقوق محفوظ است.",
+    "categories": {
+      "development": "برنامه نویسی",
+      "design": "طراحی و خلاقیت",
+      "marketing": "بازاریابی دیجیتال",
+      "writing": "نویسندگی و ترجمه",
+      "music": "موسیقی و ویدئو",
+      "video": "ویدئو و انیمیشن",
+      "architecture": "طراحی معماری",
+      "finance": "مالی و حسابداری"
+    },
+    "stats": {
+      "freelancers": "فریلنسرها",
+      "postedProjects": "پروژه های ثبت شده",
+      "completedProjects": "پروژه های تکمیل شده",
+      "companies": "شرکت های ثبت شده"
+    },
+    "footer": {
+      "clients": "کارفرماها",
+      "postProject": "ثبت پروژه",
+      "findFreelancer": "پیدا کردن فریلنسر",
+      "manageProjects": "مدیریت پروژه‌ها",
+      "clientGuide": "راهنمای کارفرما",
+      "freelancers": "فریلنسرها",
+      "findProject": "پیدا کردن پروژه",
+      "buildProfile": "ساخت پروفایل",
+      "rules": "قوانین همکاری",
+      "freelancerGuide": "راهنمای فریلنسر",
+      "support": "پشتیبانی",
+      "contact": "تماس با ما",
+      "faq": "سؤالات متداول",
+      "terms": "قوانین و مقررات",
+      "privacy": "حریم خصوصی"
+    }
   },
   "server": {
     "BAD_REQUEST": "درخواست نامعتبر است",

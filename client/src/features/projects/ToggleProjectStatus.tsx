@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import useToggleProjectStatus from "./useToggleProjectStatus";
 import Loading from "../../ui/Loading";
 import Toggle from "../../ui/Toggle";
@@ -5,6 +6,7 @@ import { PROJECT_STATUS, PROJECT_STATUS_BADGES } from "../../constants";
 import type { Project } from "../../types/api";
 
 function ToggleProjectStatus({ project }: { project: Project }) {
+  const { t } = useTranslation();
   const { status } = project;
   const isOpen = status === PROJECT_STATUS.OPEN;
 
@@ -24,7 +26,7 @@ function ToggleProjectStatus({ project }: { project: Project }) {
         <Loading height={20} width={50} />
       ) : (
         <Toggle
-          label={PROJECT_STATUS_BADGES[isOpen ? PROJECT_STATUS.OPEN : PROJECT_STATUS.CLOSED].label}
+          label={t(PROJECT_STATUS_BADGES[isOpen ? PROJECT_STATUS.OPEN : PROJECT_STATUS.CLOSED].label)}
           enabled={isOpen}
           onChange={toggleHandler}
         />

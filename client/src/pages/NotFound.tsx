@@ -1,7 +1,9 @@
+import { useTranslation } from "react-i18next";
 import { HiArrowRight } from "react-icons/hi";
 import useMoveBack from "../hooks/useMoveBack";
 
 function NotFound() {
+  const { t } = useTranslation();
   const moveBack = useMoveBack();
 
   return (
@@ -10,14 +12,14 @@ function NotFound() {
         <div className="sm:max-w-sm flex justify-center">
           <div>
             <h1 className="text-xl font-bold text-secondary-700 mb-8">
-              صفحه ای که دنبالش بودید، پیدا نشد
+              {t("pages.notFound")}
             </h1>
             <button
               onClick={moveBack}
               className="flex items-center gap-x-2 bg-primary-600 py-2 px-4 rounded-lg mb-4 text-secondary-50 "
             >
               <HiArrowRight className="w-6 h-6 text-secondary-50" />
-              برگشت
+              {t("common.back")}
             </button>
           </div>
         </div>

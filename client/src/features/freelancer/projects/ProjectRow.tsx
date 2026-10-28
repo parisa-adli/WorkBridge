@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Table from "../../../ui/Table";
 import { toPersianNumbersWithComma } from "../../../utils/toPersianNumber";
 import truncateText from "../../../utils/truncateText";
@@ -11,6 +12,7 @@ import { PROJECT_STATUS_BADGES } from "../../../constants";
 import type { Project } from "../../../types/api";
 
 function ProjectRow({ project, index }: { project: Project; index: number }) {
+  const { t } = useTranslation();
   const { title, budget, deadline, status } = project;
   const [open, setOpen] = useState(false);
   return (
@@ -27,7 +29,7 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
         <Modal
           open={open}
           onClose={() => setOpen(false)}
-          title={`درخواست انجام پروژه ${title}`}
+          title={t("proposal.send", { title })}
         >
           <CreateProposal
             projectId={project._id}

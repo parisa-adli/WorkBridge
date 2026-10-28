@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import Textfield from "../../ui/Textfield";
 import RHFSelect from "../../ui/RHFSelect";
@@ -20,6 +21,7 @@ type CreateProjectFormProps = {
 };
 
 function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormProps) {
+  const { t } = useTranslation();
   const { _id: editId } = projectToEdit;
   const isEditSession = Boolean(editId);
 
@@ -62,7 +64,7 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
   const { isEditing, editProject } = useEditProject();
 
   const onSubmit = (data: ProjectValues) => {
-    if (!date) return toast.error("ددلاین ضروری است");
+    if (!date) return toast.error(t("validation.deadlineRequired"));
     const newProject = {
       ...data,
       deadline: new Date(date.valueOf()).toISOString(),
@@ -91,21 +93,21 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
   return (
     <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
       <Textfield
-        label="عنوان پروژه"
+        label={t("project.title")}
         name="title"
         register={register}
         required
         errors={errors}
       />
       <Textfield
-        label="توضیحات"
+        label={t("common.description")}
         name="description"
         register={register}
         required
         errors={errors}
       />
       <Textfield
-        label="بودجه"
+        label={t("project.budget")}
         name="budget"
         type="number"
         register={register}
@@ -113,7 +115,7 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
         errors={errors}
       />
       <RHFSelect
-        label="دسته بندی"
+        label={t("project.category")}
         required
         name="category"
         register={register}
@@ -121,17 +123,17 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
       />
       <div>
         <label htmlFor="tags" className="mb-2 block text-secondary-700">
-          تگ
+          {t("project.tag")}
         </label>
         <TagsInput value={tags} onChange={setTags} name="tags" />
       </div>
-      <DatePickerField date={date} setDate={setDate} label="ددلاین" />
+      <DatePickerField date={date} setDate={setDate} label={t("project.deadline")} />
       <div className="!mt-8">
         {isCreating || isEditing ? (
           <Loading />
         ) : (
           <button type="submit" className="btn btn--primary w-full">
-            تایید
+            {t("common.confirm")}
           </button>
         )}
       </div>
