@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { HiArrowRight } from "react-icons/hi";
 import useMoveBack from "../../hooks/useMoveBack";
 import type { Project } from "../../types/api";
+import localized from "../../utils/localized";
 
 function ProjectHeader({ project }: { project: Project }) {
   const { t } = useTranslation();
@@ -16,7 +17,7 @@ function ProjectHeader({ project }: { project: Project }) {
         <HiArrowRight className="w-6 h-6 text-secondary-50 ltr:-scale-x-100" />
       </button>
       <h1 className="font-black text-secondary-700 text-xl">
-        {t("project.proposalsOf", { title: project.title })}
+        {t("project.proposalsOf", { title: localized(project, "title") })}
       </h1>
     </div>
   );

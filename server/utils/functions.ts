@@ -1,5 +1,4 @@
-import crypto from "crypto";
-import { promisify } from "util";
+import bcrypt from "bcryptjs";
 import { apiError } from "./apiResponse";
 import { ERROR_CODES, type ErrorCode } from "./errorCodes";
 import JWT, { type JwtPayload, type SignOptions } from "jsonwebtoken";
@@ -149,18 +148,11 @@ export function copyObject<T>(object: T): T {
   return JSON.parse(JSON.stringify(object));
 }
 
-const scrypt = promisify(crypto.scrypt) as (password: string, salt: string, keylen: number) => Promise<Buffer>;
-
-// Stored as "salt:hash" (hex).
-export async function hashPassword(password: string) {
-  const salt = crypto.randomBytes(16).toString("hex");
-  return `${salt}:${(await scrypt(password, salt, 64)).toString("hex")}`;
+// bcrypt (PRD F1); the hash carries its own salt and cost.
+export function hashPassword(password: string) {
+  return bcrypt.hash(password, 10);
 }
 
-export async function verifyPassword(password: string, stored: string) {
-  const [salt, hash] = stored.split(":");
-  if (!salt || !hash) return false;
-  const actual = await scrypt(password, salt, 64);
-  const expected = Buffer.from(hash, "hex");
-  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
+export function verifyPassword(password: string, stored: string) {
+  return bcrypt.compare(password, stored);
 }

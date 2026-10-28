@@ -50,7 +50,7 @@ class ProjectController extends Controller {
       })
       .populate([
         { path: "category", select: { title: 1, englishTitle: 1 } },
-        { path: "owner", select: { name: 1 } },
+        { path: "owner", select: { name: 1, translations: 1 } },
       ])
       .sort(sort);
 
@@ -62,8 +62,8 @@ class ProjectController extends Controller {
     const projects = await ProjectModel.find({ ...filter, owner: req.user!._id })
       .populate([
         { path: "category", select: { title: 1, englishTitle: 1 } },
-        { path: "owner", select: { name: 1 } },
-        { path: "freelancer", select: { name: 1 } },
+        { path: "owner", select: { name: 1, translations: 1 } },
+        { path: "freelancer", select: { name: 1, translations: 1 } },
       ])
       .sort(sort);
 
@@ -88,19 +88,19 @@ class ProjectController extends Controller {
           {
             path: "user",
             model: "User",
-            select: { name: 1 },
+            select: { name: 1, translations: 1 },
           },
         ],
       },
       {
         path: "owner",
         model: "User",
-        select: { name: 1 },
+        select: { name: 1, translations: 1 },
       },
       {
         path: "freelancer",
         model: "User",
-        select: { name: 1 },
+        select: { name: 1, translations: 1 },
       },
     ]);
 
@@ -160,6 +160,8 @@ class ProjectController extends Controller {
       { _id: id },
       {
         $set: { title, description, tags, deadline, category, budget },
+        // the edited text is the owner's own; a seeded English version would be stale
+        $unset: { translations: 1 },
       }
     );
     if (updateResult.modifiedCount == 0)

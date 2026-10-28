@@ -10,8 +10,30 @@ export const STATUS = Object.freeze({ REJECTED: 0, PENDING: 1, ACCEPTED: 2 });
 export const PROJECT_STATUS = Object.freeze({ OPEN: "OPEN", CLOSED: "CLOSED" });
 // Public demo accounts for the email login tab (pre-filled in the client); seeded on startup.
 export const DEMO_USERS = Object.freeze({
-  OWNER: { name: "کارفرمای نمونه", email: "owner@workbridge.dev", password: "Owner@1234" },
-  FREELANCER: { name: "فریلنسر نمونه", email: "freelancer@workbridge.dev", password: "Freelancer@1234" },
+  OWNER: {
+    username: "demo-owner",
+    name: "کارفرمای نمونه",
+    biography: "کارفرمای نمونه",
+    en: { name: "Demo Owner", biography: "Demo owner" },
+    email: "owner@workbridge.dev",
+    password: "Owner@1234",
+  },
+  FREELANCER: {
+    username: "demo-freelancer",
+    name: "فریلنسر نمونه",
+    biography: "توسعه‌دهنده وب",
+    en: { name: "Demo Freelancer", biography: "Web developer" },
+    email: "freelancer@workbridge.dev",
+    password: "Freelancer@1234",
+  },
+  ADMIN: {
+    username: "demo-admin",
+    name: "مدیر نمونه",
+    biography: "مدیر سامانه",
+    en: { name: "Demo Admin", biography: "Site admin" },
+    email: "admin@workbridge.dev",
+    password: "Admin@1234",
+  },
 });
 export const LIMITS = Object.freeze({
   PROJECT_TITLE_MIN: 10,

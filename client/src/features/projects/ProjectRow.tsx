@@ -14,30 +14,36 @@ import ToggleProjectStatus from "./ToggleProjectStatus";
 import { HiEye } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import type { Project, UserRef } from "../../types/api";
+import localized, { categoryName } from "../../utils/localized";
 
 function ProjectRow({ project, index }: { project: Project; index: number }) {
   const { t } = useTranslation();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const { removeProject } = useRemoveProject();
+  const title = localized(project, "title");
+  const freelancer = project.freelancer as UserRef | null;
+  const freelancerName = freelancer && localized(freelancer, "name");
 
   return (
     <Table.Row>
       <td>{index + 1}</td>
-      <td>{truncateText(project.title, 30)}</td>
-      <td>{project.category.title}</td>
+      <td>
+        <span dir="auto">{truncateText(title, 30)}</span>
+      </td>
+      <td>{categoryName(project.category)}</td>
       <td>{toPersianNumbersWithComma(project.budget)}</td>
       <td>{toLocalDateShort(project.deadline)}</td>
       <td>
         <div className="flex flex-wrap items-center gap-2 max-w-[200px]">
-          {project.tags.map((tag) => (
-            <span key={tag} className="badge badge--secondary">
+          {localized(project, "tags").map((tag) => (
+            <span key={tag} dir="auto" className="badge badge--secondary">
               {tag}
             </span>
           ))}
         </div>
       </td>
-      <td>{(project.freelancer as UserRef | null)?.name || "-"}</td>
+      <td>{freelancerName ? <span dir="auto">{freelancerName}</span> : "-"}</td>
       <td>
         <ToggleProjectStatus project={project} />
       </td>
@@ -48,7 +54,7 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
               <PiPencilSimpleLineBold className="w-5 h-5 text-primary-900" />
             </button>
             <Modal
-              title={t("project.edit", { title: project.title })}
+              title={t("project.edit", { title })}
               open={isEditOpen}
               onClose={() => setIsEditOpen(false)}
             >
@@ -63,12 +69,12 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
               <PiTrashBold className="w-5 h-5 text-error" />
             </button>
             <Modal
-              title={t("project.delete", { title: project.title })}
+              title={t("project.delete", { title })}
               open={isDeleteOpen}
               onClose={() => setIsDeleteOpen(false)}
             >
               <ConfirmDelete
-                recourseName={project.title}
+                recourseName={title}
                 onClose={() => setIsDeleteOpen(false)}
                 onConfirm={() =>
                   removeProject(project._id, {

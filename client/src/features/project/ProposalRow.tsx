@@ -8,6 +8,7 @@ import { TbChecklist } from "react-icons/tb";
 import ChangeProposalStatus from "./ChangeProposalStatus";
 import StatusBadge from "../../ui/StatusBadge";
 import type { Proposal, UserRef } from "../../types/api";
+import localized from "../../utils/localized";
 
 function ProposalRow({ proposal, index }: { proposal: Proposal; index: number }) {
   const { t } = useTranslation();
@@ -18,9 +19,11 @@ function ProposalRow({ proposal, index }: { proposal: Proposal; index: number })
     <Table.Row>
       <td>{index + 1}</td>
       {/* a single project populates its proposals' users */}
-      <td>{(proposal.user as UserRef).name}</td>
       <td>
-        <p>{truncateText(proposal.description, 50)}</p>
+        <span dir="auto">{localized(proposal.user as UserRef, "name")}</span>
+      </td>
+      <td>
+        <p dir="auto">{truncateText(localized(proposal, "description"), 50)}</p>
       </td>
       <td>{t("proposal.days", { days: proposal.duration })}</td>
       <td>{toPersianNumbersWithComma(proposal.price)}</td>

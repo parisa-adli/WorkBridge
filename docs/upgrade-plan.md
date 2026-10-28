@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**35 of 49 phases done** (Parts A, B, C and D). Next: Phase 30 (seed script and bilingual content fields).
+**36 of 49 phases done** (Parts A, B, C and D, and Phase 30). Next: Phase 31 (demo login).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -39,7 +39,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
-| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
+| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 1/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
@@ -464,14 +464,14 @@ Verify: tests pass; the reference page passes an axe check in both themes.
 
 Every feature is built on the new components and in both languages, with server tests and, where it is a user flow, an e2e test.
 
-### Phase 30: Seed script and bilingual content fields (F1 part 1, F10 data) ⬜
+### Phase 30: Seed script and bilingual content fields (F1 part 1, F10 data) ✅
 **Goal:** `npm run seed --prefix server` creates demo data in both languages.
 
 Files: `server/scripts/seed.ts` (new), `server/package.json`, models `project`, `proposal`, `user` (`translations.en`), `server/app/models/user.js` (`username`, `passwordHash`), client display helper for `translations.en` fallback
 
-- [ ] Optional `translations.en` on the text fields listed in PRD F10; API returns it.
-- [ ] Seed: three verified demo accounts with hashed passwords, categories, projects, proposals, both languages. Idempotent.
-- [ ] Client shows `translations.en` in English when present; user content renders with `dir="auto"`; category name by language.
+- [x] Optional `translations.en` on the text fields listed in PRD F10; API returns it.
+- [x] Seed: three verified demo accounts with hashed passwords, categories, projects, proposals, both languages. Idempotent.
+- [x] Client shows `translations.en` in English when present; user content renders with `dir="auto"`; category name by language.
 
 Verify: run seed twice, no duplicates; switching language changes demo content without a refetch.
 

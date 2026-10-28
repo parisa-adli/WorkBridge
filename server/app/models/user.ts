@@ -6,6 +6,10 @@ const UserSchema = new mongoose.Schema(
     name: { type: String, trim: true },
     avatar: { type: String },
     biography: { type: String, default: null },
+    // optional English version of the Persian base fields (PRD F10)
+    translations: { en: { name: String, biography: String } },
+    // set only on the seeded demo accounts
+    username: { type: String, trim: true, lowercase: true, unique: true, sparse: true },
     email: { type: String, lowercase: true, trim: true },
     phoneNumber: { type: String, trim: true },
     password: { type: String },

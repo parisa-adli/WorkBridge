@@ -7,6 +7,7 @@ import {
 import truncateText from "../../utils/truncateText";
 import StatusBadge from "../../ui/StatusBadge";
 import type { Proposal, UserRef } from "../../types/api";
+import localized from "../../utils/localized";
 
 function ProposalRow({
   proposal,
@@ -18,13 +19,17 @@ function ProposalRow({
   isAdmin: boolean;
 }) {
   const { t } = useTranslation();
-  const { description, duration, price, status } = proposal;
+  const { duration, price, status } = proposal;
+  const owner = (proposal.project as { owner: UserRef } | null)?.owner;
+  const user = proposal.user as UserRef | null;
   return (
     <Table.Row>
       <td>{index + 1}</td>
-      <td>{truncateText(description, 60)}</td>
-      <td>{(proposal.project as { owner: UserRef } | null)?.owner?.name}</td>
-      {isAdmin && <td>{(proposal.user as UserRef | null)?.name}</td>}
+      <td>
+        <span dir="auto">{truncateText(localized(proposal, "description"), 60)}</span>
+      </td>
+      <td>{owner && <span dir="auto">{localized(owner, "name")}</span>}</td>
+      {isAdmin && <td>{user && <span dir="auto">{localized(user, "name")}</span>}</td>}
       <td>{t("proposal.days", { days: toPersianNumbers(duration) })}</td>
       <td>{toPersianNumbersWithComma(price)}</td>
       <td>

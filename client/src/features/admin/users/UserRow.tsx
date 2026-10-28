@@ -7,6 +7,7 @@ import Table from "../../../ui/Table";
 import ChangeUserStatus from "./ChangeUserStatus";
 import StatusBadge from "../../../ui/StatusBadge";
 import type { User } from "../../../types/api";
+import localized from "../../../utils/localized";
 
 function UserRow({ user, index }: { user: User; index: number }) {
   const { t } = useTranslation();
@@ -16,7 +17,9 @@ function UserRow({ user, index }: { user: User; index: number }) {
   return (
     <Table.Row>
       <td>{index + 1}</td>
-      <td>{user.name}</td>
+      <td>
+        <span dir="auto">{localized(user, "name")}</span>
+      </td>
       <td>{user.email}</td>
       <td>{user.phoneNumber}</td>
       <td>{user.role}</td>

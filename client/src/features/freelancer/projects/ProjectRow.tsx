@@ -10,17 +10,22 @@ import CreateProposal from "../../proposals/CreateProposal";
 import StatusBadge from "../../../ui/StatusBadge";
 import { PROJECT_STATUS_BADGES } from "../../../constants";
 import type { Project, UserRef } from "../../../types/api";
+import localized, { categoryName } from "../../../utils/localized";
 
 function ProjectRow({ project, index }: { project: Project; index: number }) {
   const { t } = useTranslation();
-  const { title, budget, deadline, status } = project;
+  const { budget, deadline, status } = project;
+  const title = localized(project, "title");
+  const owner = project.owner as UserRef | null;
   const [open, setOpen] = useState(false);
   return (
     <Table.Row>
       <td>{index + 1}</td>
-      <td>{truncateText(title, 30)}</td>
-      <td>{project.category.title}</td>
-      <td>{(project.owner as UserRef | null)?.name}</td>
+      <td>
+        <span dir="auto">{truncateText(title, 30)}</span>
+      </td>
+      <td>{categoryName(project.category)}</td>
+      <td>{owner && <span dir="auto">{localized(owner, "name")}</span>}</td>
       <td>{toPersianNumbersWithComma(budget)}</td>
       <td>{toLocalDateShort(deadline)}</td>
       <td>

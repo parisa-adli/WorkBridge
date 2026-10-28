@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import useUser from "./useUser";
 import redirectByRole from "../../utils/redirectByRole";
+import localized from "../../utils/localized";
 
 function UserAvatar() {
   const { user } = useUser();
@@ -18,7 +19,7 @@ function UserAvatar() {
         src="/user.jpg"
         alt="user-account"
       />
-      <span>{user.name}</span>
+      <span dir="auto">{localized(user, "name")}</span>
     </div>
   );
 }

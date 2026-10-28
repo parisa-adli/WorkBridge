@@ -13,11 +13,14 @@ export type Status = (typeof STATUS)[keyof typeof STATUS];
 export type ProjectStatus = (typeof PROJECT_STATUS)[keyof typeof PROJECT_STATUS];
 
 type Timestamps = { createdAt: string; updatedAt: string };
+// Optional English version of an entity's Persian text fields (PRD F10); read through utils/localized.
+export type Translations<T> = { translations?: { en?: Partial<T> } };
 // A populated user reference carries only the selected fields.
-export type UserRef = { _id: string; name: string };
+export type UserRef = { _id: string; name: string } & Translations<{ name: string }>;
 
-export type User = Timestamps & {
+export type User = Timestamps & Translations<{ name: string; biography: string }> & {
   _id: string;
+  username?: string;
   name?: string;
   email?: string;
   phoneNumber: string;
@@ -37,7 +40,7 @@ export type Category = Timestamps & {
   type: string;
 };
 
-export type Proposal = Timestamps & {
+export type Proposal = Timestamps & Translations<{ description: string }> & {
   _id: string;
   price: number;
   duration: number;
@@ -49,7 +52,7 @@ export type Proposal = Timestamps & {
   status: Status;
 };
 
-export type Project = Timestamps & {
+export type Project = Timestamps & Translations<{ title: string; description: string; tags: string[] }> & {
   _id: string;
   title: string;
   description: string;

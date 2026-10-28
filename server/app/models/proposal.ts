@@ -7,6 +7,8 @@ const ProposalSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     duration: { type: Number, required: true },
     description: { type: String, required: true },
+    // optional English version of the Persian base field (PRD F10)
+    translations: { en: { description: String } },
     user: { type: ObjectId, ref: "User", required: true },
     project: { type: ObjectId, ref: "Project", required: true },
     status: {

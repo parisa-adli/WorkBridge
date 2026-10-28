@@ -61,8 +61,12 @@ class ProposalController extends Controller {
 
     const proposals = await ProposalModel.find(dbQuery)
       .populate([
-        { path: "user", select: { name: 1 } },
-        { path: "project", select: { owner: 1 }, populate: { path: "owner", select: { name: 1 } } },
+        { path: "user", select: { name: 1, translations: 1 } },
+        {
+          path: "project",
+          select: { owner: 1 },
+          populate: { path: "owner", select: { name: 1, translations: 1 } },
+        },
       ])
       .sort(createdAtSort(req.query.sort));
 
