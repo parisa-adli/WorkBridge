@@ -16,9 +16,12 @@
 @theme {
   --breakpoint-xs: 440px;
 
-  --font-sans:
-    Vazir, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  /* fa stack; `:lang(en)` below puts Inter first (docs/design.md §5). */
+  --font-sans: Vazirmatn, Inter, system-ui, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
 
   /* Old scale, unchanged from Tailwind 3; deleted in Phase 42 (docs/design.md §2). */
   --color-primary-900: rgb(74 109 255);
@@ -80,6 +83,9 @@
 @layer base {
   :root {
     --background-app-rgb: 255, 255, 255;
+  }
+  :root:lang(en) {
+    --font-sans: Inter, Vazirmatn, system-ui, sans-serif;
   }
   :root.dark-mode {
     --color-secondary-900: rgb(249 250 251);
@@ -204,7 +210,6 @@
   body {
     padding: 0;
     margin: 0;
-    font-family: "Vazir";
     min-height: 100vh;
     user-select: none;
     background-color: rgb(var(--background-app-rgb));
@@ -217,6 +222,22 @@
     outline: none;
     padding: 0;
     margin: 0;
+  }
+
+  /* Beats the `outline: none` reset above: every control shows a ring on keyboard focus (docs/design.md §6). */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   button {

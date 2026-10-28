@@ -1,30 +1,38 @@
 import { useTranslation } from "react-i18next";
-import { HiArrowRight } from "react-icons/hi";
+import { HiArrowRight, HiOutlineHome } from "react-icons/hi";
+import { Link } from "react-router-dom";
 import useMoveBack from "../hooks/useMoveBack";
+import Button, { buttonClass } from "../ui/Button";
+import EmptyState from "../ui/EmptyState";
+import { toPersianNumbers } from "../utils/toPersianNumber";
 
+// Reference page for the Part F re-skins: tokens and ui/ components only.
 function NotFound() {
   const { t } = useTranslation();
   const moveBack = useMoveBack();
 
   return (
-    <div className="h-screen bg-secondary-0 p-10">
-      <div className="container xl:max-w-(--breakpoint-xl)">
-        <div className="sm:max-w-sm flex justify-center">
-          <div>
-            <h1 className="text-xl font-bold text-secondary-700 mb-8">
-              {t("pages.notFound")}
-            </h1>
-            <button
-              onClick={moveBack}
-              className="flex items-center gap-x-2 bg-primary-600 py-2 px-4 rounded-lg mb-4 text-secondary-50 "
-            >
-              <HiArrowRight className="w-6 h-6 text-secondary-50 ltr:-scale-x-100" />
-              {t("common.back")}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <main className="grid min-h-screen place-items-center bg-bg px-4">
+      <EmptyState
+        titleAs="h1"
+        icon={
+          <span aria-hidden="true" className="text-7xl font-bold text-primary">
+            {toPersianNumbers(404)}
+          </span>
+        }
+        title={t("pages.notFound")}
+        description={t("pages.notFoundBody")}
+      >
+        <Link to="/" className={buttonClass()}>
+          <HiOutlineHome aria-hidden="true" className="h-5 w-5" />
+          {t("pages.home")}
+        </Link>
+        <Button variant="outline" onClick={moveBack}>
+          <HiArrowRight aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
+          {t("common.back")}
+        </Button>
+      </EmptyState>
+    </main>
   );
 }
 export default NotFound;

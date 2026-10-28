@@ -29,12 +29,13 @@ function ProjectsHeader() {
       </div>
 
       <div>
-        <FilterDropDown filterField="sort" options={sortOptions} />
+        <FilterDropDown filterField="sort" label={t("project.sort")} options={sortOptions} />
       </div>
 
       <div>
         <FilterDropDown
           filterField="category"
+          label={t("project.category")}
           options={[
             {
               value: "ALL",

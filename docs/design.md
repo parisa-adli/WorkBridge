@@ -1,6 +1,6 @@
 # WorkBridge: Design Direction
 
-Status: **agreed** by the project owner (2026-10-28), after review of the prototype. Closes the Part D gate in `docs/upgrade-plan.md` (PRD R9). A visual prototype is at `client/prototype/design.html` (see section 9).
+Status: **agreed** by the project owner (2026-10-28), after review of the prototype. Closes the Part D gate in `docs/upgrade-plan.md` (PRD R9).
 
 This is the fixed target for the Tailwind 4 tokens (Phase 28), the design-system components (Phase 29) and the page re-skins (Part F). Anything not listed here is out of scope for F9.
 
@@ -58,7 +58,7 @@ Badges are `{status}` text on `{status}-soft` background. The danger button is `
 
 Phase 28 moves the current `--color-primary-*` / `--color-secondary-*` scale into `@theme` **unchanged**, so its screenshots match `main` (its Verify step). The semantic tokens above are added beside them in the same phase. Components (Phase 29) and re-skinned pages (Part F) use only the semantic tokens. The old scale and the `.btn`/`.badge`/`.textField__input` classes are deleted in Phase 42, once a grep finds no use of them.
 
-As built in Phase 28b: each token is `--color-<token>`, so the utilities are `bg-bg`, `bg-surface`, `text-text`, `text-text-muted`, `border-border-strong`, and so on. `success`, `warning` and `error` share their names with today's tokens and take the new values above (today's `text-error` field errors and icons turn darker). The radius tokens in section 4 are not in `@theme` yet: `--radius-sm/md/lg` would change Tailwind's own `rounded-sm/md/lg` on every current page, so Phase 29 adds them with the components.
+As built in Phase 28b: each token is `--color-<token>`, so the utilities are `bg-bg`, `bg-surface`, `text-text`, `text-text-muted`, `border-border-strong`, and so on. `success`, `warning` and `error` share their names with today's tokens and take the new values above (today's `text-error` field errors and icons turn darker). Phase 29 added the radius tokens of section 4 to `@theme`; they replace Tailwind's own `rounded-sm/md/lg` values on every page.
 
 ## 3. Spacing
 
@@ -151,8 +151,8 @@ Pages 13–15 are created in Part E already on the new components; Phase 41 only
 
 - [x] Direction, tokens, fonts, page list and accessibility target agreed by the project owner.
 
-## 9. Prototype
+## 9. Components and reference page
 
-`client/prototype/design.html` shows this direction on realistic screens: the 404 and not-access reference pages, the sidebar layout (a drawer below 768px), dashboard stats, a projects table, a project card, a proposal form, every button, input and badge state, list loading/empty/error states, a modal, and the token, type, radius and spacing scales with contrast computed live. It switches fa/en and light/dark (the `.dark-mode` class), and `?view=all` shows all four side by side.
+Phase 29 built the components in `client/src/ui/`: `Button` (and `buttonClass` for links), `Input`, `Select`, `Textarea` (all three through `Field`: visible label, `aria-describedby` error), `Badge`, `Table`, `Pagination`, `Modal` (focus trap, Escape, focus back to the trigger), `Card`, `EmptyState` and `Skeleton`. `pages/NotFound.tsx` and `pages/NotAccess.tsx` are the reference re-skin for Part F; `e2e/reference-pages.spec.js` runs axe on them in fa/en × light/dark.
 
-Preview: `npm run dev`, then open <http://localhost:3000/prototype/design.html>. It is standalone HTML and CSS: the app does not import it and the production build does not include it. It loads Vazirmatn and Inter from Google Fonts; the app will self-host them (§5). Delete it once Phase 29 has built the real components.
+The standalone prototype that this direction was agreed on (`client/prototype/design.html`) was deleted in Phase 29; it is in git history before that commit.

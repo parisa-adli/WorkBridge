@@ -58,6 +58,8 @@ async function startApps(mongoUri, attempts = 3) {
       REFRESH_TOKEN_SECRET_KEY: "e2e-refresh-secret",
       COOKIE_PARSER_SECRET_KEY: "e2e-cookie-secret",
       TOKEN_SECRET_KEY: "e2e-token-secret",
+      // Every signed-in spec logs in from the same IP; the default 10 per 15 min is too few for the suite.
+      OTP_RATE_LIMIT: "1000",
       SERVER_URL: serverUrl,
       CLIENT_URL: clientUrl,
       ALLOW_CORS_ORIGIN: clientUrl,

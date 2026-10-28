@@ -16,7 +16,8 @@
     "actions": "Actions",
     "all": "All",
     "description": "Description",
-    "back": "Back"
+    "back": "Back",
+    "close": "Close"
   },
   "nav": {
     "home": "Home",
@@ -84,6 +85,7 @@
     "delete": "Delete {{title}}",
     "list": "Projects",
     "proposalsOf": "Proposals for {{title}}",
+    "sort": "Sort",
     "sortLatest": "Sort (newest)",
     "sortEarliest": "Sort (oldest)",
     "allCategories": "Category (all)"
@@ -107,9 +109,17 @@
     "list": "Users"
   },
   "pages": {
-    "notFound": "The page you were looking for was not found",
-    "notAccess": "You do not have access to this page",
-    "backHome": "Back to home"
+    "notFound": "We couldn't find that page",
+    "notAccess": "You don't have access to this page",
+    "notFoundBody": "The address may be wrong, or the page may have moved.",
+    "notAccessBody": "This section belongs to another role. Continue from your own dashboard.",
+    "goDashboard": "Go to dashboard",
+    "home": "Home"
+  },
+  "pagination": {
+    "label": "Pagination",
+    "previous": "Previous page",
+    "next": "Next page"
   },
   "validation": {
     "phoneRequired": "Enter a valid phone number",
