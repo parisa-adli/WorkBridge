@@ -73,6 +73,33 @@ describe("httpService 401 handling", () => {
     ]);
   });
 
+  it.each([
+    ["fa", "ایمیل یا رمز عبور اشتباه است"],
+    ["en", "Wrong email or password"],
+  ])("rejects a login 401 with its own error and no refresh (%s)", async (lng, message) => {
+    await i18n.changeLanguage(lng);
+    adapter.mockImplementationOnce((config) =>
+      Promise.reject(
+        new AxiosError("Unauthorized", "ERR_BAD_REQUEST", config, null, {
+          data: { statusCode: 401, code: "INVALID_CREDENTIALS", message: "ایمیل یا رمز عبور اشتباه است" },
+          status: 401,
+          statusText: "Unauthorized",
+          headers: {},
+          config,
+        })
+      )
+    );
+
+    try {
+      await expect(http.post("/user/login")).rejects.toMatchObject({
+        response: { status: 401, data: { code: "INVALID_CREDENTIALS", message } },
+      });
+      expect(calledUrls()).toEqual(["/user/login"]);
+    } finally {
+      await i18n.changeLanguage("fa");
+    }
+  });
+
   it("rejects a network error (no response) without trying to refresh", async () => {
     adapter.mockImplementation((config) =>
       Promise.reject(new AxiosError("Network Error", "ERR_NETWORK", config))

@@ -27,7 +27,9 @@ app.interceptors.response.use(
   async (err: AxiosError<{ code?: string; message?: string }>) => {
     const originalConfig = err.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
 
-    if (err.response?.status === 401 && originalConfig && !originalConfig._retry) {
+    // a login 401 means wrong credentials, not an expired session: refreshing would replace its error
+    const isLogin = originalConfig?.url === "/user/login";
+    if (err.response?.status === 401 && originalConfig && !originalConfig._retry && !isLogin) {
       originalConfig._retry = true;
       try {
         const { data } = await axios.get(`${BASE_URL}/user/refresh-token`, {
