@@ -128,7 +128,7 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
         <TagsInput value={tags} onChange={setTags} name="tags" />
       </div>
       <DatePickerField date={date} setDate={setDate} label={t("project.deadline")} />
-      <div className="!mt-8">
+      <div className="mt-8!">
         {isCreating || isEditing ? (
           <Loading />
         ) : (

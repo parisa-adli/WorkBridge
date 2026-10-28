@@ -32,7 +32,7 @@ function ChangeUserStatus({ userId, onClose, userStatus }: ChangeUserStatusProps
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <StatusSelect register={register} />
-        <div className="!mt-8">
+        <div className="mt-8!">
           {isUpdating ? (
             <Loading />
           ) : (

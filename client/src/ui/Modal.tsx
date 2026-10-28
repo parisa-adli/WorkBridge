@@ -15,13 +15,12 @@ function Modal({ open, onClose, title, children }: ModalProps) {
   return (
     open && (
       <div
-        className="backdrop-blur-sm fixed inset-0
-           w-full h-screen bg-secondary-800 bg-opacity-30 z-50"
+        className="backdrop-blur-xs fixed inset-0
+           w-full h-screen bg-secondary-800/30 z-50 flex items-center justify-center"
       >
         <div
           ref={ref}
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-        rounded-lg bg-secondary-0 p-4 shadow-lg transition-all duration-500 ease-out
+          className="rounded-lg bg-secondary-0 p-4 shadow-lg transition-all duration-500 ease-out
         w-[calc(100vw-2rem)] sm:max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto"
         >
           <div

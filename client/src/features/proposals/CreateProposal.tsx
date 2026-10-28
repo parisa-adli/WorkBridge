@@ -51,7 +51,7 @@ function CreateProposal({ onClose, projectId }: { onClose: () => void; projectId
           required
           errors={errors}
         />
-        <div className="!mt-8">
+        <div className="mt-8!">
           {isCreating ? (
             <Loading />
           ) : (

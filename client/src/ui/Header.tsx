@@ -11,8 +11,8 @@ function Header({ isShowSidebar, toggleSidebar }: HeaderProps) {
   return (
     <div className="bg-secondary-0 md:row-auto py-4 border-b border-secondary-200">
       <div
-        className={`container xl:max-w-screen-lg flex items-center justify-between md:justify-end gap-x-8 
-          ${isLoading ? "blur-sm opacity-50" : ""}
+        className={`container xl:max-w-(--breakpoint-lg) flex items-center justify-between md:justify-end gap-x-8 
+          ${isLoading ? "blur-xs opacity-50" : ""}
           `}
       >
         <button

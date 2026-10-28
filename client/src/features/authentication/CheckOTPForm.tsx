@@ -65,7 +65,7 @@ function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }: CheckOT
   return (
     <div>
       <button onClick={onBack} className="bg-primary-600 p-1 rounded-lg mb-4">
-        <HiArrowRight className="w-6 h-6 text-secondary-50" />
+        <HiArrowRight className="w-6 h-6 text-secondary-50 ltr:-scale-x-100" />
       </button>
       {otpResponse && (
         <p className="flex justify-center items-center gap-x-2 my-4 text-secondary-700">
@@ -97,11 +97,11 @@ function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }: CheckOT
                 numInputs={LIMITS.OTP_MAX}
                 renderSeparator={<span className="text-secondary-900">-</span>}
                 renderInput={(props) => <input {...props} />}
-                containerStyle="flex flex-row-reverse gap-x-2 justify-center"
+                containerStyle="flex rtl:flex-row-reverse gap-x-2 justify-center"
                 inputStyle={{
                   width: "2.5rem",
                   padding: "0.5rem 0.2rem",
-                  border: "1px solid rgb(var(--color-primary-300))",
+                  border: "1px solid var(--color-primary-300)",
                   borderRadius: "0.5rem",
                 }}
               />

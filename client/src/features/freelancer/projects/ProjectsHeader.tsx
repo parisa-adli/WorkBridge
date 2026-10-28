@@ -21,7 +21,7 @@ function ProjectsHeader() {
 
   return (
     <div className="flex items-center flex-wrap gap-4 text-secondary-700 mb-8">
-      <h1 className="text-lg font-bold ml-8">
+      <h1 className="text-lg font-bold me-8">
         {t("project.list")}
       </h1>
       <div>

@@ -97,7 +97,7 @@ function Home() {
     <div className="bg-secondary-0">
       <MainHeader />
       <div className="bg-primary-100 w-full">
-        <div className="container xl:max-w-screen-lg">
+        <div className="container xl:max-w-(--breakpoint-lg)">
           <div className="p-4 text-xl text-gray-700 grid grid-cols-1 md:grid-cols-[1fr_2fr] md:gap-x-8">
             <div className="space-y-4 md:space-y-8 my-4 md:mt-10">
               <div>
@@ -108,7 +108,7 @@ function Home() {
                   {t("home.subtitle")}
                 </h3>
               </div>
-              <p className="text-justify leading-relaxed text-sm md:text-lg">
+              <p className="text-justify leading-relaxed text-sm md:text-lg md:leading-7">
                 {t("home.intro")}
               </p>
             </div>
@@ -140,7 +140,7 @@ function Home() {
               <p className="col-span-3 flex flex-col items-start gap-2 text-nowrap text-sm lg:text-lg text-secondary-800">
                 {t(category.title)}
                 <span className="flex items-center gap-x-2 text-secondary-400 text-xs ">
-                  {t("home.projectsCount", { n: toPersianNumbers(category.skills) })} <HiArrowLeft />
+                  {t("home.projectsCount", { n: toPersianNumbers(category.skills) })} <HiArrowLeft className="ltr:-scale-x-100" />
                 </span>
               </p>
             </div>
@@ -158,7 +158,6 @@ function Home() {
       >
         <div
           className="    snap-start
-      w-90
       flex items-center justify-between
      rounded-2xl
       bg-secondary-50
@@ -193,7 +192,6 @@ function Home() {
         </div>
         <div
           className="    snap-start
-      w-90
       flex items-center justify-between
       rounded-2xl
       bg-secondary-50
@@ -262,7 +260,7 @@ function Home() {
       </div>
 
       <footer className="bg-secondary-50 text-secondary-900 mt-16">
-        <div className="container xl:max-w-screen-lg px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="container xl:max-w-(--breakpoint-lg) px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           <div className="lg:col-span-2 space-y-4">
             <h3 className="text-xl font-extrabold text-primary-900">
               {t("app.name")}
@@ -317,7 +315,7 @@ function Home() {
           </div>
         </div>
         <div className="border-t border-secondary-300">
-          <div className="container xl:max-w-screen-lg px-4 py-4 flex flex-col text-center gap-3 text-xs text-secondary-400">
+          <div className="container xl:max-w-(--breakpoint-lg) px-4 py-4 flex flex-col text-center gap-3 text-xs text-secondary-400">
             <p>
               {t("home.copyright", { year: new Date().getFullYear() })}
             </p>

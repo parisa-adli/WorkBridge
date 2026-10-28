@@ -58,6 +58,8 @@ Badges are `{status}` text on `{status}-soft` background. The danger button is `
 
 Phase 28 moves the current `--color-primary-*` / `--color-secondary-*` scale into `@theme` **unchanged**, so its screenshots match `main` (its Verify step). The semantic tokens above are added beside them in the same phase. Components (Phase 29) and re-skinned pages (Part F) use only the semantic tokens. The old scale and the `.btn`/`.badge`/`.textField__input` classes are deleted in Phase 42, once a grep finds no use of them.
 
+As built in Phase 28b: each token is `--color-<token>`, so the utilities are `bg-bg`, `bg-surface`, `text-text`, `text-text-muted`, `border-border-strong`, and so on. `success`, `warning` and `error` share their names with today's tokens and take the new values above (today's `text-error` field errors and icons turn darker). The radius tokens in section 4 are not in `@theme` yet: `--radius-sm/md/lg` would change Tailwind's own `rounded-sm/md/lg` on every current page, so Phase 29 adds them with the components.
+
 ## 3. Spacing
 
 Tailwind 4's default spacing (`--spacing: 0.25rem`, so `p-4` = 16px). No custom scale. The values in use:

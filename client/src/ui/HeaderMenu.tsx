@@ -23,7 +23,7 @@ function HeaderMenu() {
       {!user && (
         <li className="flex hover:text-rose-500">
           <button onClick={handleClick}>
-            <HiArrowLeftOnRectangle className="h-5 w-5 text-secondary-500 hover:text-success" />
+            <HiArrowLeftOnRectangle className="h-5 w-5 text-secondary-500 hover:text-success ltr:-scale-x-100" />
           </button>
         </li>
       )}

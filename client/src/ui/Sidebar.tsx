@@ -9,7 +9,7 @@ function Sidebar({ children, isShowSidebar }: SidebarProps) {
   const { t } = useTranslation();
   return (
     <div
-      className={`bg-secondary-0 md:row-start-1 md:row-span-2 border-l border-secondary-200 p-4 transition-all duration-300 ease-in-out
+      className={`bg-secondary-0 md:row-start-1 md:row-span-2 border-e border-secondary-200 p-4 transition-all duration-300 ease-in-out
         ${!isShowSidebar ? "hidden" : "block"}
         `}
     >

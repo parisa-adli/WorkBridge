@@ -13,7 +13,7 @@ function AppLayout({ children }: { children: ReactNode }) {
       <Header toggleSidebar={toggleSidebar} isShowSidebar={isShowSidebar} />
       <Sidebar isShowSidebar={isShowSidebar}>{children}</Sidebar>
       <div className="bg-secondary-100 p-8 overflow-y-auto">
-        <div className="max-w-screen-lg mx-auto flex flex-col gap-y-12">
+        <div className="max-w-(--breakpoint-lg) mx-auto flex flex-col gap-y-12">
           <Outlet />
         </div>
       </div>

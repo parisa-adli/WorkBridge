@@ -21,7 +21,7 @@ function ToggleProjectStatus({ project }: { project: Project }) {
   };
 
   return (
-    <div className="w-[5rem]">
+    <div className="w-20">
       {isUpdating ? (
         <Loading height={20} width={50} />
       ) : (

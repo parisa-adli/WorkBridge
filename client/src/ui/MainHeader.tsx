@@ -6,7 +6,7 @@ function MainHeader() {
   const { t } = useTranslation();
   return (
     <div className=" md:row-auto py-4 md:px-8 border-b border-secondary-200">
-      <div className="container xl:max-w-screen-xl flex items-center justify-between">
+      <div className="container xl:max-w-(--breakpoint-xl) flex items-center justify-between">
         <Link to="/" className="font-bold text-lg text-secondary-700">
           {t("app.name")}
         </Link>
