@@ -104,7 +104,7 @@ class userAuthController extends Controller {
   }
   sendOTP(phoneNumber, code, res) {
     // no SMS provider: outside production, print the code and return it so login still works (PRD R1)
-    if (showOtp()) console.log(`OTP for ${phoneNumber}: ${code}`);
+    if (showOtp()) console.log(`[dev OTP] ${phoneNumber}: ${code}`);
     return res.status(HttpStatus.OK).send({
       statusCode: HttpStatus.OK,
       data: {
@@ -113,7 +113,7 @@ class userAuthController extends Controller {
         )} ارسال گردید`,
         expiresIn: CODE_EXPIRES,
         phoneNumber,
-        ...(showOtp() && { code }),
+        
       },
     });
   }
