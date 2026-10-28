@@ -386,7 +386,7 @@ Verify: each form shows the same Persian messages as before; tests and e2e pass.
 
 ## Part D: Design and i18n foundation ⬜
 
-**Gate before Phase 28:** agree on the design direction and the F9 page list (PRD R9). Record it in `docs/design.md`.
+**Gate before Phase 28 ✅:** agree on the design direction and the F9 page list (PRD R9). Recorded and agreed in `docs/design.md` (2026-10-28, #36).
 
 ### Phase 26: i18n setup ✅
 **Goal:** `react-i18next` runs with `fa` (default) and `en`, and the language switcher works, even though most strings are still hardcoded.
