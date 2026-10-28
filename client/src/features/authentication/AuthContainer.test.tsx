@@ -143,13 +143,9 @@ describe("AuthContainer", () => {
 
   it("reads in English after a language switch", async () => {
     await i18n.changeLanguage("en");
-    try {
-      renderAuth();
-      expect(screen.getByRole("tab", { name: "Log in with email" })).toHaveAttribute("aria-selected", "true");
-      expect(screen.getByLabelText(/^Email/)).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "Log in" })).toBeInTheDocument();
-    } finally {
-      await i18n.changeLanguage("fa");
-    }
+    renderAuth();
+    expect(screen.getByRole("tab", { name: "Log in with email" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByLabelText(/^Email/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Log in" })).toBeInTheDocument();
   });
 });

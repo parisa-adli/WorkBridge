@@ -3,7 +3,7 @@ import axios, {
   type AxiosAdapter,
   type InternalAxiosRequestConfig,
 } from "axios";
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import i18n from "../i18n";
 
 type Config = InternalAxiosRequestConfig;
@@ -90,14 +90,10 @@ describe("httpService 401 handling", () => {
       )
     );
 
-    try {
-      await expect(http.post("/user/login")).rejects.toMatchObject({
-        response: { status: 401, data: { code: "INVALID_CREDENTIALS", message } },
-      });
-      expect(calledUrls()).toEqual(["/user/login"]);
-    } finally {
-      await i18n.changeLanguage("fa");
-    }
+    await expect(http.post("/user/login")).rejects.toMatchObject({
+      response: { status: 401, data: { code: "INVALID_CREDENTIALS", message } },
+    });
+    expect(calledUrls()).toEqual(["/user/login"]);
   });
 
   it("rejects a network error (no response) without trying to refresh", async () => {
@@ -149,7 +145,6 @@ describe("httpService message translation", () => {
   beforeEach(() => {
     adapter.mockReset();
   });
-  afterEach(() => i18n.changeLanguage("fa"));
 
   it("keeps the server's Persian message in fa", async () => {
     adapter.mockImplementationOnce(otpSent);

@@ -6,7 +6,7 @@ import Loading from "../ui/Loading";
 import toast from "react-hot-toast";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
-  const negative = useNavigate();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   // 1. load the authenticated user
@@ -17,14 +17,14 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) {
-      negative("/auth");
+      navigate("/auth");
     } else if (!isVerified) {
       toast.error(t("auth.profileNotVerified"));
-      negative("/");
+      navigate("/");
     } else if (!isAuthorized) {
-      negative("/not-access", { replace: true });
+      navigate("/not-access", { replace: true });
     }
-  }, [isLoading, isAuthenticated, isAuthorized, isVerified, negative, t]);
+  }, [isLoading, isAuthenticated, isAuthorized, isVerified, navigate, t]);
 
   // 3. while loading => show loading
   if (isLoading)
