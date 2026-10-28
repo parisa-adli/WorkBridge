@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const createError = require("http-errors");
 const path = require("path");
 const { allRoutes } = require("./router/router");
+const { seedDemoUsers } = require("../utils/seedDemoUsers");
 dotenv.config();
 
 const REQUIRED_ENV = [
@@ -34,6 +35,7 @@ class Application {
       if (missing.length)
         throw new Error(`Missing required env vars: ${missing.join(", ")}`);
       await this.connectToDB();
+      await seedDemoUsers();
       this.createServer();
     } catch (err) {
       console.error("Server failed to start:", err.message);
