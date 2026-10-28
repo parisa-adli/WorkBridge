@@ -10,12 +10,13 @@ Install: `npm install && npm install --prefix client && npm install --prefix ser
 
 - `npm run dev` (root): runs server (`tsx watch`, port 5000) and client (Vite, port 3000 per `client/vite.config.js`) together via `concurrently`
 - `npm run build --prefix client`: production build
-- `npm run lint --prefix client`: flat ESLint config (`client/eslint.config.js`).
+- `npm run lint --prefix client`: flat ESLint config (`client/eslint.config.js`), then `scripts/check-direction.mjs`, which fails on physical direction classes (`ml-`, `pr-`, `left-`, `text-right`, `border-l`, ...): use logical ones (`ms-`, `pe-`, `start-`, `text-start`, `border-e`) so fa (RTL) and en (LTR) mirror. Arrow icons get `ltr:-scale-x-100`.
 - `npm run lint --prefix server`: flat ESLint config (`server/eslint.config.js`).
-- `npm run typecheck --prefix client`: `tsc --noEmit`, strict with `allowJs: false`: all of `client/src` is `.ts`/`.tsx` (only the Vite, ESLint, PostCSS and Tailwind configs are `.js`). API data is typed against `src/types/api.ts`.
+- `npm run typecheck --prefix client`: `tsc --noEmit`, strict with `allowJs: false`: all of `client/src` is `.ts`/`.tsx` (only the Vite and ESLint configs are `.js`). API data is typed against `src/types/api.ts`.
 - `npm test --prefix server`: Vitest + Supertest behavior tests (`server/tests/`) against an in-memory MongoDB (the first run downloads a ~600MB mongod binary). They pin current behavior, including the bugs listed in `docs/known-bugs.md`.
+- `npm run i18n:check --prefix client`: fails when a translation key is in only one of `src/i18n/fa.json`/`en.json` (runs in CI).
 - `npm test --prefix client`: Vitest + Testing Library (jsdom) characterization tests next to the code (`*.test.ts(x)`), pinning current behavior.
-- `npm run e2e` (root): Playwright suite in `e2e/`. Global setup starts an in-memory MongoDB (seeded with one category), the server and the Vite dev server on free ports, so nothing needs to be running. First run: `npx playwright install chromium`.
+- `npm run e2e` (root): Playwright suite in `e2e/`. Global setup starts an in-memory MongoDB (seeded with one category), the server and the Vite dev server on free ports, so nothing needs to be running. First run: `npx playwright install chromium`. `e2e/screenshots.spec.js` compares 4 pages in fa/en × light/dark against committed baselines, one set per platform (`-win32`, `-linux` for CI); refresh them with `npm run e2e -- screenshots --update-snapshots` only for an intended visual change.
 
 The server needs `server/.env`; copy `server/.env.example`.
 
@@ -33,7 +34,9 @@ The data flow is layered, and each feature follows it:
 
 List filtering and sorting are driven by URL query params: `useProjects` passes `location.search` directly to `/project/list`.
 
-Dark mode lives in `context/DarkModeContext.tsx` and is stored via `useLocalStorageState`. Persian numbers and dates come from `utils/`.
+**i18n:** `react-i18next`, `fa` (default) and `en` in `src/i18n/`. UI text goes through `t()` (`react/jsx-no-literals` fails lint on literals; it does not check attributes, so `title`/`label`/`alt` need `t()` too). Status badge labels in `constants/` are keys, translated where rendered. Client schema messages use `msg(key)` from `schemas/message.ts`, translated when a parse fails. The `httpService` interceptor translates every server `message` by its `code` (`server.<CODE>` keys; fa keeps the server's Persian text), so toasts need nothing extra; a new server code needs a key in both locales and in the copied list in `src/i18n/serverCodes.test.ts`.
+
+Styling is Tailwind 4 with no JS config: colors are `@theme` variables in `src/index.css` (light values), and `:root.dark-mode` overrides the same variables. The old `primary-*`/`secondary-*` scale sits beside the semantic tokens from `docs/design.md` (`bg`, `surface`, `text-muted`, `primary`, `error`, ...); new UI uses the semantic ones. Dark mode lives in `context/DarkModeContext.tsx` and is stored via `useLocalStorageState`. Persian numbers and dates come from `utils/`.
 
 ## Server architecture (`server/`)
 

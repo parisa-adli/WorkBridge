@@ -33,6 +33,12 @@ export default [
       "react/prop-types": 0,
     },
   },
+  {
+    // UI text goes through t()
+    files: ["src/**/*.tsx"],
+    ignores: ["**/*.test.tsx"],
+    rules: { "react/jsx-no-literals": ["error", { allowedStrings: ["-", "*", "#"] }] },
+  },
   ...tseslint.configs.recommended.map((config) => ({
     ...config,
     files: ["**/*.{ts,tsx}"],

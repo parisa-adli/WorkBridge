@@ -6,7 +6,7 @@ function Loading({ width = "75", height = "40" }: { width?: string | number; hei
       width={width}
       height={height}
       radius={6}
-      color="rgb(var(--color-primary-900))"
+      color="var(--color-primary-900)"
       wrapperClass="flex justify-center"
       visible={true}
     />

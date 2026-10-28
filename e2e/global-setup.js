@@ -58,6 +58,8 @@ async function startApps(mongoUri, attempts = 3) {
       REFRESH_TOKEN_SECRET_KEY: "e2e-refresh-secret",
       COOKIE_PARSER_SECRET_KEY: "e2e-cookie-secret",
       TOKEN_SECRET_KEY: "e2e-token-secret",
+      // Every signed-in spec logs in from the same IP; the default 10 per 15 min is too few for the suite.
+      OTP_RATE_LIMIT: "1000",
       SERVER_URL: serverUrl,
       CLIENT_URL: clientUrl,
       ALLOW_CORS_ORIGIN: clientUrl,
@@ -76,7 +78,7 @@ async function startApps(mongoUri, attempts = 3) {
       // category/list needs the DB, so 200 means the server is listening and connected.
       await waitFor(`${serverUrl}/api/category/list`, server);
       await waitFor(clientUrl, vite);
-      return { clientUrl, kill };
+      return { serverUrl, clientUrl, kill };
     } catch (err) {
       kill();
       const exited = [server, vite].some((c) => c.exitCode !== null || c.signalCode !== null);
@@ -106,7 +108,8 @@ module.exports = async function globalSetup() {
       await client.close();
     }
 
-    const { clientUrl, kill } = await startApps(mongoUri);
+    const { serverUrl, clientUrl, kill } = await startApps(mongoUri);
+    process.env.E2E_SERVER_URL = serverUrl;
     process.env.E2E_CLIENT_URL = clientUrl;
     process.env.E2E_MONGO_URI = mongoUri;
     return async () => {

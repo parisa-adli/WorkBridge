@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import SendOTPForm from "./SendOTPForm";
 import EmailLoginForm from "./EmailLoginForm";
@@ -15,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 
 function AuthContainer() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [tab, setTab] = useState<"email" | "phone">("email");
   const [step, setStep] = useState(1);
   const {
@@ -42,7 +44,7 @@ function AuthContainer() {
       const { message, otp } = await mutateAsync(data);
       setStep(2);
       // the server returns the code only outside production, where no SMS is sent
-      toast.success(otp ? `${message} - کد تایید: ${otp}` : message);
+      toast.success(otp ? t("auth.otpSentWithCode", { message, otp }) : message);
     } catch (error) {
       toast.error((error as AxiosError<ApiErrorResponse>)?.response?.data?.message ?? null);
     }
@@ -78,8 +80,8 @@ function AuthContainer() {
   };
 
   const tabs = [
-    { id: "email", label: "ورود با ایمیل" },
-    { id: "phone", label: "ورود با موبایل" },
+    { id: "email", label: t("auth.emailTab") },
+    { id: "phone", label: t("auth.phoneTab") },
   ] as const;
 
   return (

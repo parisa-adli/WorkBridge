@@ -4,6 +4,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import i18n from "../i18n";
 
 type Config = InternalAxiosRequestConfig;
 
@@ -72,6 +73,29 @@ describe("httpService 401 handling", () => {
     ]);
   });
 
+  it.each([
+    ["fa", "ایمیل یا رمز عبور اشتباه است"],
+    ["en", "Wrong email or password"],
+  ])("rejects a login 401 with its own error and no refresh (%s)", async (lng, message) => {
+    await i18n.changeLanguage(lng);
+    adapter.mockImplementationOnce((config) =>
+      Promise.reject(
+        new AxiosError("Unauthorized", "ERR_BAD_REQUEST", config, null, {
+          data: { statusCode: 401, code: "INVALID_CREDENTIALS", message: "ایمیل یا رمز عبور اشتباه است" },
+          status: 401,
+          statusText: "Unauthorized",
+          headers: {},
+          config,
+        })
+      )
+    );
+
+    await expect(http.post("/user/login")).rejects.toMatchObject({
+      response: { status: 401, data: { code: "INVALID_CREDENTIALS", message } },
+    });
+    expect(calledUrls()).toEqual(["/user/login"]);
+  });
+
   it("rejects a network error (no response) without trying to refresh", async () => {
     adapter.mockImplementation((config) =>
       Promise.reject(new AxiosError("Network Error", "ERR_NETWORK", config))
@@ -108,5 +132,46 @@ describe("httpService base URL", () => {
     await (await import("./httpService")).default.get("/project/list");
 
     expect(adapter.mock.calls[0][0].baseURL).toBe("https://api.example.com/api");
+  });
+});
+
+describe("httpService message translation", () => {
+  const otpSent = (config: Config) =>
+    response(config, {
+      statusCode: 200,
+      data: { message: "کد تائید برای شماره موبایل ۰۹۱۲ ارسال گردید", code: "OTP_SENT", phoneNumber: "0912" },
+    });
+
+  beforeEach(() => {
+    adapter.mockReset();
+  });
+
+  it("keeps the server's Persian message in fa", async () => {
+    adapter.mockImplementationOnce(otpSent);
+    const res = await http.post("/user/get-otp");
+    expect(res.data.data.message).toBe("کد تائید برای شماره موبایل ۰۹۱۲ ارسال گردید");
+  });
+
+  it("translates success and error messages by code in en", async () => {
+    await i18n.changeLanguage("en");
+    adapter.mockImplementationOnce(otpSent);
+    const res = await http.post("/user/get-otp");
+    expect(res.data.data.message).toBe("Verification code sent to 0912");
+
+    adapter.mockImplementationOnce(unauthorized).mockImplementationOnce((config) =>
+      response(config, { statusCode: 200, data: { user: null } })
+    );
+    await expect(http.get("/project/list")).rejects.toMatchObject({
+      response: { data: { code: "INVALID_TOKEN", message: "Invalid token" } },
+    });
+  });
+
+  it("falls back to the server message for an unknown code", async () => {
+    await i18n.changeLanguage("en");
+    adapter.mockImplementationOnce((config) =>
+      response(config, { statusCode: 200, data: { message: "پیام", code: "NOT_A_CODE" } })
+    );
+    const res = await http.post("/x");
+    expect(res.data.data.message).toBe("پیام");
   });
 });

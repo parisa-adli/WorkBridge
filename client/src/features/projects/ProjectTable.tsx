@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import useOwnerProjects from "./useOwnerProjects";
 import Loading from "../../ui/Loading";
 import Empty from "../../ui/Empty";
@@ -6,25 +7,26 @@ import ProjectRow from "./ProjectRow";
 
 
 function ProjectTable() {
+  const { t } = useTranslation();
   const { isLoading, projects } = useOwnerProjects();
 
   if (isLoading) return <Loading />;
-  if (!projects.length) return <Empty resourceName="پروژه" />;
+  if (!projects.length) return <Empty resourceName={t("project.resource")} />;
 
   return (
     <Table>
       <Table.Header>
         <tr className="title-row">
           <th>#</th>
-          <th>عنوان پروژه</th>
-          <th>دسته بندی</th>
-          <th>بودجه</th>
-          <th>ددلاین</th>
-          <th>تگ ها</th>
-          <th>فریلنسر</th>
-          <th>وضعیت</th>
-          <th>عملیات</th>
-          <th>درخواست ها</th>
+          <th>{t("project.title")}</th>
+          <th>{t("project.category")}</th>
+          <th>{t("project.budget")}</th>
+          <th>{t("project.deadline")}</th>
+          <th>{t("project.tags")}</th>
+          <th>{t("project.freelancer")}</th>
+          <th>{t("common.status")}</th>
+          <th>{t("common.actions")}</th>
+          <th>{t("project.proposals")}</th>
         </tr>
       </Table.Header>
       <Table.Body>

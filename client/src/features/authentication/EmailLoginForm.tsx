@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +17,7 @@ import redirectByRole from "../../utils/redirectByRole";
 
 function EmailLoginForm() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -56,14 +58,14 @@ function EmailLoginForm() {
           name: "role",
           validationSchema: { onChange: fillDemoUser },
           options: [
-            { value: ROLES.OWNER, label: "کارفرما" },
-            { value: ROLES.FREELANCER, label: "فریلنسر" },
+            { value: ROLES.OWNER, label: t("roles.owner") },
+            { value: ROLES.FREELANCER, label: t("roles.freelancer") },
           ],
         }}
       />
-      <Textfield label="ایمیل" name="email" type="email" register={register} required errors={errors} />
+      <Textfield label={t("auth.email")} name="email" type="email" register={register} required errors={errors} />
       <Textfield
-        label="رمز عبور"
+        label={t("auth.password")}
         name="password"
         type="password"
         register={register}
@@ -74,7 +76,7 @@ function EmailLoginForm() {
         <Loading />
       ) : (
         <button type="submit" className="btn btn--primary w-full">
-          ورود
+          {t("auth.login")}
         </button>
       )}
     </form>

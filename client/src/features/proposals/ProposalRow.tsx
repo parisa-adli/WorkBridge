@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Table from "../../ui/Table";
 import {
   toPersianNumbers,
@@ -8,12 +9,13 @@ import StatusBadge from "../../ui/StatusBadge";
 import type { Proposal } from "../../types/api";
 
 function ProposalRow({ proposal, index }: { proposal: Proposal; index: number }) {
+  const { t } = useTranslation();
   const { description, duration, price, status } = proposal;
   return (
     <Table.Row>
       <td>{index + 1}</td>
       <td>{truncateText(description, 60)}</td>
-      <td>{toPersianNumbers(duration)} روز</td>
+      <td>{t("proposal.days", { days: toPersianNumbers(duration) })}</td>
       <td>{toPersianNumbersWithComma(price)}</td>
       <td>
         <StatusBadge status={status} />

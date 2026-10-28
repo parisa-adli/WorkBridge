@@ -1,22 +1,24 @@
+import { useTranslation } from "react-i18next";
 import Empty from "../../ui/Empty";
 import Table from "../../ui/Table";
 import ProposalRow from "./ProposalRow";
 import type { Proposal } from "../../types/api";
 
 function ProposalsTable({ proposals }: { proposals: Proposal[] }) {
-  if (!proposals.length) return <Empty resourceName="درخواستی" />;
+  const { t } = useTranslation();
+  if (!proposals.length) return <Empty resourceName={t("proposal.resource")} />;
 
   return (
     <Table>
       <Table.Header>
         <tr className="title-row">
           <th>#</th>
-          <th>فریلنسر</th>
-          <th>توضیحات</th>
-          <th>زمان تحویل</th>
-          <th>هزینه</th>
-          <th>وضعیت</th>
-          <th>عملیات</th>
+          <th>{t("project.freelancer")}</th>
+          <th>{t("common.description")}</th>
+          <th>{t("proposal.deliveryTime")}</th>
+          <th>{t("proposal.cost")}</th>
+          <th>{t("common.status")}</th>
+          <th>{t("common.actions")}</th>
         </tr>
       </Table.Header>
       <Table.Body>

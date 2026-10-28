@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import useAuthorize from "../features/authentication/useAuthorize";
 import { useEffect, type ReactNode } from "react";
@@ -5,7 +6,8 @@ import Loading from "../ui/Loading";
 import toast from "react-hot-toast";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
-  const negative = useNavigate();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // 1. load the authenticated user
   const { isLoading, isAuthenticated, isAuthorized, isVerified } =
@@ -15,14 +17,14 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) {
-      negative("/auth");
+      navigate("/auth");
     } else if (!isVerified) {
-      toast.error("پروفایل شما هنوز تایید نشده است");
-      negative("/");
+      toast.error(t("auth.profileNotVerified"));
+      navigate("/");
     } else if (!isAuthorized) {
-      negative("/not-access", { replace: true });
+      navigate("/not-access", { replace: true });
     }
-  }, [isLoading, isAuthenticated, isAuthorized, isVerified, negative]);
+  }, [isLoading, isAuthenticated, isAuthorized, isVerified, navigate, t]);
 
   // 3. while loading => show loading
   if (isLoading)

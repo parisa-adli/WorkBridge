@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Loading from "../../../ui/Loading";
@@ -13,6 +14,7 @@ type ChangeUserStatusProps = {
 };
 
 function ChangeUserStatus({ userId, onClose, userStatus }: ChangeUserStatusProps) {
+  const { t } = useTranslation();
   const { register, handleSubmit } = useForm<StatusInput, unknown, StatusValues>({
     defaultValues: { status: userStatus },
     resolver: zodResolver(userStatusSchema),
@@ -30,12 +32,12 @@ function ChangeUserStatus({ userId, onClose, userStatus }: ChangeUserStatusProps
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <StatusSelect register={register} />
-        <div className="!mt-8">
+        <div className="mt-8!">
           {isUpdating ? (
             <Loading />
           ) : (
             <button type="submit" className="btn btn--primary w-full">
-              تایید
+              {t("common.confirm")}
             </button>
           )}
         </div>

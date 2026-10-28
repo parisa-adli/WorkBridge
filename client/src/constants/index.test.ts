@@ -17,17 +17,17 @@ describe("constants", () => {
     expect(ROLE_HOME).toEqual({ ADMIN: "/admin", OWNER: "/owner", FREELANCER: "/freelancer" });
   });
 
-  it("status codes with labels and badge styles", () => {
+  it("status codes with label keys and badge styles", () => {
     expect(STATUS).toEqual({ REJECTED: 0, PENDING: 1, ACCEPTED: 2 });
     expect(STATUS_BADGES).toEqual({
-      0: { label: "رد شده", className: "badge--danger" },
-      1: { label: "در انتظار تایید", className: "badge--secondary" },
-      2: { label: "تایید شده", className: "badge--success" },
+      0: { label: "status.rejected", className: "badge--danger" },
+      1: { label: "status.pending", className: "badge--secondary" },
+      2: { label: "status.accepted", className: "badge--success" },
     });
     expect(PROJECT_STATUS).toEqual({ OPEN: "OPEN", CLOSED: "CLOSED" });
     expect(PROJECT_STATUS_BADGES).toEqual({
-      OPEN: { label: "باز", className: "badge--success" },
-      CLOSED: { label: "بسته", className: "badge--danger" },
+      OPEN: { label: "projectStatus.open", className: "badge--success" },
+      CLOSED: { label: "projectStatus.closed", className: "badge--danger" },
     });
   });
 

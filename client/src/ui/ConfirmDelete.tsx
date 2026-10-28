@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 type ConfirmDeleteProps = {
   recourseName: string;
   onClose: () => void;
@@ -6,10 +7,11 @@ type ConfirmDeleteProps = {
 };
 
 function ConfirmDelete({ recourseName, onClose, onConfirm, disabled }: ConfirmDeleteProps) {
+  const { t } = useTranslation();
   return (
     <div>
       <h2 className="font-bold text-base mb-8">
-        آیا از حذف {recourseName} مطمئن هستید؟
+        {t("common.confirmDelete", { name: recourseName })}
       </h2>
       <div className="flex justify-between items-center gap-x-16">
         <button
@@ -17,14 +19,14 @@ function ConfirmDelete({ recourseName, onClose, onConfirm, disabled }: ConfirmDe
           onClick={onClose}
           disabled={disabled}
         >
-          لغو
+          {t("common.cancel")}
         </button>
         <button
           className="btn btn--danger py-3 flex-1"
           onClick={onConfirm}
           disabled={disabled}
         >
-          تایید
+          {t("common.confirm")}
         </button>
       </div>
     </div>

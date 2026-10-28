@@ -1,5 +1,6 @@
-const farsiDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+import { activeLocale } from "../i18n";
 
+// Names kept from the Persian-only days: digits follow the active language.
 export function toPersianNumbersWithComma(n: number | string) {
   const numWithCommas = numberWithCommas(n); // 1000,2343
   const persianNumber = toPersianNumbers(numWithCommas);
@@ -11,5 +12,6 @@ function numberWithCommas(x: number | string) {
 }
 
 export function toPersianNumbers(n: number | string) {
-  return n.toString().replace(/\d/g, (x) => farsiDigits[parseInt(x)]);
+  const digits = new Intl.NumberFormat(activeLocale());
+  return n.toString().replace(/\d/g, (x) => digits.format(Number(x)));
 }

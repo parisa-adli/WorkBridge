@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import useProject from "../features/project/useProject";
 import ProjectHeader from "../features/project/ProjectHeader";
 import ProposalsTable from "../features/project/ProposalsTable";
@@ -6,10 +7,11 @@ import Empty from "../ui/Empty";
 import type { Proposal } from "../types/api";
 
 function Project() {
+  const { t } = useTranslation();
   const { isLoading, project } = useProject();
 
   if (isLoading) return <Loading />;
-  if (!project) return <Empty resourceName="پروژه" />;
+  if (!project) return <Empty resourceName={t("project.resource")} />;
 
   return (
     <div>

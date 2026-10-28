@@ -1,26 +1,40 @@
-import { HiArrowRight } from "react-icons/hi";
+import { useTranslation } from "react-i18next";
+import { HiArrowLeft, HiOutlineLockClosed } from "react-icons/hi";
 import { Link } from "react-router-dom";
+import { ROLE_HOME } from "../constants";
+import useUser from "../features/authentication/useUser";
+import { buttonClass } from "../ui/Button";
+import EmptyState from "../ui/EmptyState";
 
+// Reference page for the Part F re-skins: tokens and ui/ components only.
 function NotAccess() {
+  const { t } = useTranslation();
+  const { user } = useUser();
+  const home = user && ROLE_HOME[user.role];
+
   return (
-    <div className="h-screen bg-secondary-0 p-10">
-      <div className="container xl:max-w-screen-xl">
-        <div className="sm:max-w-sm flex justify-center">
-          <div>
-            <h1 className="text-xl font-bold text-secondary-700 mb-8">
-              شما به این صفحه دسترسی ندارید
-            </h1>
-            <Link
-              to="/"
-              className="flex items-center gap-x-2 bg-primary-600 py-2 px-4 rounded-lg mb-4 text-secondary-50 "
-            >
-              <HiArrowRight className="w-6 h-6 text-secondary-50" />
-              بازگشت به خانه
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
+    <main className="grid min-h-screen place-items-center bg-bg px-4">
+      <EmptyState
+        titleAs="h1"
+        icon={
+          <span className="grid h-18 w-18 place-items-center rounded-full bg-error-soft text-error">
+            <HiOutlineLockClosed aria-hidden="true" className="h-8 w-8" />
+          </span>
+        }
+        title={t("pages.notAccess")}
+        description={t("pages.notAccessBody")}
+      >
+        {home && (
+          <Link to={`${home}/dashboard`} className={buttonClass()}>
+            {t("pages.goDashboard")}
+            <HiArrowLeft aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
+          </Link>
+        )}
+        <Link to="/" className={buttonClass({ variant: home ? "ghost" : "primary" })}>
+          {t("pages.home")}
+        </Link>
+      </EmptyState>
+    </main>
   );
 }
 export default NotAccess;

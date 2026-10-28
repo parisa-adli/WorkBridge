@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import { useEffect, useId, type KeyboardEvent, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { HiOutlineX } from "react-icons/hi";
 import useOutsideClick from "../hooks/useOutsideClick";
 
@@ -9,31 +10,64 @@ type ModalProps = {
   children: ReactNode;
 };
 
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 function Modal({ open, onClose, title, children }: ModalProps) {
+  const { t } = useTranslation();
   const ref = useOutsideClick<HTMLDivElement>(onClose);
+  const titleId = useId();
+
+  // Focus moves into the dialog on open and back to whatever had it (the trigger) on close.
+  useEffect(() => {
+    if (!open) return;
+    const trigger = document.activeElement as HTMLElement | null;
+    (ref.current?.querySelector<HTMLElement>(FOCUSABLE) ?? ref.current)?.focus();
+    return () => trigger?.focus();
+  }, [open, ref]);
+
+  function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    if (e.key === "Escape") return onClose();
+    if (e.key !== "Tab" || !ref.current) return;
+    const focusable = ref.current.querySelectorAll<HTMLElement>(FOCUSABLE);
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
 
   return (
     open && (
-      <div
-        className="backdrop-blur-sm fixed inset-0
-           w-full h-screen bg-secondary-800 bg-opacity-30 z-50"
-      >
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-backdrop">
         <div
           ref={ref}
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-        rounded-lg bg-secondary-0 p-4 shadow-lg transition-all duration-500 ease-out
-        w-[calc(100vw-2rem)] sm:max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          tabIndex={-1}
+          onKeyDown={handleKeyDown}
+          className="w-[calc(100vw-2rem)] sm:max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto
+            rounded-lg border border-border bg-surface text-text shadow-xl"
         >
-          <div
-            className="flex items-center justify-between border-b 
-          border-b-secondary-300 pb-2 mb-6"
-          >
-            <p className="text-secondary-700 font-bold text-base">{title}</p>
-            <button onClick={onClose}>
-              <HiOutlineX className="w-5 h-5 text-secondary-500" />
+          <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
+            <h2 id={titleId} className="text-lg font-bold">
+              {title}
+            </h2>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={t("common.close")}
+              className="grid h-11 w-11 place-items-center rounded-md text-text-muted hover:bg-surface-muted hover:text-text"
+            >
+              <HiOutlineX aria-hidden="true" className="h-5 w-5" />
             </button>
           </div>
-          {children}
+          <div className="p-4 md:p-6">{children}</div>
         </div>
       </div>
     )

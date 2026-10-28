@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 type FilterProps = {
@@ -6,6 +7,7 @@ type FilterProps = {
 };
 
 function Filter({ options, filterField }: FilterProps) {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const currentFilter = searchParams.get(filterField) || options[0].value;
 
@@ -15,7 +17,7 @@ function Filter({ options, filterField }: FilterProps) {
   }
   return (
     <div className="flex items-center gap-x-2 text-xs">
-      <span>وضعیت</span>
+      <span>{t("common.status")}</span>
       <div className="flex items-center gap-x-2 p-1 border border-secondary-100 bg-secondary-0 rounded-lg">
         {options.map(({ label, value }) => {
           const isActive = value === currentFilter;
@@ -27,7 +29,7 @@ function Filter({ options, filterField }: FilterProps) {
               className={`whitespace-nowrap rounded-md px-4 py-2 font-bold transition-all decoration-neutral-300
                 ${
                   isActive
-                    ? "!bg-primary-900 text-white"
+                    ? "bg-primary-900! text-white"
                     : "bg-secondary-0 text-secondary-800"
                 }`}
             >

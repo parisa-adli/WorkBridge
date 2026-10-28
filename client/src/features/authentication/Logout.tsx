@@ -8,7 +8,7 @@ function Logout() {
     <Loading />
   ) : (
     <button onClick={() => logout()}>
-      <HiArrowRightOnRectangle className="h-5 w-5 text-secondary-500 hover:text-error" />
+      <HiArrowRightOnRectangle className="h-5 w-5 text-secondary-500 hover:text-error ltr:-scale-x-100" />
     </button>
   );
 }

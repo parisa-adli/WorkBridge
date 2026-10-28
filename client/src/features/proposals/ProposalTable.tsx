@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Empty from "../../ui/Empty";
 import Loading from "../../ui/Loading";
 import Table from "../../ui/Table";
@@ -5,19 +6,20 @@ import ProposalRow from "./ProposalRow";
 import useProposals from "./useProposals";
 
 function ProposalTable() {
+  const { t } = useTranslation();
   const { isLoading, proposals } = useProposals();
   if (isLoading) return <Loading />;
-  if (!proposals.length) return <Empty resourceName="پروژه" />;
+  if (!proposals.length) return <Empty resourceName={t("project.resource")} />;
 
   return (
     <Table>
       <Table.Header>
         <tr className="title-row">
           <th>#</th>
-          <th>توضیحات</th>
-          <th>زمان تحویل</th>
-          <th>هزینه</th>
-          <th>وضعیت</th>
+          <th>{t("common.description")}</th>
+          <th>{t("proposal.deliveryTime")}</th>
+          <th>{t("proposal.cost")}</th>
+          <th>{t("common.status")}</th>
         </tr>
       </Table.Header>
       <Table.Body>

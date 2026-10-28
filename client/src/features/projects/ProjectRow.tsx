@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import Modal from "../../ui/Modal";
 import Table from "../../ui/Table";
@@ -15,6 +16,7 @@ import { Link } from "react-router-dom";
 import type { Project, UserRef } from "../../types/api";
 
 function ProjectRow({ project, index }: { project: Project; index: number }) {
+  const { t } = useTranslation();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const { removeProject } = useRemoveProject();
@@ -46,7 +48,7 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
               <PiPencilSimpleLineBold className="w-5 h-5 text-primary-900" />
             </button>
             <Modal
-              title={`ویرایش ${project.title}`}
+              title={t("project.edit", { title: project.title })}
               open={isEditOpen}
               onClose={() => setIsEditOpen(false)}
             >
@@ -61,7 +63,7 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
               <PiTrashBold className="w-5 h-5 text-error" />
             </button>
             <Modal
-              title={`حذف ${project.title}`}
+              title={t("project.delete", { title: project.title })}
               open={isDeleteOpen}
               onClose={() => setIsDeleteOpen(false)}
             >

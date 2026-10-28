@@ -10,6 +10,7 @@ import OwnerDashboard from "./pages/OwnerDashboard";
 import Projects from "./pages/Projects";
 import Project from "./pages/Project";
 import { DarkModeProvider } from "./context/DarkModeContext";
+import { LanguageProvider } from "./context/LanguageContext";
 import OwnerLayout from "./features/owner/OwnerLayout";
 import FreelancerDashboard from "./pages/FreelancerDashboard";
 import Proposals from "./pages/Proposals";
@@ -26,57 +27,59 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <DarkModeProvider>
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools initialIsOpen={false} />
-        <Toaster />
-        <Routes>
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/complete-profile" element={<CompleteProfile />} />
-          <Route
-            path="/owner"
-            element={
-              <ProtectedRoute>
-                <OwnerLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<OwnerDashboard />} />
-            <Route path="projects" element={<Projects />} />
-            <Route path="projects/:id" element={<Project />} />
-          </Route>
-          <Route
-            path="/freelancer"
-            element={
-              <ProtectedRoute>
-                <FreelancerLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<FreelancerDashboard />} />
-            <Route path="proposals" element={<Proposals />} />
-            <Route path="projects" element={<SubmittedProjects />} />
-          </Route>
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="users" element={<Users />} />
-            <Route path="proposals" element={<Proposals />} />
-            <Route path="projects" element={<SubmittedProjects />} />
-          </Route>
-          <Route path="/" element={<Home />} />
-          <Route path="/not-access" element={<NotAccess />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </QueryClientProvider>
+      <LanguageProvider>
+        <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools initialIsOpen={false} />
+          <Toaster />
+          <Routes>
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/complete-profile" element={<CompleteProfile />} />
+            <Route
+              path="/owner"
+              element={
+                <ProtectedRoute>
+                  <OwnerLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<OwnerDashboard />} />
+              <Route path="projects" element={<Projects />} />
+              <Route path="projects/:id" element={<Project />} />
+            </Route>
+            <Route
+              path="/freelancer"
+              element={
+                <ProtectedRoute>
+                  <FreelancerLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<FreelancerDashboard />} />
+              <Route path="proposals" element={<Proposals />} />
+              <Route path="projects" element={<SubmittedProjects />} />
+            </Route>
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="users" element={<Users />} />
+              <Route path="proposals" element={<Proposals />} />
+              <Route path="projects" element={<SubmittedProjects />} />
+            </Route>
+            <Route path="/" element={<Home />} />
+            <Route path="/not-access" element={<NotAccess />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </QueryClientProvider>
+      </LanguageProvider>
     </DarkModeProvider>
   );
 }
