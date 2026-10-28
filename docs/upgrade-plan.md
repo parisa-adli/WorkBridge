@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**33 of 49 phases done** (Parts A, B and C, Phases 26, 27a, 27b and 28a). Next: Phase 28b (Tailwind 4, tokens and logical utilities).
+**34 of 49 phases done** (Parts A, B and C, Phases 26, 27a, 27b, 28a and 28b). Next: Phase 29 (design-system components).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -38,7 +38,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
-| D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ⬜ 4/6 |
+| D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ⬜ 5/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
@@ -435,14 +435,14 @@ Files: `e2e/` (screenshot specs and baselines), CI
 
 Verify: the screenshot specs pass twice in a row locally and in CI.
 
-### Phase 28b: Tailwind 4, tokens and logical utilities ⬜
+### Phase 28b: Tailwind 4, tokens and logical utilities ✅
 **Goal:** Tailwind 4 with a CSS-first `@theme` holding the agreed light/dark tokens; all physical direction classes replaced (PRD R3, R10).
 
 Files: `client/package.json`, `client/postcss.config.js` / `vite.config.js`, `client/tailwind.config.js` (delete), `client/src/index.css`, every component using `ml-/mr-/pl-/pr-/left-/right-/text-left/text-right`
 
-- [ ] Run the official upgrade tool, then move tokens into `@theme` (light + dark via the existing CSS variables).
-- [ ] Replace physical classes with logical ones (`ms-`, `ps-`, `start-`, `text-start`); mirror directional icons.
-- [ ] CI grep that fails on physical direction classes.
+- [x] Run the official upgrade tool, then move tokens into `@theme` (light + dark via the existing CSS variables).
+- [x] Replace physical classes with logical ones (`ms-`, `ps-`, `start-`, `text-start`); mirror directional icons.
+- [x] CI grep that fails on physical direction classes.
 
 Verify: fa screenshots match the Phase 28a baseline (or the diffs are reviewed and accepted in the PR); en screenshots show a correct LTR mirror.
 
