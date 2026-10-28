@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**38 of 49 phases done** (Parts A, B, C and D, and Phases 30–32). Next: Phase 33 (proposal workflow).
+**39 of 49 phases done** (Parts A, B, C and D, and Phases 30–33). Next: Phase 34 (profile page and avatar).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -39,7 +39,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
-| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 3/9 |
+| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 4/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
@@ -496,13 +496,13 @@ Files: `userAuth.controller.ts` (logout), `server/tests/auth.test.ts`, `ui/Heade
 
 Verify: e2e passes.
 
-### Phase 33: Proposal workflow (F6) ⬜
+### Phase 33: Proposal workflow (F6) ✅
 Files: `proposal.controller.ts`, `project.controller.ts`, project router (freelancer read access), client proposal lists, `pages/` new freelancer project detail, admin projects page
 
-- [ ] Accept = assign freelancer + close project + reject other pending proposals, in a transaction (memory server needs a replica set — or use a safe sequence).
-- [ ] Only one accepted per project; un-accept clears `freelancer`.
-- [ ] Proposal lists show the linked project title; `/freelancer/projects/:id` read-only without others' proposals.
-- [ ] ADMIN can't send proposals (server 403, button hidden).
+- [x] Accept = assign freelancer + close project + reject other pending proposals, in a transaction (memory server needs a replica set — or use a safe sequence).
+- [x] Only one accepted per project; un-accept clears `freelancer`.
+- [x] Proposal lists show the linked project title; `/freelancer/projects/:id` read-only without others' proposals.
+- [x] ADMIN can't send proposals (server 403, button hidden).
 
 Verify: server tests for each rule; e2e: owner accepts, freelancer sees it accepted.
 

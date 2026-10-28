@@ -27,7 +27,7 @@ router.post(
 );
 router.get(
   "/:id",
-  authorize(ROLES.ADMIN, ROLES.OWNER),
+  authorize(ROLES.ADMIN, ROLES.OWNER, ROLES.FREELANCER),
   validate(idParamSchema, "params"),
   ProjectController.getProjectById
 );

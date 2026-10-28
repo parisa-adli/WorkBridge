@@ -20,6 +20,7 @@ function ProposalTable() {
       <Table.Header>
         <tr className="title-row">
           <th>#</th>
+          <th>{t("project.title")}</th>
           <th>{t("common.description")}</th>
           <th>{t("roles.owner")}</th>
           {isAdmin && <th>{t("roles.freelancer")}</th>}

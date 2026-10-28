@@ -42,7 +42,7 @@ function ProposalRow({ proposal, index }: { proposal: Proposal; index: number })
             onClose={() => setOpen(false)}
           />
         </Modal>
-        <button onClick={() => setOpen(true)}>
+        <button onClick={() => setOpen(true)} aria-label={t("proposal.changeStatus")}>
           <TbChecklist className="w-6 h-6 text-primary-800" />
         </button>
       </td>

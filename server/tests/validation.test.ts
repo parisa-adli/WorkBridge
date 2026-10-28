@@ -3,7 +3,7 @@ import { startApp, stopApp, clearDb, createUser, type TestUser } from "./helpers
 import { ERROR_CODES } from "../utils/errorCodes";
 import { LIMITS } from "../utils/constants";
 
-let app: Express, admin: TestUser;
+let app: Express, admin: TestUser, freelancer: TestUser;
 
 beforeAll(async () => {
   app = await startApp();
@@ -12,6 +12,7 @@ afterAll(stopApp);
 beforeEach(async () => {
   await clearDb();
   admin = await createUser(app, { phoneNumber: "09120000041", role: "ADMIN" });
+  freelancer = await createUser(app, { phoneNumber: "09120000042", role: "FREELANCER" });
 });
 
 // Validation runs before any lookup, so a well-formed id needs no document behind it.
@@ -97,7 +98,9 @@ const cases: Case[] = [
 
 describe("validation errors", () => {
   it.each(cases)("%s %s %j fails on %s", async (method, url, body, field, code, message) => {
-    const req = admin.agent[method as "get" | "post" | "patch" | "delete"](url);
+    // only freelancers may send proposals (ADMIN gets 403 before validation)
+    const { agent } = url === "/api/proposal/add" ? freelancer : admin;
+    const req = agent[method as "get" | "post" | "patch" | "delete"](url);
     const res = await (body ? req.send(body) : req);
     expect(res.status).toBe(400);
     expect(res.body).toEqual({ statusCode: 400, code, message, field });

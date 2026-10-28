@@ -6,7 +6,7 @@ export default function useProject() {
   const { id } = useParams();
   const { data, isLoading } = useQuery({
     queryKey: ["project", id],
-    // the route is /owner/projects/:id, so id is always set
+    // the routes are /<role>/projects/:id, so id is always set
     queryFn: () => getProjectApi(id!),
     retry: false,
   });

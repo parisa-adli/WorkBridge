@@ -71,7 +71,12 @@ class ProjectController extends Controller {
   }
   async getProjectById(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
-    await this.findOwnProject(id, req.user!);
+    const user = req.user!;
+    // freelancers get a read-only view of any project, with only their own proposal
+    const isFreelancer = user.role === ROLES.FREELANCER;
+    if (isFreelancer)
+      await findByIdOr404(ProjectModel, id, ERROR_CODES.PROJECT_NOT_FOUND, "پروژه یافت نشد.");
+    else await this.findOwnProject(id, user);
     const project = await ProjectModel.findById(id).populate([
       {
         path: "category",
@@ -84,6 +89,7 @@ class ProjectController extends Controller {
       {
         path: "proposals",
         model: "Proposal",
+        match: isFreelancer ? { user: user._id } : {},
         populate: [
           {
             path: "user",

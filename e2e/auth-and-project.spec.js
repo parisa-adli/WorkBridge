@@ -65,6 +65,53 @@ test.describe("logout", () => {
   }
 });
 
+test("owner accepts a proposal, the freelancer sees it accepted", async ({ page }) => {
+  const db = mongo.db();
+  const [owner, freelancer, category] = await Promise.all([
+    users().findOne({ username: "demo-owner" }),
+    users().findOne({ username: "demo-freelancer" }),
+    db.collection("categories").findOne(),
+  ]);
+  const title = "پروژه پذیرش پیشنهاد";
+  const { insertedId: projectId } = await db.collection("projects").insertOne({
+    title,
+    description: "پروژه ای برای تست پذیرش پیشنهاد",
+    status: "OPEN",
+    category: category._id,
+    budget: 500000,
+    tags: [],
+    proposals: [],
+    deadline: new Date("2030-01-01"),
+    owner: owner._id,
+    freelancer: null,
+  });
+  const { insertedId: proposalId } = await db.collection("proposals").insertOne({
+    description: "من این پروژه را انجام می دهم",
+    price: 400000,
+    duration: 10,
+    user: freelancer._id,
+    project: projectId,
+    status: 1,
+  });
+  await db.collection("projects").updateOne({ _id: projectId }, { $push: { proposals: proposalId } });
+
+  await demoLogin(page, "کارفرما", "demo-owner", "/owner");
+  await page.goto(url(`/owner/projects/${projectId}`));
+  await page.getByRole("button", { name: "تغییر وضعیت درخواست" }).click();
+  await page.getByRole("combobox", { name: "تغییر وضعیت" }).selectOption({ label: "تایید شده" });
+  await page.getByRole("button", { name: "تایید", exact: true }).click();
+  await expect(page.getByRole("cell", { name: "تایید شده" })).toBeVisible();
+  await page.getByRole("button", { name: "خروج" }).click();
+
+  await demoLogin(page, "فریلنسر", "demo-freelancer", "/freelancer");
+  await page.goto(url("/freelancer/proposals"));
+  await page.getByRole("link", { name: title }).click();
+  await expect(page).toHaveURL(url(`/freelancer/projects/${projectId}`));
+  await expect(page.getByRole("heading", { name: title })).toBeVisible();
+  await expect(page.getByText("بسته", { exact: true })).toBeVisible();
+  await expect(page.getByText("تایید شده", { exact: true })).toBeVisible();
+});
+
 test.describe.serial("OTP login", () => {
   test("new user completes profile as OWNER and waits for approval", async ({ page }) => {
     await loginWithOtp(page);

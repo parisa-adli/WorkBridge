@@ -47,8 +47,8 @@ export type Proposal = Timestamps & Translations<{ description: string }> & {
   description: string;
   // populated with { _id, name } inside a single project and in the list
   user: string | UserRef;
-  // populated with the project's owner in the list
-  project: string | { _id: string; owner: UserRef };
+  // populated with the project's title and owner in the list
+  project: string | ({ _id: string; title: string; owner: UserRef } & Translations<{ title: string }>);
   status: Status;
 };
 

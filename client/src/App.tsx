@@ -16,6 +16,7 @@ import FreelancerDashboard from "./pages/FreelancerDashboard";
 import Proposals from "./pages/Proposals";
 import FreelancerLayout from "./features/freelancer/FreelancerLayout";
 import SubmittedProjects from "./pages/SubmittedProjects";
+import FreelancerProject from "./pages/FreelancerProject";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import ProtectedRoute from "./ui/ProtectedRoute";
 import AdminLayout from "./features/admin/AdminLayout";
@@ -59,6 +60,7 @@ function App() {
               <Route path="dashboard" element={<FreelancerDashboard />} />
               <Route path="proposals" element={<Proposals />} />
               <Route path="projects" element={<SubmittedProjects />} />
+              <Route path="projects/:id" element={<FreelancerProject />} />
             </Route>
             <Route
               path="/admin"
@@ -73,6 +75,7 @@ function App() {
               <Route path="users" element={<Users />} />
               <Route path="proposals" element={<Proposals />} />
               <Route path="projects" element={<SubmittedProjects />} />
+              <Route path="projects/:id" element={<Project />} />
             </Route>
             <Route path="/" element={<Home />} />
             <Route path="/not-access" element={<NotAccess />} />

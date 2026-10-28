@@ -4,10 +4,14 @@ import Empty from "../../../ui/Empty";
 import Loading from "../../../ui/Loading";
 import Table from "../../../ui/Table";
 import ProjectRow from "./ProjectRow";
+import useUser from "../../authentication/useUser";
+import { ROLES } from "../../../constants";
 
 function ProjectsTable() {
   const { t } = useTranslation();
   const { isLoading, projects } = useProjects();
+  const { user } = useUser();
+  const isAdmin = user?.role === ROLES.ADMIN;
 
   if (isLoading) return <Loading />;
   if (!projects.length) return <Empty resourceName={t("project.resource")} />;
@@ -28,7 +32,7 @@ function ProjectsTable() {
       </Table.Header>
       <Table.Body>
         {projects.map((project, index) => (
-          <ProjectRow key={project._id} project={project} index={index} />
+          <ProjectRow key={project._id} project={project} index={index} isAdmin={isAdmin} />
         ))}
       </Table.Body>
     </Table>
