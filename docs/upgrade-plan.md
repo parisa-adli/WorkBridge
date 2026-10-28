@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**34 of 49 phases done** (Parts A, B and C, Phases 26, 27a, 27b, 28a and 28b). Next: Phase 29 (design-system components).
+**35 of 49 phases done** (Parts A, B, C and D). Next: Phase 30 (seed script and bilingual content fields).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -38,7 +38,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
-| D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ⬜ 5/6 |
+| D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
@@ -384,7 +384,7 @@ Verify: each form shows the same Persian messages as before; tests and e2e pass.
 
 ---
 
-## Part D: Design and i18n foundation ⬜
+## Part D: Design and i18n foundation ✅
 
 **Gate before Phase 28a ✅:** agree on the design direction and the F9 page list (PRD R9). Recorded and agreed in `docs/design.md` (2026-10-28, #36).
 
@@ -446,15 +446,15 @@ Files: `client/package.json`, `client/postcss.config.js` / `vite.config.js`, `cl
 
 Verify: fa screenshots match the Phase 28a baseline (or the diffs are reviewed and accepted in the PR); en screenshots show a correct LTR mirror.
 
-### Phase 29: Design-system components ⬜
+### Phase 29: Design-system components ✅
 **Goal:** the `ui/` components from F9 exist, are accessible, and are used by at least one page.
 
 Files: `client/src/ui/` (Button, Input, Select, Textarea, Badge, Table, Pagination, Modal, Card, EmptyState, Skeleton), fonts in `index.css`
 
-- [ ] Build each component on the tokens; visible focus, labelled fields, keyboard-operable Modal.
-- [ ] Vazirmatn + a Latin font with `font-display: swap`.
-- [ ] Re-skin one page (404 / not-access) end to end as the reference.
-- [ ] Unit tests for Modal keyboard behavior and Pagination.
+- [x] Build each component on the tokens; visible focus, labelled fields, keyboard-operable Modal.
+- [x] Vazirmatn + a Latin font with `font-display: swap`.
+- [x] Re-skin one page (404 / not-access) end to end as the reference.
+- [x] Unit tests for Modal keyboard behavior and Pagination.
 
 Verify: tests pass; the reference page passes an axe check in both themes.
 
