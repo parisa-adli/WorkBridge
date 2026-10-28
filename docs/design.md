@@ -1,6 +1,6 @@
 # WorkBridge: Design Direction
 
-Status: **agreed** by the project owner (2026-10-28). Closes the Part D gate in `docs/upgrade-plan.md` (PRD R9).
+Status: **agreed** by the project owner (2026-10-28), after review of the prototype. Closes the Part D gate in `docs/upgrade-plan.md` (PRD R9). A visual prototype is at `client/prototype/design.html` (see section 9).
 
 This is the fixed target for the Tailwind 4 tokens (Phase 28), the design-system components (Phase 29) and the page re-skins (Part F). Anything not listed here is out of scope for F9.
 
@@ -148,3 +148,9 @@ Pages 13–15 are created in Part E already on the new components; Phase 41 only
 ## 8. Agreement
 
 - [x] Direction, tokens, fonts, page list and accessibility target agreed by the project owner.
+
+## 9. Prototype
+
+`client/prototype/design.html` shows this direction on realistic screens: the 404 and not-access reference pages, the sidebar layout (a drawer below 768px), dashboard stats, a projects table, a project card, a proposal form, every button, input and badge state, list loading/empty/error states, a modal, and the token, type, radius and spacing scales with contrast computed live. It switches fa/en and light/dark (the `.dark-mode` class), and `?view=all` shows all four side by side.
+
+Preview: `npm run dev`, then open <http://localhost:3000/prototype/design.html>. It is standalone HTML and CSS: the app does not import it and the production build does not include it. It loads Vazirmatn and Inter from Google Fonts; the app will self-host them (§5). Delete it once Phase 29 has built the real components.

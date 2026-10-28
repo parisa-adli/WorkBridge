@@ -1,0 +1,780 @@
+<!doctype html>
+<!-- Design prototype for docs/design.md (issue #36). Not part of the app: Vite serves it in dev only, the build bundles index.html alone. -->
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WorkBridge Design Prototype</title>
+<!-- shortcut: fonts from Google Fonts for the prototype only; the real app self-hosts woff2 (docs/design.md §5) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet" />
+<script>
+  // Apply theme/lang before paint: ?theme=dark&lang=en&page=404|access&view=all
+  const params = new URLSearchParams(location.search);
+  const root = document.documentElement;
+  if (params.get("theme") === "dark") root.classList.add("dark-mode");
+  if (params.get("lang") === "en") { root.lang = "en"; root.dir = "ltr"; }
+</script>
+<style>
+  /* ---- Tokens: docs/design.md §2–5 (become Tailwind 4 @theme in Phase 28) ---- */
+  :root {
+    --color-bg: #F8FAFC;
+    --color-surface: #FFFFFF;
+    --color-surface-muted: #F1F5F9;
+    --color-border: #E2E8F0;
+    --color-border-strong: #7C8798;
+    --color-text: #0F172A;
+    --color-text-muted: #475569;
+    --color-primary: #4338CA;
+    --color-primary-hover: #3730A3;
+    --color-on-primary: #FFFFFF;
+    --color-primary-soft: #EEF2FF;
+    --color-success: #047857;
+    --color-success-soft: #ECFDF5;
+    --color-warning: #B45309;
+    --color-warning-soft: #FFFBEB;
+    --color-error: #B91C1C;
+    --color-error-soft: #FEF2F2;
+    --color-backdrop: rgb(15 23 42 / 0.5);
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+
+    --font-fa: "Vazirmatn", "Inter", system-ui, sans-serif;
+    --font-en: "Inter", "Vazirmatn", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  :root.dark-mode {
+    --color-bg: #0B1120;
+    --color-surface: #131C2E;
+    --color-surface-muted: #1E293B;
+    --color-border: #273449;
+    --color-border-strong: #64748B;
+    --color-text: #F1F5F9;
+    --color-text-muted: #A0AEC0;
+    --color-primary: #818CF8;
+    --color-primary-hover: #A5B4FC;
+    --color-on-primary: #0B1120;
+    --color-primary-soft: #1E1B4B;
+    --color-success: #34D399;
+    --color-success-soft: #052E25;
+    --color-warning: #FBBF24;
+    --color-warning-soft: #2D1F05;
+    --color-error: #F87171;
+    --color-error-soft: #3B0D0D;
+    --color-backdrop: rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+
+  /* Type scale: size / line height */
+  .text-xs { font-size: 12px; line-height: 18px; }
+  .text-sm { font-size: 14px; line-height: 22px; }
+  .text-base { font-size: 16px; line-height: 26px; }
+  .text-lg { font-size: 18px; line-height: 28px; }
+  .text-xl { font-size: 20px; line-height: 30px; }
+  .text-2xl { font-size: 24px; line-height: 34px; }
+  .text-3xl { font-size: 30px; line-height: 40px; }
+  .text-4xl { font-size: 36px; line-height: 48px; }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { font-family: var(--font-fa); }
+  html:lang(en) { font-family: var(--font-en); }
+  body {
+    margin: 0; min-height: 100vh;
+    background: var(--color-bg); color: var(--color-text);
+    font-size: 16px; line-height: 26px;
+  }
+  h1, h2, h3, p { margin: 0; }
+  h1, h2, h3 { font-weight: 700; }
+  .muted { color: var(--color-text-muted); }
+  .num { font-variant-numeric: tabular-nums; }
+  .stack { display: flex; flex-direction: column; }
+  .row { display: flex; align-items: center; flex-wrap: wrap; }
+  .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-5 { gap: 20px; } .gap-8 { gap: 32px; }
+  svg.icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  [dir="rtl"] .icon-dir { transform: scaleX(-1); } /* directional icons mirror in RTL */
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* Focus: 2px primary ring, 2px offset (forced with .is-focus to show the state) */
+  :focus-visible, .is-focus { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+  :focus:not(:focus-visible) { outline: none; }
+
+  /* ---- Prototype chrome (not part of the design) ---- */
+  .proto-bar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+    padding: 8px 16px; font: 13px/20px "Inter", system-ui, sans-serif;
+    background: repeating-linear-gradient(-45deg, #FEF3C7 0 10px, #FDE68A 10px 20px); color: #422006;
+    direction: ltr;
+  }
+  .proto-bar a { color: #422006; font-weight: 700; }
+  .proto-bar a[aria-current="page"] { text-decoration: none; background: #422006; color: #FEF3C7; padding: 0 6px; border-radius: 4px; }
+
+  /* ---- Buttons ---- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 44px; padding: 10px 16px; border-radius: var(--radius-md);
+    font: inherit; font-weight: 700; border: 1px solid transparent; cursor: pointer; text-decoration: none; white-space: nowrap;
+    transition: background-color .15s, color .15s, border-color .15s;
+  }
+  .btn-sm { min-height: 36px; padding: 6px 12px; font-size: 14px; line-height: 22px; }
+  .btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
+  .btn-primary:hover, .btn-primary.is-hover { background: var(--color-primary-hover); }
+  .btn-secondary { background: var(--color-surface-muted); color: var(--color-text); border-color: var(--color-border); }
+  .btn-secondary:hover, .btn-secondary.is-hover { border-color: var(--color-border-strong); }
+  .btn-outline { background: transparent; color: var(--color-text); border-color: var(--color-border-strong); }
+  .btn-outline:hover, .btn-outline.is-hover { background: var(--color-surface-muted); }
+  .btn-danger { background: transparent; color: var(--color-error); border-color: var(--color-error); }
+  .btn-danger:hover, .btn-danger.is-hover { background: var(--color-error-soft); }
+  .btn-danger-solid { background: var(--color-error); color: var(--color-surface); }
+  .btn-ghost { background: transparent; color: var(--color-primary); }
+  .btn-ghost:hover, .btn-ghost.is-hover { background: var(--color-primary-soft); }
+  .btn-icon { width: 44px; padding: 0; color: var(--color-text-muted); background: transparent; }
+  .btn-icon:hover { background: var(--color-surface-muted); color: var(--color-text); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-inline-end-color: transparent; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---- Badges ---- */
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: var(--radius-sm); font-size: 12px; line-height: 18px; font-weight: 500; white-space: nowrap; }
+  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .badge-primary { background: var(--color-primary-soft); color: var(--color-primary); }
+  .badge-success { background: var(--color-success-soft); color: var(--color-success); }
+  .badge-warning { background: var(--color-warning-soft); color: var(--color-warning); }
+  .badge-error { background: var(--color-error-soft); color: var(--color-error); }
+  .badge-neutral { background: var(--color-surface-muted); color: var(--color-text-muted); }
+
+  /* ---- Cards ---- */
+  .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 16px; }
+  @media (min-width: 768px) { .card { padding: 24px; } }
+  .card-title { font-size: 18px; line-height: 28px; font-weight: 700; }
+
+  /* ---- Form fields ---- */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .label { font-size: 14px; line-height: 22px; font-weight: 500; }
+  .label .req { color: var(--color-error); margin-inline-start: 2px; }
+  .input, .select, .textarea {
+    width: 100%; min-height: 44px; padding: 10px 16px; font: inherit; color: var(--color-text);
+    background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--radius-md);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .input::placeholder, .textarea::placeholder { color: var(--color-text-muted); }
+  .input:hover, .select:hover, .textarea:hover { border-color: var(--color-text-muted); }
+  .input:focus-visible, .select:focus-visible, .textarea:focus-visible, .input.is-focus {
+    outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 2px var(--color-primary);
+  }
+  .input[aria-invalid="true"], .textarea[aria-invalid="true"] { border-color: var(--color-error); }
+  .input[aria-invalid="true"]:focus-visible { box-shadow: 0 0 0 2px var(--color-error); }
+  .input:disabled { background: var(--color-surface-muted); color: var(--color-text-muted); cursor: not-allowed; }
+  .textarea { min-height: 112px; resize: vertical; }
+  .help { font-size: 14px; line-height: 22px; color: var(--color-text-muted); }
+  .error-msg { font-size: 14px; line-height: 22px; color: var(--color-error); display: flex; gap: 6px; align-items: center; }
+  .error-msg svg.icon { width: 16px; height: 16px; }
+  .check { display: inline-flex; gap: 10px; align-items: center; min-height: 44px; cursor: pointer; }
+  .check input { width: 20px; height: 20px; accent-color: var(--color-primary); margin: 0; }
+
+  /* ---- Layout: sidebar + content (drawer below 768px) ---- */
+  .shell { display: grid; grid-template-columns: 256px 1fr; min-height: calc(100vh - 36px); }
+  .sidebar {
+    background: var(--color-surface); border-inline-end: 1px solid var(--color-border);
+    padding: 20px 12px; display: flex; flex-direction: column; gap: 4px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 0 12px 20px; font-weight: 700; font-size: 20px; line-height: 30px; }
+  .brand-mark { width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--color-primary); color: var(--color-on-primary); display: grid; place-items: center; font-family: "Inter", sans-serif; font-size: 16px; }
+  .nav-link {
+    display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px; border-radius: var(--radius-md);
+    color: var(--color-text-muted); text-decoration: none; font-weight: 500;
+  }
+  .nav-link:hover { background: var(--color-surface-muted); color: var(--color-text); }
+  .nav-link[aria-current="page"] { background: var(--color-primary-soft); color: var(--color-primary); }
+  .topbar {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px; min-height: 68px;
+    background: var(--color-surface); border-bottom: 1px solid var(--color-border);
+  }
+  .topbar .spacer { flex: 1; }
+  .avatar { width: 36px; height: 36px; border-radius: var(--radius-full); background: var(--color-primary-soft); color: var(--color-primary); display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+  .main { min-width: 0; }
+  .content { padding: 24px 16px 64px; display: flex; flex-direction: column; gap: 32px; max-width: 1200px; }
+  @media (min-width: 1024px) { .content { padding-inline: 32px; } }
+  .menu-btn { display: none; }
+  .drawer-backdrop { display: none; }
+  @media (max-width: 767px) {
+    .shell { grid-template-columns: 1fr; }
+    .sidebar { position: fixed; inset-block: 0; inset-inline-start: 0; width: 280px; z-index: 40; transform: translateX(-100%); transition: transform .2s; box-shadow: 0 10px 30px rgb(0 0 0 / .2); }
+    [dir="rtl"] .sidebar { transform: translateX(100%); }
+    .shell.drawer-open .sidebar { transform: none; }
+    .shell.drawer-open .drawer-backdrop { display: block; position: fixed; inset: 0; background: var(--color-backdrop); z-index: 30; }
+    .menu-btn { display: inline-flex; }
+  }
+
+  .section-head { display: flex; flex-direction: column; gap: 4px; }
+  .grid-2 { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
+  .grid-3 { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+  .stat { display: flex; gap: 16px; align-items: center; }
+  .stat-icon { width: 48px; height: 48px; border-radius: var(--radius-md); display: grid; place-items: center; }
+  .stat-value { font-size: 30px; line-height: 40px; font-weight: 700; }
+
+  /* ---- Table (scrolls on mobile) ---- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+  table { width: 100%; border-collapse: collapse; min-width: 720px; font-size: 14px; line-height: 22px; }
+  th { text-align: start; font-weight: 500; color: var(--color-text-muted); background: var(--color-surface-muted); padding: 12px 16px; white-space: nowrap; }
+  td.num { white-space: nowrap; }
+  td .row { flex-wrap: nowrap; }
+  td { padding: 14px 16px; border-top: 1px solid var(--color-border); vertical-align: middle; }
+  tbody tr:hover { background: var(--color-surface-muted); }
+
+  /* ---- Reference pages: 404 / not access ---- */
+  .ref-page {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 20px;
+    padding: 48px 16px; min-height: 420px;
+  }
+  .ref-page.full { min-height: calc(100vh - 36px); position: relative; }
+  .ref-code { font-family: "Inter", "Vazirmatn", sans-serif; font-size: 72px; line-height: 80px; font-weight: 700; color: var(--color-primary); letter-spacing: -0.02em; }
+  :lang(fa) .ref-code { font-family: "Vazirmatn", sans-serif; letter-spacing: 0; }
+  .ref-icon { width: 72px; height: 72px; border-radius: var(--radius-full); background: var(--color-error-soft); color: var(--color-error); display: grid; place-items: center; }
+  .ref-icon svg.icon { width: 32px; height: 32px; }
+  .ref-page p { max-width: 420px; }
+
+  /* ---- List states ---- */
+  .empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 32px 16px; }
+  .empty-icon { width: 56px; height: 56px; border-radius: var(--radius-full); background: var(--color-surface-muted); color: var(--color-text-muted); display: grid; place-items: center; }
+  .skeleton { background: var(--color-surface-muted); border-radius: var(--radius-sm); height: 14px; animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .5; } }
+  .alert { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid currentColor; }
+  .alert-error { background: var(--color-error-soft); color: var(--color-error); }
+  .alert-success { background: var(--color-success-soft); color: var(--color-success); }
+  .alert p { color: var(--color-text); }
+
+  /* ---- Toast & modal ---- */
+  .toast { display: inline-flex; gap: 10px; align-items: center; padding: 12px 16px; border-radius: var(--radius-md); background: var(--color-surface); border: 1px solid var(--color-border); box-shadow: 0 10px 30px rgb(15 23 42 / .12); }
+  dialog { border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); color: var(--color-text); padding: 0; width: min(92vw, 440px); box-shadow: 0 20px 50px rgb(0 0 0 / .25); }
+  dialog::backdrop { background: var(--color-backdrop); }
+  .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--color-border); }
+  .dialog-body { padding: 24px; }
+  .dialog-foot { display: flex; justify-content: flex-end; gap: 12px; padding: 0 24px 24px; }
+
+  /* ---- Token swatches ---- */
+  .swatches { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+  .swatch { border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface); }
+  .swatch-color { height: 56px; display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+  .swatch-meta { padding: 8px 12px; font-size: 12px; line-height: 18px; direction: ltr; text-align: start; font-family: "Inter", monospace; }
+  .pass { color: var(--color-success); font-weight: 700; }
+  .fail { color: var(--color-error); font-weight: 700; }
+  .radius-demo { width: 72px; height: 48px; background: var(--color-primary-soft); border: 2px solid var(--color-primary); }
+  .space-bar { height: 12px; background: var(--color-primary); border-radius: 2px; }
+
+  /* ---- All-four view ---- */
+  .matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 640px), 1fr)); gap: 16px; padding: 16px; }
+  .matrix figure { margin: 0; }
+  .matrix figcaption { font: 700 13px/20px "Inter", sans-serif; padding-bottom: 6px; direction: ltr; text-align: left; }
+  .matrix iframe { width: 100%; height: 820px; border: 1px solid var(--color-border-strong); border-radius: 8px; background: #fff; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6h6l2 2h10v11H3z"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 13h6M9 17h4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M16 4a4 4 0 0 1 0 8M22 21c0-3-2-5-4-5.5"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 13h5l2 3h4l2-3h5"/><path d="M5 5h14l2 8v6H3v-6z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></symbol>
+</svg>
+
+<nav class="proto-bar" aria-label="Prototype controls">
+  <strong>PROTOTYPE · docs/design.md · not approved</strong>
+  <a data-page="">Kit</a>
+  <a data-page="404">404 page</a>
+  <a data-page="access">Not-access page</a>
+  <a data-view="all">All 4 (fa/en × light/dark)</a>
+  <span>Use the header buttons to switch language and theme.</span>
+</nav>
+
+<div id="app"></div>
+
+<template id="tpl-404">
+  <div class="ref-page">
+    <span class="ref-code num" data-t="code404"></span>
+    <h1 class="text-2xl" data-t="nf.title"></h1>
+    <p class="muted" data-t="nf.body"></p>
+    <div class="row gap-3" style="justify-content:center">
+      <a class="btn btn-primary" href="#"><svg class="icon"><use href="#i-home"/></svg><span data-t="nf.home"></span></a>
+      <button class="btn btn-outline" type="button"><svg class="icon icon-dir"><use href="#i-back"/></svg><span data-t="nf.back"></span></button>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-access">
+  <div class="ref-page">
+    <span class="ref-icon"><svg class="icon"><use href="#i-lock"/></svg></span>
+    <h1 class="text-2xl" data-t="na.title"></h1>
+    <p class="muted" data-t="na.body"></p>
+    <div class="row gap-3" style="justify-content:center">
+      <a class="btn btn-primary" href="#"><span data-t="na.dashboard"></span><svg class="icon icon-dir"><use href="#i-arrow"/></svg></a>
+      <a class="btn btn-ghost" href="#" data-t="na.home"></a>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-kit">
+  <div class="shell" id="shell">
+    <div class="drawer-backdrop" data-close-drawer></div>
+    <aside class="sidebar" id="sidebar" aria-label="Sidebar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">W</span><span data-t="brand"></span></div>
+      <a class="nav-link" href="#"><svg class="icon"><use href="#i-home"/></svg><span data-t="nav.dashboard"></span></a>
+      <a class="nav-link" href="#" aria-current="page"><svg class="icon"><use href="#i-folder"/></svg><span data-t="nav.projects"></span></a>
+      <a class="nav-link" href="#"><svg class="icon"><use href="#i-file"/></svg><span data-t="nav.proposals"></span></a>
+      <a class="nav-link" href="#"><svg class="icon"><use href="#i-users"/></svg><span data-t="nav.users"></span></a>
+      <a class="nav-link" href="#"><svg class="icon"><use href="#i-tag"/></svg><span data-t="nav.categories"></span></a>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button class="btn btn-icon menu-btn" type="button" data-open-drawer data-ta="menu"><svg class="icon"><use href="#i-menu"/></svg></button>
+        <div class="stack">
+          <span class="text-sm muted" data-t="hello"></span>
+          <strong data-t="userName"></strong>
+        </div>
+        <span class="spacer"></span>
+        <button class="btn btn-secondary btn-sm" type="button" data-toggle-lang><svg class="icon"><use href="#i-globe"/></svg><span data-t="otherLang"></span></button>
+        <button class="btn btn-icon" type="button" data-toggle-theme data-ta="theme"><svg class="icon"><use href="#i-moon" data-theme-icon/></svg></button>
+        <span class="avatar" aria-hidden="true" data-t="initials"></span>
+      </header>
+
+      <main class="content">
+        <!-- 1. Reference pages -->
+        <section class="stack gap-5" aria-labelledby="h-ref">
+          <div class="section-head">
+            <h2 class="text-xl" id="h-ref" data-t="s.ref"></h2>
+            <p class="muted text-sm" data-t="s.refHint"></p>
+          </div>
+          <div class="grid-2">
+            <div class="card" style="padding:0" data-slot="404"></div>
+            <div class="card" style="padding:0" data-slot="access"></div>
+          </div>
+        </section>
+
+        <!-- 2. Dashboard stats -->
+        <section class="stack gap-5" aria-labelledby="h-stats">
+          <h2 class="text-xl" id="h-stats" data-t="s.stats"></h2>
+          <div class="grid-3">
+            <div class="card stat"><span class="stat-icon badge-primary"><svg class="icon"><use href="#i-folder"/></svg></span><div class="stack"><span class="muted text-sm" data-t="st.projects"></span><span class="stat-value num" data-t="n12"></span></div></div>
+            <div class="card stat"><span class="stat-icon badge-success"><svg class="icon"><use href="#i-check"/></svg></span><div class="stack"><span class="muted text-sm" data-t="st.accepted"></span><span class="stat-value num" data-t="n4"></span></div></div>
+            <div class="card stat"><span class="stat-icon badge-warning"><svg class="icon"><use href="#i-file"/></svg></span><div class="stack"><span class="muted text-sm" data-t="st.pending"></span><span class="stat-value num" data-t="n27"></span></div></div>
+          </div>
+        </section>
+
+        <!-- 3. Table -->
+        <section class="stack gap-5" aria-labelledby="h-table">
+          <div class="row gap-3" style="justify-content:space-between">
+            <h2 class="text-xl" id="h-table" data-t="s.table"></h2>
+            <button class="btn btn-primary" type="button"><svg class="icon"><use href="#i-plus"/></svg><span data-t="newProject"></span></button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th data-t="th.title"></th><th data-t="th.category"></th><th data-t="th.budget"></th><th data-t="th.deadline"></th><th data-t="th.status"></th><th data-t="th.actions"></th></tr></thead>
+              <tbody>
+                <tr><td class="num" data-t="n1"></td><td data-t="p1"></td><td class="muted" data-t="c1"></td><td class="num" data-t="b1"></td><td class="num" data-t="d1"></td><td><span class="badge badge-success" data-t="open"></span></td>
+                  <td><div class="row gap-2"><button class="btn btn-icon btn-sm" type="button" data-ta="edit"><svg class="icon"><use href="#i-edit"/></svg></button><button class="btn btn-icon btn-sm" type="button" data-ta="delete" data-open-modal style="color:var(--color-error)"><svg class="icon"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td class="num" data-t="n2"></td><td data-t="p2"></td><td class="muted" data-t="c2"></td><td class="num" data-t="b2"></td><td class="num" data-t="d2"></td><td><span class="badge badge-neutral" data-t="closed"></span></td>
+                  <td><div class="row gap-2"><button class="btn btn-icon btn-sm" type="button" data-ta="edit"><svg class="icon"><use href="#i-edit"/></svg></button><button class="btn btn-icon btn-sm" type="button" data-ta="delete" data-open-modal style="color:var(--color-error)"><svg class="icon"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td class="num" data-t="n3"></td><td data-t="p3"></td><td class="muted" data-t="c3"></td><td class="num" data-t="b3"></td><td class="num" data-t="d3"></td><td><span class="badge badge-warning" data-t="pending"></span></td>
+                  <td><div class="row gap-2"><button class="btn btn-icon btn-sm" type="button" data-ta="edit"><svg class="icon"><use href="#i-edit"/></svg></button><button class="btn btn-icon btn-sm" type="button" data-ta="delete" data-open-modal style="color:var(--color-error)"><svg class="icon"><use href="#i-trash"/></svg></button></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 4. Card + form -->
+        <section class="grid-2" aria-label="Card and form">
+          <article class="card stack gap-5">
+            <div class="row gap-3" style="justify-content:space-between">
+              <h3 class="card-title" data-t="p1"></h3>
+              <span class="badge badge-success" data-t="open"></span>
+            </div>
+            <p class="muted" data-t="p1.desc"></p>
+            <div class="row gap-2">
+              <span class="badge badge-primary" data-t="tag1"></span>
+              <span class="badge badge-primary" data-t="tag2"></span>
+              <span class="badge badge-primary" data-t="tag3"></span>
+            </div>
+            <dl class="grid-2" style="gap:12px;margin:0">
+              <div><dt class="muted text-sm" data-t="th.budget"></dt><dd class="num text-lg" style="margin:0;font-weight:700" data-t="b1"></dd></div>
+              <div><dt class="muted text-sm" data-t="th.deadline"></dt><dd class="num text-lg" style="margin:0;font-weight:700" data-t="d1"></dd></div>
+            </dl>
+            <div class="row gap-3"><span class="avatar" aria-hidden="true" data-t="initials2"></span><div class="stack"><strong class="text-sm" data-t="owner"></strong><span class="muted text-xs" data-t="ownerRole"></span></div></div>
+          </article>
+
+          <form class="card stack gap-5" novalidate onsubmit="event.preventDefault()">
+            <h3 class="card-title" data-t="f.title"></h3>
+            <div class="field">
+              <label class="label" for="f-desc"><span data-t="f.desc"></span><span class="req" aria-hidden="true">*</span></label>
+              <textarea class="textarea" id="f-desc" aria-describedby="f-desc-help" data-tp="f.descPh"></textarea>
+              <span class="help" id="f-desc-help" data-t="f.descHelp"></span>
+            </div>
+            <div class="grid-2" style="gap:20px">
+              <div class="field">
+                <label class="label" for="f-price"><span data-t="f.price"></span><span class="req" aria-hidden="true">*</span></label>
+                <input class="input num" id="f-price" inputmode="numeric" aria-invalid="true" aria-describedby="f-price-err" data-tv="f.priceVal" />
+                <span class="error-msg" id="f-price-err" role="alert"><svg class="icon"><use href="#i-alert"/></svg><span data-t="f.priceErr"></span></span>
+              </div>
+              <div class="field">
+                <label class="label" for="f-dur" data-t="f.duration"></label>
+                <select class="select" id="f-dur">
+                  <option data-t="f.d1"></option><option data-t="f.d2"></option><option data-t="f.d3"></option>
+                </select>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" checked /><span data-t="f.terms"></span></label>
+            <div class="row gap-3">
+              <button class="btn btn-primary" type="submit" data-t="f.submit"></button>
+              <button class="btn btn-outline" type="button" data-t="cancel"></button>
+            </div>
+          </form>
+        </section>
+
+        <!-- 5. Component states -->
+        <section class="card stack gap-8" aria-labelledby="h-states">
+          <div class="section-head">
+            <h2 class="text-xl" id="h-states" data-t="s.states"></h2>
+            <p class="muted text-sm" data-t="s.statesHint"></p>
+          </div>
+          <div class="stack gap-3">
+            <h3 class="text-sm muted" data-t="buttons"></h3>
+            <div class="row gap-3">
+              <button class="btn btn-primary" type="button" data-t="v.primary"></button>
+              <button class="btn btn-secondary" type="button" data-t="v.secondary"></button>
+              <button class="btn btn-outline" type="button" data-t="v.outline"></button>
+              <button class="btn btn-danger" type="button" data-t="v.danger"></button>
+              <button class="btn btn-ghost" type="button" data-t="v.ghost"></button>
+            </div>
+            <div class="row gap-3">
+              <button class="btn btn-primary is-hover" type="button" data-t="st.hover"></button>
+              <button class="btn btn-primary is-focus" type="button" data-t="st.focus"></button>
+              <button class="btn btn-primary" type="button" disabled data-t="st.disabled"></button>
+              <button class="btn btn-primary" type="button" aria-busy="true"><span class="spinner" aria-hidden="true"></span><span data-t="st.loading"></span></button>
+              <button class="btn btn-outline btn-sm" type="button" data-t="st.small"></button>
+            </div>
+          </div>
+          <div class="stack gap-3">
+            <h3 class="text-sm muted" data-t="inputs"></h3>
+            <div class="grid-3">
+              <div class="field"><label class="label" for="s1" data-t="st.default"></label><input class="input" id="s1" data-tp="phonePh" /></div>
+              <div class="field"><label class="label" for="s2" data-t="st.focus"></label><input class="input is-focus" id="s2" data-tv="phoneVal" /></div>
+              <div class="field"><label class="label" for="s3" data-t="st.error"></label><input class="input" id="s3" aria-invalid="true" aria-describedby="s3-err" data-tv="phoneBad" /><span class="error-msg" id="s3-err"><svg class="icon"><use href="#i-alert"/></svg><span data-t="phoneErr"></span></span></div>
+              <div class="field"><label class="label" for="s4" data-t="st.disabled"></label><input class="input" id="s4" disabled data-tv="phoneVal" /></div>
+            </div>
+          </div>
+          <div class="stack gap-3">
+            <h3 class="text-sm muted" data-t="badges"></h3>
+            <div class="row gap-2">
+              <span class="badge badge-success" data-t="open"></span>
+              <span class="badge badge-neutral" data-t="closed"></span>
+              <span class="badge badge-warning" data-t="pending"></span>
+              <span class="badge badge-success" data-t="accepted"></span>
+              <span class="badge badge-error" data-t="rejected"></span>
+              <span class="badge badge-primary" data-t="verified"></span>
+            </div>
+          </div>
+          <div class="stack gap-3">
+            <h3 class="text-sm muted" data-t="feedback"></h3>
+            <div class="row gap-3">
+              <span class="toast" role="status"><svg class="icon" style="color:var(--color-success)"><use href="#i-check"/></svg><span data-t="toastOk"></span></span>
+              <span class="toast" role="status"><svg class="icon" style="color:var(--color-error)"><use href="#i-alert"/></svg><span data-t="toastErr"></span></span>
+              <button class="btn btn-danger" type="button" data-open-modal><svg class="icon"><use href="#i-trash"/></svg><span data-t="openModal"></span></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. List states -->
+        <section class="stack gap-5" aria-labelledby="h-list">
+          <h2 class="text-xl" id="h-list" data-t="s.list"></h2>
+          <div class="grid-3">
+            <div class="card stack gap-3" aria-busy="true">
+              <strong class="text-sm" data-t="ls.loading"></strong>
+              <div class="skeleton" style="width:70%"></div><div class="skeleton"></div><div class="skeleton" style="width:55%"></div><div class="skeleton" style="width:85%"></div>
+            </div>
+            <div class="card empty">
+              <span class="empty-icon"><svg class="icon"><use href="#i-inbox"/></svg></span>
+              <strong data-t="ls.empty"></strong>
+              <p class="muted text-sm" data-t="ls.emptyBody"></p>
+              <button class="btn btn-primary btn-sm" type="button"><svg class="icon"><use href="#i-plus"/></svg><span data-t="newProject"></span></button>
+            </div>
+            <div class="card stack gap-3">
+              <div class="alert alert-error" role="alert"><svg class="icon"><use href="#i-alert"/></svg><div class="stack"><strong data-t="ls.error"></strong><p class="text-sm" data-t="ls.errorBody"></p></div></div>
+              <button class="btn btn-outline btn-sm" type="button" style="align-self:flex-start"><svg class="icon"><use href="#i-refresh"/></svg><span data-t="retry"></span></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. Tokens -->
+        <section class="stack gap-5" aria-labelledby="h-tokens">
+          <div class="section-head">
+            <h2 class="text-xl" id="h-tokens" data-t="s.tokens"></h2>
+            <p class="muted text-sm" data-t="s.tokensHint"></p>
+          </div>
+          <div class="swatches" id="swatches"></div>
+        </section>
+
+        <!-- 8. Type, radius, spacing -->
+        <section class="grid-2" aria-label="Type, radius and spacing">
+          <div class="card stack gap-3">
+            <h2 class="text-xl" data-t="s.type"></h2>
+            <div class="stack gap-2" id="typescale"></div>
+          </div>
+          <div class="card stack gap-8">
+            <div class="stack gap-3">
+              <h2 class="text-xl" data-t="s.radius"></h2>
+              <div class="row gap-5">
+                <div class="stack gap-2"><div class="radius-demo" style="border-radius:var(--radius-sm)"></div><span class="text-xs muted">sm · 6px</span></div>
+                <div class="stack gap-2"><div class="radius-demo" style="border-radius:var(--radius-md)"></div><span class="text-xs muted">md · 10px</span></div>
+                <div class="stack gap-2"><div class="radius-demo" style="border-radius:var(--radius-lg)"></div><span class="text-xs muted">lg · 16px</span></div>
+                <div class="stack gap-2"><div class="radius-demo" style="border-radius:var(--radius-full);width:48px"></div><span class="text-xs muted">full</span></div>
+              </div>
+            </div>
+            <div class="stack gap-3">
+              <h2 class="text-xl" data-t="s.spacing"></h2>
+              <div class="stack gap-2 text-xs muted" style="direction:ltr">
+                <div class="row gap-3"><span style="width:120px">gap-5 · 20px</span><div class="space-bar" style="width:20px"></div><span data-t="sp.fields"></span></div>
+                <div class="row gap-3"><span style="width:120px">p-4/p-6 · 16/24px</span><div class="space-bar" style="width:24px"></div><span data-t="sp.cards"></span></div>
+                <div class="row gap-3"><span style="width:120px">gap-8 · 32px</span><div class="space-bar" style="width:32px"></div><span data-t="sp.sections"></span></div>
+                <div class="row gap-3"><span style="width:120px">44px</span><div class="space-bar" style="width:44px"></div><span data-t="sp.touch"></span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="confirm" aria-labelledby="dlg-title">
+    <div class="dialog-head">
+      <h2 class="text-lg" id="dlg-title" data-t="m.title"></h2>
+      <button class="btn btn-icon" type="button" data-close-modal data-ta="close"><svg class="icon"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="dialog-body"><p class="muted" data-t="m.body"></p></div>
+    <div class="dialog-foot">
+      <button class="btn btn-outline" type="button" data-close-modal data-t="cancel"></button>
+      <button class="btn btn-danger-solid" type="button" data-close-modal data-t="m.confirm"></button>
+    </div>
+  </dialog>
+</template>
+
+<script>
+  // [fa, en]
+  const T = {
+    brand: ["ورک‌بریج", "WorkBridge"],
+    "nav.dashboard": ["داشبورد", "Dashboard"], "nav.projects": ["پروژه‌ها", "Projects"], "nav.proposals": ["درخواست‌ها", "Proposals"],
+    "nav.users": ["کاربران", "Users"], "nav.categories": ["دسته‌بندی‌ها", "Categories"],
+    menu: ["باز کردن منو", "Open menu"], theme: ["تغییر پوسته", "Toggle theme"], close: ["بستن", "Close"],
+    hello: ["سلام،", "Hello,"], userName: ["پریسا عادلی", "Parisa Adli"], initials: ["پ", "PA"], initials2: ["س", "SM"],
+    otherLang: ["English", "فارسی"],
+    code404: ["۴۰۴", "404"],
+    "nf.title": ["صفحه‌ای که دنبالش بودید پیدا نشد", "We couldn't find that page"],
+    "nf.body": ["ممکن است آدرس اشتباه باشد یا صفحه جابه‌جا شده باشد.", "The address may be wrong, or the page may have moved."],
+    "nf.home": ["صفحه اصلی", "Go home"], "nf.back": ["بازگشت", "Go back"],
+    "na.title": ["به این صفحه دسترسی ندارید", "You don't have access to this page"],
+    "na.body": ["این بخش مخصوص نقش دیگری است. از داشبورد خودتان ادامه دهید.", "This section belongs to another role. Continue from your own dashboard."],
+    "na.dashboard": ["رفتن به داشبورد", "Go to dashboard"], "na.home": ["صفحه اصلی", "Home"],
+    "s.ref": ["صفحه‌های مرجع (فاز ۲۹)", "Reference pages (Phase 29)"],
+    "s.refHint": ["از نوار بالا هر کدام را تمام‌صفحه ببینید.", "Open each one full-page from the bar at the top."],
+    "s.stats": ["داشبورد", "Dashboard"],
+    "st.projects": ["پروژه‌ها", "Projects"], "st.accepted": ["درخواست‌های پذیرفته", "Accepted proposals"], "st.pending": ["در انتظار بررسی", "Awaiting review"],
+    n1: ["۱", "1"], n2: ["۲", "2"], n3: ["۳", "3"], n4: ["۴", "4"], n12: ["۱۲", "12"], n27: ["۲۷", "27"],
+    "s.table": ["پروژه‌های من", "My projects"], newProject: ["پروژه جدید", "New project"],
+    "th.title": ["عنوان", "Title"], "th.category": ["دسته‌بندی", "Category"], "th.budget": ["بودجه", "Budget"],
+    "th.deadline": ["ددلاین", "Deadline"], "th.status": ["وضعیت", "Status"], "th.actions": ["عملیات", "Actions"],
+    p1: ["طراحی فروشگاه اینترنتی پوشاک", "Clothing online store design"],
+    p2: ["اپلیکیشن رزرو نوبت پزشک", "Doctor appointment booking app"],
+    p3: ["بازطراحی لوگو و هویت بصری", "Logo and brand identity redesign"],
+    c1: ["توسعه وب", "Web development"], c2: ["موبایل", "Mobile"], c3: ["طراحی", "Design"],
+    b1: ["۲۵٬۰۰۰٬۰۰۰ تومان", "25,000,000 toman"], b2: ["۸۰٬۰۰۰٬۰۰۰ تومان", "80,000,000 toman"], b3: ["۶٬۵۰۰٬۰۰۰ تومان", "6,500,000 toman"],
+    d1: ["۱۴۰۵/۰۹/۱۵", "Dec 6, 2026"], d2: ["۱۴۰۵/۱۰/۰۱", "Dec 22, 2026"], d3: ["۱۴۰۵/۰۸/۳۰", "Nov 21, 2026"],
+    open: ["باز", "Open"], closed: ["بسته", "Closed"], pending: ["در انتظار", "Pending"], accepted: ["پذیرفته", "Accepted"],
+    rejected: ["رد شده", "Rejected"], verified: ["تأیید شده", "Verified"],
+    edit: ["ویرایش", "Edit"], delete: ["حذف", "Delete"],
+    "p1.desc": ["فروشگاه کامل با سبد خرید، درگاه پرداخت و پنل مدیریت محصولات. طراحی واکنش‌گرا و راست‌چین.", "A full store with cart, payment gateway and a product admin panel. Responsive, right-to-left layout."],
+    tag1: ["React", "React"], tag2: ["Node.js", "Node.js"], tag3: ["UI/UX", "UI/UX"],
+    owner: ["سارا محمدی", "Sara Mohammadi"], ownerRole: ["کارفرما", "Owner"],
+    "f.title": ["ارسال درخواست همکاری", "Send a proposal"],
+    "f.desc": ["توضیحات", "Description"], "f.descPh": ["رویکرد و تجربه‌تان را بنویسید…", "Describe your approach and experience…"],
+    "f.descHelp": ["حداقل ۲۰ کاراکتر.", "At least 20 characters."],
+    "f.price": ["قیمت (تومان)", "Price (toman)"], "f.priceVal": ["۵۰۰", "500"],
+    "f.priceErr": ["قیمت باید حداقل ۱۰۰٬۰۰۰ تومان باشد.", "Price must be at least 100,000 toman."],
+    "f.duration": ["مدت انجام", "Duration"], "f.d1": ["۷ روز", "7 days"], "f.d2": ["۱۴ روز", "14 days"], "f.d3": ["۳۰ روز", "30 days"],
+    "f.terms": ["شرایط همکاری را می‌پذیرم", "I accept the collaboration terms"],
+    "f.submit": ["ارسال درخواست", "Send proposal"], cancel: ["انصراف", "Cancel"],
+    "s.states": ["اجزا و حالت‌ها", "Components and states"],
+    "s.statesHint": ["با Tab در صفحه حرکت کنید تا حلقه فوکوس واقعی را ببینید.", "Press Tab to move through the page and see the real focus ring."],
+    buttons: ["دکمه‌ها", "Buttons"], inputs: ["فیلدها", "Inputs"], badges: ["نشان‌ها", "Badges"], feedback: ["بازخورد", "Feedback"],
+    "v.primary": ["اصلی", "Primary"], "v.secondary": ["ثانویه", "Secondary"], "v.outline": ["حاشیه‌دار", "Outline"], "v.danger": ["خطرناک", "Danger"], "v.ghost": ["متنی", "Ghost"],
+    "st.hover": ["هاور", "Hover"], "st.focus": ["فوکوس", "Focus"], "st.disabled": ["غیرفعال", "Disabled"], "st.loading": ["در حال ارسال", "Sending"],
+    "st.small": ["کوچک", "Small"], "st.default": ["پیش‌فرض", "Default"], "st.error": ["خطا", "Error"],
+    phonePh: ["۰۹۱۲۳۴۵۶۷۸۹", "09123456789"], phoneVal: ["۰۹۱۲۳۴۵۶۷۸۹", "09123456789"], phoneBad: ["۰۹۱۲", "0912"],
+    phoneErr: ["شماره موبایل معتبر نیست", "Enter a valid mobile number"],
+    toastOk: ["پروژه با موفقیت ایجاد شد", "Project created"], toastErr: ["خطا در ارتباط با سرور", "Couldn't reach the server"],
+    openModal: ["باز کردن مودال", "Open modal"],
+    "m.title": ["حذف پروژه", "Delete project"],
+    "m.body": ["آیا از حذف «طراحی فروشگاه اینترنتی پوشاک» مطمئن هستید؟ درخواست‌های آن هم حذف می‌شوند.", "Delete “Clothing online store design”? Its proposals are deleted too."],
+    "m.confirm": ["حذف", "Delete"],
+    "s.list": ["حالت‌های لیست", "List states"],
+    "ls.loading": ["در حال بارگذاری", "Loading"], "ls.empty": ["هنوز پروژه‌ای ندارید", "No projects yet"],
+    "ls.emptyBody": ["اولین پروژه‌تان را بسازید تا فریلنسرها درخواست بفرستند.", "Create your first project so freelancers can send proposals."],
+    "ls.error": ["بارگذاری پروژه‌ها انجام نشد", "Couldn't load projects"], "ls.errorBody": ["اتصال را بررسی کنید و دوباره تلاش کنید.", "Check your connection and try again."],
+    retry: ["تلاش دوباره", "Try again"],
+    "s.tokens": ["رنگ‌ها و کنتراست", "Colors and contrast"],
+    "s.tokensHint": ["نسبت‌ها همین‌جا از رنگ‌های پوسته فعال محاسبه می‌شوند (متن ≥ ۴٫۵، حاشیه ≥ ۳).", "Ratios are computed here from the active theme's colors (text ≥ 4.5, borders ≥ 3)."],
+    "s.type": ["مقیاس تایپوگرافی", "Type scale"], "s.radius": ["گردی گوشه‌ها", "Radius"], "s.spacing": ["فاصله‌ها", "Spacing"],
+    typeSample: ["پروژه‌ات را ثبت کن، بهترین فریلنسر را پیدا کن", "Post your project, find the right freelancer"],
+    "sp.fields": ["بین فیلدها", "between fields"], "sp.cards": ["داخل کارت", "inside cards"], "sp.sections": ["بین بخش‌ها", "between sections"], "sp.touch": ["حداقل اندازه لمسی", "min touch target"],
+  };
+
+  // Token pairs checked live: [token, background, minimum ratio]
+  const PAIRS = [
+    ["text", "bg", 4.5], ["text-muted", "surface", 4.5], ["text-muted", "surface-muted", 4.5],
+    ["on-primary", "primary", 4.5], ["on-primary", "primary-hover", 4.5], ["primary", "surface", 4.5],
+    ["primary", "primary-soft", 4.5], ["success", "success-soft", 4.5], ["warning", "warning-soft", 4.5],
+    ["error", "error-soft", 4.5], ["border-strong", "surface", 3], ["border-strong", "surface-muted", 3],
+  ];
+
+  const isEn = () => root.lang === "en";
+  const page = params.get("page") || "";
+  const view = params.get("view");
+
+  function url(changes) {
+    const p = new URLSearchParams(location.search);
+    for (const [k, v] of Object.entries(changes)) v ? p.set(k, v) : p.delete(k);
+    return "?" + p.toString();
+  }
+
+  function translate(scope) {
+    const i = isEn() ? 1 : 0;
+    scope.querySelectorAll("[data-t]").forEach(el => { el.textContent = T[el.dataset.t]?.[i] ?? el.dataset.t; });
+    scope.querySelectorAll("[data-tp]").forEach(el => { el.placeholder = T[el.dataset.tp][i]; });
+    scope.querySelectorAll("[data-tv]").forEach(el => { el.value = T[el.dataset.tv][i]; });
+    scope.querySelectorAll("[data-ta]").forEach(el => { el.setAttribute("aria-label", T[el.dataset.ta][i]); });
+  }
+
+  function lum(h) {
+    return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255)
+      .map(v => v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
+      .reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
+  }
+  const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
+
+  function renderSwatches() {
+    const box = document.getElementById("swatches");
+    if (!box) return;
+    const css = getComputedStyle(root);
+    const val = t => css.getPropertyValue("--color-" + t).trim().toUpperCase();
+    box.innerHTML = PAIRS.map(([fg, bg, min]) => {
+      const r = ratio(val(fg), val(bg));
+      const border = min === 3;
+      return `<div class="swatch">
+        <div class="swatch-color" style="background:var(--color-${bg});color:var(--color-${border ? "text" : fg});${border ? `box-shadow:inset 0 0 0 3px var(--color-${fg})` : ""}">Aa · آب</div>
+        <div class="swatch-meta"><div><b>${fg}</b> on ${bg}</div>
+        <div>${val(fg)} / ${val(bg)}</div>
+        <div class="${r >= min ? "pass" : "fail"}">${r.toFixed(2)}:1 ${r >= min ? "✓" : "✗"} (≥ ${min})</div></div></div>`;
+    }).join("");
+  }
+
+  function renderTypeScale() {
+    const box = document.getElementById("typescale");
+    if (!box) return;
+    const sizes = [["xs", "12/18"], ["sm", "14/22"], ["base", "16/26"], ["lg", "18/28"], ["xl", "20/30"], ["2xl", "24/34"], ["3xl", "30/40"], ["4xl", "36/48"]];
+    box.innerHTML = sizes.map(([n, s]) =>
+      `<div class="row gap-3" style="flex-wrap:nowrap;align-items:baseline"><span class="text-xs muted" style="width:88px;flex:none;direction:ltr;text-align:start">${n} · ${s}</span><span class="text-${n}" style="font-weight:${["xl", "2xl", "3xl", "4xl"].includes(n) ? 700 : 400};white-space:nowrap;overflow:hidden;text-overflow:ellipsis" data-t="typeSample"></span></div>`
+    ).join("");
+  }
+
+  function syncThemeIcon() {
+    document.querySelectorAll("[data-theme-icon]").forEach(u => u.setAttribute("href", root.classList.contains("dark-mode") ? "#i-sun" : "#i-moon"));
+  }
+
+  function render() {
+    const app = document.getElementById("app");
+    document.querySelectorAll(".proto-bar a").forEach(a => {
+      const href = a.dataset.view ? url({ view: "all" }) : url({ page: a.dataset.page, view: null });
+      a.href = href;
+      const current = a.dataset.view ? view === "all" : view !== "all" && a.dataset.page === page;
+      current ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current");
+    });
+
+    if (view === "all") {
+      const base = url({ view: null, theme: null, lang: null });
+      const sep = base === "?" ? "" : "&";
+      app.innerHTML = `<div class="matrix">${[["fa", "light"], ["fa", "dark"], ["en", "light"], ["en", "dark"]].map(([l, t]) =>
+        `<figure><figcaption>${l === "fa" ? "Persian · RTL" : "English · LTR"} · ${t}</figcaption><iframe title="${l} ${t}" src="${base}${sep}lang=${l}&theme=${t}"></iframe></figure>`).join("")}</div>`;
+      return;
+    }
+
+    if (page === "404" || page === "access") {
+      app.replaceChildren(document.getElementById(page === "404" ? "tpl-404" : "tpl-access").content.cloneNode(true));
+      app.firstElementChild.classList.add("full");
+      // full-page view gets its own language/theme buttons, like the public header
+      app.firstElementChild.insertAdjacentHTML("afterbegin",
+        `<div class="row gap-2" style="position:absolute;inset-block-start:16px;inset-inline-end:16px">
+          <button class="btn btn-secondary btn-sm" type="button" data-toggle-lang><svg class="icon"><use href="#i-globe"/></svg><span data-t="otherLang"></span></button>
+          <button class="btn btn-icon" type="button" data-toggle-theme data-ta="theme"><svg class="icon"><use href="#i-moon" data-theme-icon/></svg></button></div>`);
+    } else {
+      app.replaceChildren(document.getElementById("tpl-kit").content.cloneNode(true));
+      app.querySelector('[data-slot="404"]').append(document.getElementById("tpl-404").content.cloneNode(true));
+      app.querySelector('[data-slot="access"]').append(document.getElementById("tpl-access").content.cloneNode(true));
+      app.querySelectorAll("[data-slot] h1").forEach(h => h.outerHTML = h.outerHTML.replace(/^<h1/, "<h3").replace(/h1>$/, "h3>"));
+      renderTypeScale();
+    }
+    translate(document);
+    renderSwatches();
+    syncThemeIcon();
+  }
+
+  document.addEventListener("click", e => {
+    const el = e.target.closest("[data-toggle-lang],[data-toggle-theme],[data-open-modal],[data-close-modal],[data-open-drawer],[data-close-drawer]");
+    if (!el) return;
+    if (el.matches("[data-toggle-lang]")) {
+      const en = !isEn();
+      root.lang = en ? "en" : "fa"; root.dir = en ? "ltr" : "rtl";
+      history.replaceState(null, "", url({ lang: en ? "en" : null }));
+      translate(document); renderSwatches();
+    } else if (el.matches("[data-toggle-theme]")) {
+      const dark = root.classList.toggle("dark-mode");
+      history.replaceState(null, "", url({ theme: dark ? "dark" : null }));
+      renderSwatches(); syncThemeIcon();
+    } else if (el.matches("[data-open-modal]")) {
+      document.getElementById("confirm").showModal(); // native dialog: traps focus, closes on Escape, restores focus
+    } else if (el.matches("[data-close-modal]")) {
+      document.getElementById("confirm").close();
+    } else if (el.matches("[data-open-drawer]")) {
+      document.getElementById("shell").classList.add("drawer-open");
+      document.querySelector("#sidebar .nav-link").focus();
+    } else {
+      document.getElementById("shell").classList.remove("drawer-open");
+    }
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") document.getElementById("shell")?.classList.remove("drawer-open");
+  });
+
+  render();
+</script>
+</body>
+</html>
