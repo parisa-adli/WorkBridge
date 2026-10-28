@@ -1,4 +1,5 @@
 import DarkModeToggle from "./DarkModeToggle";
+import LanguageToggle from "./LanguageToggle";
 import UserAvatar from "../features/authentication/UserAvatar";
 import { useNavigate } from "react-router-dom";
 import { HiArrowLeftOnRectangle } from "react-icons/hi2";
@@ -15,6 +16,9 @@ function HeaderMenu() {
       <UserAvatar />
       <li className="flex">
         <DarkModeToggle />
+      </li>
+      <li className="flex">
+        <LanguageToggle />
       </li>
       {!user && (
         <li className="flex hover:text-rose-500">

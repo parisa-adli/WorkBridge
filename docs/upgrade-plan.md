@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**29 of 47 phases done** (Parts A, B and C). Next: Phase 26 (i18n setup).
+**30 of 47 phases done** (Parts A, B and C, Phase 26). Next: Phase 27 (string extraction and translation checks).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -38,7 +38,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
-| D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
+| D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 1/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
@@ -388,15 +388,15 @@ Verify: each form shows the same Persian messages as before; tests and e2e pass.
 
 **Gate before Phase 28:** agree on the design direction and the F9 page list (PRD R9). Record it in `docs/design.md`.
 
-### Phase 26: i18n setup ⬜
+### Phase 26: i18n setup ✅
 **Goal:** `react-i18next` runs with `fa` (default) and `en`, and the language switcher works, even though most strings are still hardcoded.
 
 Files: `client/src/i18n/` (new: setup, `fa.json`, `en.json`), `client/src/context/` (language provider), `ui/Header.jsx`, `ui/DashboardHeader.jsx`, `utils/toPersianNumbers`, `utils/toLocalDateShort`, `ui/DatePickerField.jsx`
 
-- [ ] Provider sets `<html lang dir>`; choice persists via `useLocalStorageState`; no browser detection.
-- [ ] Number and date formatters take the active locale through `Intl` (Persian output unchanged — the Phase 4 tests prove it).
-- [ ] Date picker switches calendar/locale with the language and always stores ISO.
-- [ ] Switcher in both headers.
+- [x] Provider sets `<html lang dir>`; choice persists via `useLocalStorageState`; no browser detection.
+- [x] Number and date formatters take the active locale through `Intl` (Persian output unchanged — the Phase 4 tests prove it).
+- [x] Date picker switches calendar/locale with the language and always stores ISO.
+- [x] Switcher in both headers.
 
 Verify: switching sets `lang`/`dir` without reload; Phase 4 formatter tests pass; add tests for `en` output.
 
