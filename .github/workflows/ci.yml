@@ -78,5 +78,8 @@ jobs:
         if: failure()
         with:
           name: playwright-traces
-          path: test-results/
+          # A missing baseline (e.g. the first Linux run of a new screenshot) is written here; commit it from the artifact.
+          path: |
+            test-results/
+            e2e/*-snapshots/
           retention-days: 7

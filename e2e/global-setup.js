@@ -76,7 +76,7 @@ async function startApps(mongoUri, attempts = 3) {
       // category/list needs the DB, so 200 means the server is listening and connected.
       await waitFor(`${serverUrl}/api/category/list`, server);
       await waitFor(clientUrl, vite);
-      return { clientUrl, kill };
+      return { serverUrl, clientUrl, kill };
     } catch (err) {
       kill();
       const exited = [server, vite].some((c) => c.exitCode !== null || c.signalCode !== null);
@@ -106,7 +106,8 @@ module.exports = async function globalSetup() {
       await client.close();
     }
 
-    const { clientUrl, kill } = await startApps(mongoUri);
+    const { serverUrl, clientUrl, kill } = await startApps(mongoUri);
+    process.env.E2E_SERVER_URL = serverUrl;
     process.env.E2E_CLIENT_URL = clientUrl;
     process.env.E2E_MONGO_URI = mongoUri;
     return async () => {
