@@ -23,6 +23,7 @@ import AdminLayout from "./features/admin/AdminLayout";
 import Categories from "./pages/Categories";
 import AdminDashboard from "./pages/AdminDashboard";
 import Users from "./pages/Users";
+import AdminUserProfile from "./pages/AdminUserProfile";
 import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
@@ -78,6 +79,7 @@ function App() {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="profile" element={<Profile />} />
               <Route path="users" element={<Users />} />
+              <Route path="users/:id" element={<AdminUserProfile />} />
               <Route path="categories" element={<Categories />} />
               <Route path="proposals" element={<Proposals />} />
               <Route path="projects" element={<SubmittedProjects />} />

@@ -4,7 +4,7 @@ import { changeUserStatusApi } from "../../../services/authService";
 export default function useChangeUserStatus() {
   const { isPending: isUpdating, mutate: changeUserStatus } = useAppMutation(
     changeUserStatusApi,
-    [["users"]]
+    [["users"], ["admin-user"]]
   );
   return { isUpdating, changeUserStatus };
 }

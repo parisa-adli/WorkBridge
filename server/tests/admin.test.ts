@@ -1,6 +1,8 @@
 import type { Express } from "express";
-import { startApp, stopApp, clearDb, createUser, type TestUser } from "./helpers";
+import { startApp, stopApp, clearDb, createUser, createCategory, type TestUser } from "./helpers";
 import { UserModel } from "../app/models/user";
+import { ProjectModel } from "../app/models/project";
+import { ProposalModel } from "../app/models/proposal";
 
 let app: Express, admin: TestUser, member: TestUser;
 
@@ -69,6 +71,35 @@ describe("admin user management", () => {
     const res = await admin.agent.get(`/api/admin/user/list?search=${encodeURIComponent(search)}`);
     expect(res.status).toBe(200);
     expect(res.body.data.users).toEqual([]);
+  });
+
+  it("returns a user's profile with project titles on proposals and no otp", async () => {
+    const category = await createCategory();
+    const project = await ProjectModel.create({
+      title: "Landing page",
+      description: "Build it",
+      category: category._id,
+      deadline: "2030-01-01",
+      budget: 1000000,
+      owner: admin.user._id,
+      freelancer: member.user._id,
+    });
+    await ProposalModel.create({ description: "d", price: 1, duration: 1, user: member.user._id, project: project._id });
+
+    const res = await admin.agent.get(`/api/admin/user/profile/${member.user._id}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.user.phoneNumber).toBe("09120000032");
+    expect(res.body.data.user).not.toHaveProperty("otp");
+    expect(res.body.data.createdProjects).toEqual([]);
+    expect(res.body.data.completedProjects.map((p: { title: string }) => p.title)).toEqual(["Landing page"]);
+    expect(res.body.data.proposals[0].project).toMatchObject({ _id: String(project._id), title: "Landing page" });
+  });
+
+  it("returns 404 for an unknown user's profile", async () => {
+    const res = await admin.agent.get("/api/admin/user/profile/507f1f77bcf86cd799439011");
+    expect(res.status).toBe(404);
+    expect(res.body.code).toBe("USER_NOT_FOUND");
   });
 
   it("forbids non-admins", async () => {

@@ -35,9 +35,13 @@ class UserController extends Controller {
   async userProfile(req: Request<{ userId: string }>, res: Response) {
     const { userId } = req.params;
     const user = await UserModel.findById(userId, { otp: 0 });
+    if (!user) throw apiError(404, ERROR_CODES.USER_NOT_FOUND, "کاربری با این مشخصات یافت نشد");
     const createdProjects = await ProjectModel.find({ owner: userId });
     const completedProjects = await ProjectModel.find({ freelancer: userId });
-    const proposals = await ProposalModel.find({ user: userId });
+    const proposals = await ProposalModel.find({ user: userId }).populate("project", {
+      title: 1,
+      translations: 1,
+    });
 
     return sendData(res, HttpStatus.OK, {
       user,

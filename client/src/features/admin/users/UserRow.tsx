@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import Modal from "../../../ui/Modal";
 import { TbChecklist } from "react-icons/tb";
@@ -18,7 +19,9 @@ function UserRow({ user, index }: { user: User; index: number }) {
     <Table.Row>
       <td>{index + 1}</td>
       <td>
-        <span dir="auto">{localized(user, "name")}</span>
+        <Link to={`/admin/users/${user._id}`} dir="auto" className="text-primary hover:underline">
+          {localized(user, "name") || user.phoneNumber}
+        </Link>
       </td>
       <td>{user.email}</td>
       <td>{user.phoneNumber}</td>

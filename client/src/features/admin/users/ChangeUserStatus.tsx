@@ -9,7 +9,8 @@ import { userStatusSchema, type StatusInput, type StatusValues } from "../../../
 
 type ChangeUserStatusProps = {
   userId: string;
-  onClose: () => void;
+  // omitted when the form sits in the page rather than a modal
+  onClose?: () => void;
   userStatus: Status;
 };
 

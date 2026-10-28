@@ -139,7 +139,9 @@
     "name": "Name",
     "role": "Role",
     "changeStatus": "Change user status",
-    "list": "Users"
+    "list": "Users",
+    "createdProjects": "Created projects",
+    "completedProjects": "Completed projects"
   },
   "pages": {
     "notFound": "We couldn't find that page",

@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**41 of 49 phases done** (Parts A, B, C and D, and Phases 30–35). Next: Phase 36 (admin user profile view).
+**42 of 49 phases done** (Parts A, B, C and D, and Phases 30–36). Next: Phase 37 (pagination).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -39,7 +39,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
-| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 6/9 |
+| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 7/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
@@ -523,11 +523,11 @@ Files: `category.controller.ts`, category schemas, `client/src/features/admin/ca
 
 Verify: server tests for the two fixes and the delete block.
 
-### Phase 36: Admin user profile view (F5) ⬜
+### Phase 36: Admin user profile view (F5) ✅
 Files: `server/app/http/controllers/admin/user.controller.ts`, `server/tests/admin.test.ts`, `client/src/services/authService.ts`, `client/src/pages/AdminUserProfile.tsx` (new), `features/admin/users/*`, `App.tsx`
 
-- [ ] Server: `/admin/user/profile/:userId` returns 404 for an unknown id, strips `otp`, and populates the project title on proposals; tests for each.
-- [ ] Client: service + query hook; `/admin/users/:id` shows info, created/completed projects, proposals; status change in place.
+- [x] Server: `/admin/user/profile/:userId` returns 404 for an unknown id, strips `otp`, and populates the project title on proposals; tests for each.
+- [x] Client: service + query hook; `/admin/users/:id` shows info, created/completed projects, proposals; status change in place.
 
 Verify: server tests pass; status change invalidates the user and users-list queries.
 
