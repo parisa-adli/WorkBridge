@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**37 of 49 phases done** (Parts A, B, C and D, and Phases 30–31). Next: Phase 32 (logout).
+**38 of 49 phases done** (Parts A, B, C and D, and Phases 30–32). Next: Phase 33 (proposal workflow).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -39,7 +39,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
-| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 2/9 |
+| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 3/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
@@ -487,12 +487,12 @@ Files: `server/app/router/userAuth.js`, `userAuth.controller.js`, env validation
 
 Verify: tests and e2e pass; flag off returns 404.
 
-### Phase 32: Logout (F2) ⬜
+### Phase 32: Logout (F2) ✅
 Files: `userAuth.controller.ts` (logout), `server/tests/auth.test.ts`, `ui/HeaderMenu.jsx`, `features/authentication/Logout.tsx`, `useLogout.ts`
 
-- [ ] Server: logout clears both cookies with the same options as login (`cookieOptions`); test that a request after logout gets 401.
-- [ ] Client: logout in every authenticated layout header; clears the React Query cache; redirects to `/`.
-- [ ] e2e: logout then visiting `/owner` redirects to auth.
+- [x] Server: logout clears both cookies with the same options as login (`cookieOptions`); test that a request after logout gets 401.
+- [x] Client: logout in every authenticated layout header; clears the React Query cache; redirects to `/`.
+- [x] e2e: logout then visiting `/owner` redirects to auth.
 
 Verify: e2e passes.
 
