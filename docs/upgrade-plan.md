@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**18 of 47 phases done** (Parts A and B). Next: Phase 15 (Express 5).
+**29 of 47 phases done** (Parts A, B and C). Next: Phase 26 (i18n setup).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -37,7 +37,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 |---|---|---|---|
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
-| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ⬜ 0/11 |
+| C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 0/4 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
@@ -260,125 +260,125 @@ Verify: tests pass; grep finds no leftover `statusStyle` arrays or role string l
 
 ---
 
-## Part C: Stack upgrade, TypeScript, Zod ⬜
+## Part C: Stack upgrade, TypeScript, Zod ✅
 
 Dependency upgrades go server first, then client, and each gets its own phase so a regression points at one change. The phases that change API behavior (19, 20, 25) update server and client together.
 
-### Phase 15: Express 5 ⬜
+### Phase 15: Express 5 ✅
 **Goal:** server on Express 5 (PRD R4).
 
 Files: `server/package.json`, `server/app/server.js`, `server/app/router/**`, all controllers
 
-- [ ] Upgrade `express`; remove `express-async-handler` (Express 5 forwards async errors).
-- [ ] Fix route path syntax for `path-to-regexp` v8 and any writes to `req.query`.
-- [ ] Bump in-major patches for `cookie-parser`, `cors`, `jsonwebtoken`, `http-errors`.
+- [x] Upgrade `express`; remove `express-async-handler` (Express 5 forwards async errors).
+- [x] Fix route path syntax for `path-to-regexp` v8 and any writes to `req.query`.
+- [x] Bump in-major patches for `cookie-parser`, `cors`, `jsonwebtoken`, `http-errors`.
 
 Verify: all API tests pass unchanged; e2e passes.
 
-### Phase 16: Mongoose 9 ⬜
+### Phase 16: Mongoose 9 ✅
 **Goal:** server on Mongoose 9 (PRD R5).
 
 Files: `server/package.json`, `server/app/models/*`, `server/app/server.js`, controllers using changed query APIs
 
-- [ ] Upgrade; drop `useNewUrlParser`/`useUnifiedTopology`; set `strictQuery` explicitly; fix the `ref: "PROPOSAL"` case and the `username` text index and `defaul` typo in `user.js`.
-- [ ] Bump `mongodb-memory-server` if needed.
-- [ ] `npm audit --prefix server`: 0 high/critical, or list what remains and which phase removes it.
+- [x] Upgrade; drop `useNewUrlParser`/`useUnifiedTopology`; set `strictQuery` explicitly; fix the `ref: "PROPOSAL"` case and the `username` text index and `defaul` typo in `user.js`.
+- [x] Bump `mongodb-memory-server` if needed.
+- [x] `npm audit --prefix server`: 0 high/critical, or list what remains and which phase removes it.
 
 Verify: all tests pass; audit result recorded in the PR.
 
-### Phase 17: Server TypeScript tooling + infrastructure files ⬜
+### Phase 17: Server TypeScript tooling + infrastructure files ✅
 **Goal:** server compiles with `tsc --noEmit` in strict mode, with `allowJs` so the conversion can be split.
 
 Files: `server/tsconfig.json`, `server/package.json` (`tsx watch` replaces nodemon; `typecheck` script), `server/eslint.config.js` (typescript-eslint), `server/utils/*`, `server/app/models/*`, `server/app/http/middlewares/*`, `server/index.js`, `server/app/server.js`, `.github/workflows/ci.yml`
 
-- [ ] Add `typescript`, `tsx`, `typescript-eslint`, `@types/*`; strict `tsconfig` with `allowJs`.
-- [ ] Convert utils, models, middlewares, entry and `server.js` to `.ts`.
-- [ ] Enable the CI typecheck step for the server.
+- [x] Add `typescript`, `tsx`, `typescript-eslint`, `@types/*`; strict `tsconfig` with `allowJs`.
+- [x] Convert utils, models, middlewares, entry and `server.js` to `.ts`.
+- [x] Enable the CI typecheck step for the server.
 
 Verify: `npm run typecheck --prefix server` and lint pass; `npm run dev` works through `tsx watch`.
 
-### Phase 18: Server TypeScript, controllers/routes/tests ⬜
+### Phase 18: Server TypeScript, controllers/routes/tests ✅
 **Goal:** the whole server is TypeScript; `allowJs` off.
 
 Files: `server/app/http/controllers/**`, `server/app/router/**`, `server/app/http/validators/*`, `server/tests/*`
 
-- [ ] Convert remaining files; turn off `allowJs`; no `any` without a comment saying why.
+- [x] Convert remaining files; turn off `allowJs`; no `any` without a comment saying why.
 
 Verify: typecheck passes with `allowJs: false`; tests pass.
 
-### Phase 19: Typed envelope and error codes (server + client) ⬜
+### Phase 19: Typed envelope and error codes (server + client) ✅
 **Goal:** every response is `ApiResponse<T>`; errors are `{ statusCode, code, message }`; the client reads the new shapes.
 
 Files: `server/utils/apiResponse.ts`, `server/utils/errorCodes.ts` (new), `server/app/server.ts` error handler, all controllers, `client/src/services/authService.js` (logout and refresh-token callers), `client/src/services/httpService.js`, tests on both sides
 
-- [ ] Server: fix `logout` and `refresh-token` (no capitalized `StatusCode`, use `data`).
-- [ ] Server: every thrown error and success payload carries a stable `code`; `message` stays Persian.
-- [ ] Client: update the logout/refresh callers and the interceptor to the new shapes.
-- [ ] Tests: every route's error responses include a `code` from `errorCodes`; client interceptor test updated.
+- [x] Server: fix `logout` and `refresh-token` (no capitalized `StatusCode`, use `data`).
+- [x] Server: every thrown error and success payload carries a stable `code`; `message` stays Persian.
+- [x] Client: update the logout/refresh callers and the interceptor to the new shapes.
+- [x] Tests: every route's error responses include a `code` from `errorCodes`; client interceptor test updated.
 
 Verify: tests and e2e pass; client still shows Persian toasts (it reads `message` until Phase 27).
 
-### Phase 20: Zod for auth and profile (server + client) ⬜
+### Phase 20: Zod for auth and profile (server + client) ✅
 **Goal:** the auth domain validates with Zod on both sides in one go: the OTP, complete-profile and update-profile routes, and the forms that call them.
 
 Files: `server/app/http/validators/user.schema.ts`, a `validate(schema)` middleware (new), `userAuth.controller.ts`, `server/package.json`, `client/src/schemas/auth.js` (new), `SendOTPForm`, `CheckOTPForm`, `CompleteProfileForm`, `client/package.json`, tests on both sides
 
-- [ ] Add `zod` to both packages and `@hookform/resolvers` to the client.
-- [ ] Server: port the user schemas with the same rules and Persian messages; request types from `z.infer`; validation errors return 400 with the failing field and a `code`.
-- [ ] Client: the three forms use `zodResolver` with schemas that mirror the server's, reading limits from the Phase 14 constants.
-- [ ] Tests: server validation errors for each route; client schema test that limits match the constants (PRD R8).
+- [x] Add `zod` to both packages and `@hookform/resolvers` to the client.
+- [x] Server: port the user schemas with the same rules and Persian messages; request types from `z.infer`; validation errors return 400 with the failing field and a `code`.
+- [x] Client: the three forms use `zodResolver` with schemas that mirror the server's, reading limits from the Phase 14 constants.
+- [x] Tests: server validation errors for each route; client schema test that limits match the constants (PRD R8).
 
 Verify: each auth form shows the same Persian messages as before; e2e OTP flow passes.
 
-### Phase 21: React 19 + client in-major bumps + dependency smoke test ⬜
+### Phase 21: React 19 + client in-major bumps + dependency smoke test ✅
 **Goal:** client on React 19 and the latest 7.x/5.x/7.x of Router/Query/RHF (PRD R6).
 
 Files: `client/package.json`, any component broken by React 19
 
-- [ ] Upgrade `react`, `react-dom`, `@types/react*`, `react-router-dom`, `@tanstack/*`, `react-hook-form`, `axios`, `react-hot-toast`, `@headlessui/react`, `react-icons`, `react-loader-spinner`.
-- [ ] Smoke-test `react-multi-date-picker`, `react-otp-input`, `react-tag-input-component` in the app (RTL). Record the result in the PR. If one fails, stop and pick a replacement as its own phase before continuing.
+- [x] Upgrade `react`, `react-dom`, `@types/react*`, `react-router-dom`, `@tanstack/*`, `react-hook-form`, `axios`, `react-hot-toast`, `@headlessui/react`, `react-icons`, `react-loader-spinner`.
+- [x] Smoke-test `react-multi-date-picker`, `react-otp-input`, `react-tag-input-component` in the app (RTL). Record the result in the PR. If one fails, stop and pick a replacement as its own phase before continuing.
 
 Verify: all client tests and e2e pass; manual check of OTP input, tag input and the Persian date picker.
 
-### Phase 22: Vite 8 ⬜
+### Phase 22: Vite 8 ✅
 **Goal:** Vite 8 and plugin-react 6.
 
 Files: `client/package.json`, `client/vite.config.js`
 
-- [ ] Upgrade `vite`, `@vitejs/plugin-react`, `vitest`; adjust config for breaking changes.
-- [ ] `npm audit --prefix client`: 0 high/critical, or list what remains.
+- [x] Upgrade `vite`, `@vitejs/plugin-react`, `vitest`; adjust config for breaking changes.
+- [x] `npm audit --prefix client`: 0 high/critical, or list what remains.
 
 Verify: build, dev, tests, e2e pass.
 
-### Phase 23: Client TypeScript tooling + services/utils/hooks ⬜
+### Phase 23: Client TypeScript tooling + services/utils/hooks ✅
 **Goal:** client typechecks in strict mode with `allowJs`; the data layer is typed.
 
 Files: `client/tsconfig.json`, `client/package.json` (`typecheck`), `client/eslint.config.js` (typescript-eslint), `client/src/services/*`, `utils/*`, `hooks/*`, `context/*`, `constants/*`, `client/src/types/api.ts` (new: `ApiResponse<T>` and entity types), CI
 
-- [ ] Convert the listed folders; type services against `ApiResponse<T>`.
-- [ ] Enable the CI typecheck step for the client.
+- [x] Convert the listed folders; type services against `ApiResponse<T>`.
+- [x] Enable the CI typecheck step for the client.
 
 Verify: typecheck and lint pass; tests pass.
 
-### Phase 24: Client TypeScript, components ⬜
+### Phase 24: Client TypeScript, components ✅
 **Goal:** the whole client is TypeScript; `allowJs` off.
 
 Files: `client/src/features/**`, `pages/*`, `ui/*`, `App.jsx`, `main.jsx`, client tests
 
-- [ ] Convert to `.tsx`; type the `Table` compound component and `AppLayout`'s `cloneElement` injection (or replace it with a prop).
-- [ ] Turn off `allowJs`.
+- [x] Convert to `.tsx`; type the `Table` compound component and `AppLayout`'s `cloneElement` injection (or replace it with a prop).
+- [x] Turn off `allowJs`.
 
 Verify: typecheck passes with `allowJs: false`; build, tests, e2e pass.
 
-### Phase 25: Zod for projects, proposals, categories and admin (server + client) ⬜
+### Phase 25: Zod for projects, proposals, categories and admin (server + client) ✅
 **Goal:** the rest of the API and its forms move to Zod together, and Joi is gone.
 
 Files: `server/app/http/validators/{project,proposal,category}.schema.ts`, project/proposal/category/admin controllers and routers, `client/src/schemas/*`, `CreateProjectForm`, `CreateProposal`, `ChangeProposalStatus`, `ChangeUserStatus`, `server/package.json`, tests on both sides
 
-- [ ] Server: port the remaining schemas; add schemas for routes that had none (project status, proposal status, list queries, route params).
-- [ ] Client: each form uses `zodResolver` with a schema mirroring the server's.
-- [ ] Remove `joi`.
-- [ ] Tests: server validation errors per route; client schema limits match the constants (PRD R8).
+- [x] Server: port the remaining schemas; add schemas for routes that had none (project status, proposal status, list queries, route params).
+- [x] Client: each form uses `zodResolver` with a schema mirroring the server's.
+- [x] Remove `joi`.
+- [x] Tests: server validation errors per route; client schema limits match the constants (PRD R8).
 
 Verify: each form shows the same Persian messages as before; tests and e2e pass.
 

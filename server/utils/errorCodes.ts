@@ -1,0 +1,100 @@
+// Stable codes for every API message, so the client can translate by code (Phase 27). Values never change; add new ones.
+const codes = <const K extends string>(keys: K[]) =>
+  Object.freeze(Object.fromEntries(keys.map((k) => [k, k])) as { [P in K]: P });
+
+export const ERROR_CODES = codes([
+  // Only the error handler uses these two, for errors thrown without a code (body parser, Mongoose); never throw them.
+  "BAD_REQUEST",
+  "INTERNAL_ERROR",
+  "ROUTE_NOT_FOUND",
+  "TOKEN_NOT_CREATED",
+  "RATE_LIMITED",
+  "INVALID_ID",
+  "INVALID_SEARCH",
+  "INVALID_SORT",
+  "INVALID_PAGINATION",
+  // auth
+  "PHONE_REQUIRED",
+  "INVALID_PHONE",
+  "LOGIN_FAILED",
+  "USER_NOT_FOUND",
+  "INVALID_OTP",
+  "OTP_EXPIRED",
+  "PHONE_NOT_VERIFIED",
+  "DUPLICATE_EMAIL",
+  "INVALID_NAME",
+  "INVALID_EMAIL",
+  "INVALID_ROLE",
+  "INVALID_BIOGRAPHY",
+  "PASSWORD_REQUIRED",
+  "INVALID_CREDENTIALS",
+  "LOGIN_REQUIRED",
+  "INVALID_TOKEN",
+  "ACCOUNT_NOT_FOUND",
+  "PROFILE_PENDING",
+  "PROFILE_REJECTED",
+  "ACCESS_DENIED",
+  // admin
+  "INVALID_USER_STATUS",
+  "USER_STATUS_NOT_UPDATED",
+  // project
+  "PROJECT_NOT_FOUND",
+  "PROJECT_NOT_CREATED",
+  "PROJECT_NOT_UPDATED",
+  "PROJECT_STATUS_NOT_UPDATED",
+  "PROJECT_NOT_DELETABLE",
+  "INVALID_PROJECT_TITLE",
+  "INVALID_DESCRIPTION",
+  "INVALID_TAGS",
+  "INVALID_CATEGORY",
+  "INVALID_PRICE",
+  "INVALID_DEADLINE",
+  "INVALID_PROJECT_STATUS",
+  // proposal
+  "PROPOSAL_NOT_FOUND",
+  "PROPOSAL_NOT_CREATED",
+  "PROJECT_NOT_OPEN",
+  "DUPLICATE_PROPOSAL",
+  "INVALID_DURATION",
+  "INVALID_PROJECT_ID",
+  "INVALID_PROPOSAL_STATUS",
+  // category
+  "CATEGORY_NOT_FOUND",
+  "CATEGORY_NOT_CREATED",
+  "CATEGORY_NOT_UPDATED",
+  "CATEGORY_NOT_DELETED",
+  "DUPLICATE_CATEGORY",
+  "INVALID_CATEGORY_TITLE",
+  "INVALID_CATEGORY_ENGLISH_TITLE",
+  "INVALID_CATEGORY_DESCRIPTION",
+  "INVALID_CATEGORY_TYPE",
+]);
+
+// Codes sent next to a success `message` (the ones the client shows in a toast).
+export const SUCCESS_CODES = codes([
+  "OTP_SENT",
+  "OTP_VERIFIED",
+  "OTP_VERIFIED_COMPLETE_PROFILE",
+  "LOGGED_IN",
+  "PROFILE_COMPLETED",
+  "PROFILE_UPDATED",
+  "LOGGED_OUT",
+  "USER_ACCEPTED",
+  "USER_REJECTED",
+  "USER_PENDING",
+  "PROJECT_CREATED",
+  "PROJECT_UPDATED",
+  "PROJECT_DELETED",
+  "PROJECT_OPENED",
+  "PROJECT_CLOSED",
+  "PROPOSAL_CREATED",
+  "PROPOSAL_ACCEPTED",
+  "PROPOSAL_REJECTED",
+  "PROPOSAL_PENDING",
+  "CATEGORY_CREATED",
+  "CATEGORY_UPDATED",
+  "CATEGORY_DELETED",
+]);
+
+export type ErrorCode = keyof typeof ERROR_CODES;
+export type SuccessCode = keyof typeof SUCCESS_CODES;

@@ -40,11 +40,10 @@ jobs:
       - name: Lint server
         run: npm run lint --prefix server
 
-      # Typecheck goes here once TypeScript exists (server: plan Phase 17, client: Phase 23).
-      # - name: Typecheck server
-      #   run: npm run typecheck --prefix server
-      # - name: Typecheck client
-      #   run: npm run typecheck --prefix client
+      - name: Typecheck server
+        run: npm run typecheck --prefix server
+      - name: Typecheck client
+        run: npm run typecheck --prefix client
 
       - name: Test client
         run: npm test --prefix client
