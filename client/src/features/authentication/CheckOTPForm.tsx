@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import OTPInput from "react-otp-input";
@@ -32,6 +33,7 @@ function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }: CheckOT
   } = useForm<CheckOtpValues>({ resolver: zodResolver(checkOtpSchema), defaultValues: { otp: "" } });
   const [time, setTime] = useState(RESEND_TIME);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { isPending, mutateAsync } = useMutation({
     mutationFn: checkOtp,
@@ -44,7 +46,7 @@ function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }: CheckOT
       if (!user.isActive) return navigate("/complete-profile");
       if (+user.status !== STATUS.ACCEPTED) {
         navigate("/");
-        toast("پروفایل شما در انتظار تایید است", { icon: "💫" });
+        toast(t("auth.profilePending"), { icon: "💫" });
         return;
       }
       redirectByRole(navigate, user.role);
@@ -75,15 +77,15 @@ function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }: CheckOT
       )}
       <div className="mb-6 flex justify-center text-secondary-500">
         {time > 0 ? (
-          <p>{time} ثانیه تا ارسال مجدد کد</p>
+          <p>{t("auth.resendIn", { time })}</p>
         ) : (
           <button onClick={onResendOtp} className="text-primary-900">
-            ارسال مجدد کد تایید
+            {t("auth.resend")}
           </button>
         )}
       </div>
       <form className="space-y-10" onSubmit={handleSubmit(checkOtpHandler)}>
-        <p className="font-bold text-secondary-800">کد تایید را وارد کنید</p>
+        <p className="font-bold text-secondary-800">{t("auth.enterOtp")}</p>
         <div>
           <Controller
             name="otp"
@@ -112,7 +114,7 @@ function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }: CheckOT
         {isPending ? (
           <Loading />
         ) : (
-          <button className="btn btn--primary w-full">تایید</button>
+          <button className="btn btn--primary w-full">{t("common.confirm")}</button>
         )}
       </form>
     </div>

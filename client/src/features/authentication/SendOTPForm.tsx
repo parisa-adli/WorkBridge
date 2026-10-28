@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { FormEventHandler } from "react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import Textfield from "../../ui/Textfield";
@@ -12,11 +13,12 @@ type SendOTPFormProps = {
 };
 
 function SendOTPForm({ onSubmit, isSendingOtp, register, errors }: SendOTPFormProps) {
+  const { t } = useTranslation();
   return (
     <div>
       <form className="space-y-8" onSubmit={onSubmit}>
         <Textfield
-          label="شماره موبایل"
+          label={t("auth.phoneNumber")}
           name="phoneNumber"
           register={register}
           errors={errors}
@@ -25,7 +27,7 @@ function SendOTPForm({ onSubmit, isSendingOtp, register, errors }: SendOTPFormPr
           <Loading />
         ) : (
           <button type="submit" className="btn btn--primary w-full">
-            ارسال کد تایید
+            {t("auth.sendOtp")}
           </button>
         )}
       </form>

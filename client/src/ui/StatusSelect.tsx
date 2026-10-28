@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { UseFormRegister } from "react-hook-form";
 import type { StatusInput } from "../schemas/status";
 import { STATUS_BADGES } from "../constants";
@@ -13,10 +14,11 @@ function StatusSelect({
 }: {
   register: UseFormRegister<StatusInput>;
 }) {
+  const { t } = useTranslation();
   return (
     <RHFSelect
       name="status"
-      label="تغییر وضعیت"
+      label={t("common.changeStatus")}
       register={register}
       required
       options={options}

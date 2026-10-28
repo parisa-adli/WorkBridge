@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Textfield from "../../ui/Textfield";
 import { useMutation } from "@tanstack/react-query";
 import { completeProfile } from "../../services/authService";
@@ -24,6 +25,7 @@ function CompleteProfileForm() {
   // const [email, setEmail] = useState("");
   // const [role, setRole] = useState("");
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { isPending, mutateAsync } = useMutation({
     mutationFn: completeProfile,
@@ -36,7 +38,7 @@ function CompleteProfileForm() {
 
       if (+user.status !== STATUS.ACCEPTED) {
         navigate("/");
-        toast("پروفایل شما در انتظار تایید است", { icon: "💫" });
+        toast(t("auth.profilePending"), { icon: "💫" });
         return;
       }
       redirectByRole(navigate, user.role);
@@ -50,14 +52,14 @@ function CompleteProfileForm() {
       <div className="w-full sm:max-w-sm">
         <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
           <Textfield
-            label="نام و نام خانوادگی"
+            label={t("auth.fullName")}
             name="name"
             register={register}
             required
             errors={errors}
           />
           <Textfield
-            label="ایمیل"
+            label={t("auth.email")}
             name="email"
             register={register}
             required
@@ -72,11 +74,11 @@ function CompleteProfileForm() {
               options: [
                 {
                   value: ROLES.OWNER,
-                  label: "کارفرما",
+                  label: t("roles.owner"),
                 },
                 {
                   value: ROLES.FREELANCER,
-                  label: "فریلنسر",
+                  label: t("roles.freelancer"),
                 },
               ],
             }}
@@ -84,7 +86,7 @@ function CompleteProfileForm() {
           {isPending ? (
             <Loading />
           ) : (
-            <button className="btn btn--primary w-full">تایید</button>
+            <button className="btn btn--primary w-full">{t("common.confirm")}</button>
           )}
         </form>
       </div>

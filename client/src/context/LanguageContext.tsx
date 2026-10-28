@@ -28,7 +28,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   return (
     <LanguageContext.Provider value={{ language, toggleLanguage }}>
-      {/* shortcut: remounts the tree so formatter call sites re-render (form state is lost on switch); drop once Phase 27 components subscribe via useTranslation */}
+      {/* shortcut: remounts the tree so formatter call sites re-render (form state is lost on switch); drop once Phase 27b leaves every component subscribed via useTranslation */}
       <Fragment key={language}>{children}</Fragment>
     </LanguageContext.Provider>
   );

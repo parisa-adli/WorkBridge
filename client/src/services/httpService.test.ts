@@ -3,7 +3,8 @@ import axios, {
   type AxiosAdapter,
   type InternalAxiosRequestConfig,
 } from "axios";
-import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import i18n from "../i18n";
 
 type Config = InternalAxiosRequestConfig;
 
@@ -108,5 +109,47 @@ describe("httpService base URL", () => {
     await (await import("./httpService")).default.get("/project/list");
 
     expect(adapter.mock.calls[0][0].baseURL).toBe("https://api.example.com/api");
+  });
+});
+
+describe("httpService message translation", () => {
+  const otpSent = (config: Config) =>
+    response(config, {
+      statusCode: 200,
+      data: { message: "کد تائید برای شماره موبایل ۰۹۱۲ ارسال گردید", code: "OTP_SENT", phoneNumber: "0912" },
+    });
+
+  beforeEach(() => {
+    adapter.mockReset();
+  });
+  afterEach(() => i18n.changeLanguage("fa"));
+
+  it("keeps the server's Persian message in fa", async () => {
+    adapter.mockImplementationOnce(otpSent);
+    const res = await http.post("/user/get-otp");
+    expect(res.data.data.message).toBe("کد تائید برای شماره موبایل ۰۹۱۲ ارسال گردید");
+  });
+
+  it("translates success and error messages by code in en", async () => {
+    await i18n.changeLanguage("en");
+    adapter.mockImplementationOnce(otpSent);
+    const res = await http.post("/user/get-otp");
+    expect(res.data.data.message).toBe("Verification code sent to 0912");
+
+    adapter.mockImplementationOnce(unauthorized).mockImplementationOnce((config) =>
+      response(config, { statusCode: 200, data: { user: null } })
+    );
+    await expect(http.get("/project/list")).rejects.toMatchObject({
+      response: { data: { code: "INVALID_TOKEN", message: "Invalid token" } },
+    });
+  });
+
+  it("falls back to the server message for an unknown code", async () => {
+    await i18n.changeLanguage("en");
+    adapter.mockImplementationOnce((config) =>
+      response(config, { statusCode: 200, data: { message: "پیام", code: "NOT_A_CODE" } })
+    );
+    const res = await http.post("/x");
+    expect(res.data.data.message).toBe("پیام");
   });
 });

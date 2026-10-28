@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**30 of 47 phases done** (Parts A, B and C, Phase 26). Next: Phase 27 (string extraction and translation checks).
+**31 of 49 phases done** (Parts A, B and C, Phases 26 and 27a). Next: Phase 27b (remaining feature strings; i18n lint rule as error).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -38,7 +38,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | A. Safety net | 0–7 | Lint, one test runner, client tests, e2e, CI. Nothing behavioral changes. | ✅ 8/8 |
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
-| D. Design & i18n foundation | 26–29 | i18n, Tailwind 4 tokens, design-system components. | ⬜ 1/4 |
+| D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ⬜ 2/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
 | F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
 
@@ -316,7 +316,7 @@ Files: `server/utils/apiResponse.ts`, `server/utils/errorCodes.ts` (new), `serve
 - [x] Client: update the logout/refresh callers and the interceptor to the new shapes.
 - [x] Tests: every route's error responses include a `code` from `errorCodes`; client interceptor test updated.
 
-Verify: tests and e2e pass; client still shows Persian toasts (it reads `message` until Phase 27).
+Verify: tests and e2e pass; client still shows Persian toasts (it reads `message` until Phase 27a).
 
 ### Phase 20: Zod for auth and profile (server + client) ✅
 **Goal:** the auth domain validates with Zod on both sides in one go: the OTP, complete-profile and update-profile routes, and the forms that call them.
@@ -386,7 +386,7 @@ Verify: each form shows the same Persian messages as before; tests and e2e pass.
 
 ## Part D: Design and i18n foundation ⬜
 
-**Gate before Phase 28 ✅:** agree on the design direction and the F9 page list (PRD R9). Recorded and agreed in `docs/design.md` (2026-10-28, #36).
+**Gate before Phase 28a ✅:** agree on the design direction and the F9 page list (PRD R9). Recorded and agreed in `docs/design.md` (2026-10-28, #36).
 
 ### Phase 26: i18n setup ✅
 **Goal:** `react-i18next` runs with `fa` (default) and `en`, and the language switcher works, even though most strings are still hardcoded.
@@ -400,18 +400,42 @@ Files: `client/src/i18n/` (new: setup, `fa.json`, `en.json`), `client/src/contex
 
 Verify: switching sets `lang`/`dir` without reload; Phase 4 formatter tests pass; add tests for `en` output.
 
-### Phase 27: String extraction and translation checks ⬜
-**Goal:** no hardcoded UI strings; server error codes translated on the client.
+### Phase 27a: Translation plumbing and shell/auth strings ✅
+**Goal:** the translation plumbing exists and is enforced, and the app shell (shared `ui/`, role layouts, sidebar, headers, the whole auth flow) reads in English. Split from Phase 27 because 45 client files hold Persian literals.
 
-Files: every client component with Persian literals, `fa.json`, `en.json`, `useAppMutation`, `httpService` error handling, `client/eslint.config.js` (i18n rule), a key-parity script, CI
+Files: `ui/*`, the three role layouts, `features/authentication/*`, `fa.json`, `en.json`, `i18n/index.ts`, `httpService` (covers `useAppMutation` and the auth forms), `client/eslint.config.js`, `client/src/i18n/check-parity.mjs`, CI
 
-- [ ] Extract all strings, toasts, validation messages and status labels to keys; fill `en`.
-- [ ] Toasts translate the server `code`, falling back to `message`.
-- [ ] i18n lint rule for JSX literals; a script that fails when a key exists in only one locale file; a test that every server `errorCodes` entry has a client key (copy of the list, PRD R8).
+- [x] Toasts translate the server `code`, falling back to `message` for unknown codes.
+- [x] A key-parity script fails when a key exists in only one locale file; it runs in CI.
+- [x] A test checks that every server error/success code has a client key (a copied list, PRD R8).
+- [x] i18n lint rule for JSX literals on as a warning.
+- [x] Strings in `ui/`, the layouts and the auth feature extracted to keys, with `en` filled.
 
-Verify: lint and the parity check pass in CI; the app reads fully in English (layout may still be LTR-broken until Phase 28).
+Verify: login and navigation read in English; Persian is unchanged; tests and e2e pass.
 
-### Phase 28: Tailwind 4, tokens and logical utilities ⬜
+### Phase 27b: Remaining feature strings; i18n lint rule as error ⬜
+**Goal:** no hardcoded UI strings are left; the lint rule blocks new literals.
+
+Files: the project, proposal, owner, freelancer and admin features, `pages/*`, `constants/` (status labels become keys), `schemas/*` (validation messages), `fa.json`, `en.json`, `client/eslint.config.js`
+
+- [ ] Extract every remaining component, page, status label and validation message; fill `en`.
+- [ ] The JSX-literal lint rule is an error; lint passes.
+- [ ] Client schema tests still assert the Persian messages; e2e still passes in Persian.
+
+Verify: the parity check passes in CI; every screen of each role reads in English (layout may still be LTR-broken until Phase 28b).
+
+### Phase 28a: Playwright screenshot baseline ⬜
+**Goal:** a screenshot baseline on the current Tailwind 3 styles, so Phase 28b can be compared against it.
+
+Files: `e2e/` (screenshot specs and baselines), CI
+
+- [ ] Screenshot specs for 3–4 key pages (e.g. home, auth, owner projects table, a dashboard) in fa/en × light/dark.
+- [ ] Baselines committed; the specs run in CI and are stable across two runs (no flaky dates or data).
+- [ ] No app code changes.
+
+Verify: the screenshot specs pass twice in a row locally and in CI.
+
+### Phase 28b: Tailwind 4, tokens and logical utilities ⬜
 **Goal:** Tailwind 4 with a CSS-first `@theme` holding the agreed light/dark tokens; all physical direction classes replaced (PRD R3, R10).
 
 Files: `client/package.json`, `client/postcss.config.js` / `vite.config.js`, `client/tailwind.config.js` (delete), `client/src/index.css`, every component using `ml-/mr-/pl-/pr-/left-/right-/text-left/text-right`
@@ -419,9 +443,8 @@ Files: `client/package.json`, `client/postcss.config.js` / `vite.config.js`, `cl
 - [ ] Run the official upgrade tool, then move tokens into `@theme` (light + dark via the existing CSS variables).
 - [ ] Replace physical classes with logical ones (`ms-`, `ps-`, `start-`, `text-start`); mirror directional icons.
 - [ ] CI grep that fails on physical direction classes.
-- [ ] Playwright screenshot baseline for 3–4 key pages in fa/en × light/dark.
 
-Verify: the app looks the same as before in fa (compare screenshots against `main`) and mirrors correctly in en.
+Verify: fa screenshots match the Phase 28a baseline (or the diffs are reviewed and accepted in the PR); en screenshots show a correct LTR mirror.
 
 ### Phase 29: Design-system components ⬜
 **Goal:** the `ui/` components from F9 exist, are accessible, and are used by at least one page.
@@ -572,6 +595,6 @@ Verify: every success criterion has evidence in the PR description.
 - **Jest → Vitest early (Phase 2).** The PRD wants Vitest; switching 678 lines of tests before adding more is cheaper than later.
 - **Search uses an escaped regex, not a text index (Phase 12).** Simpler and works with partial words.
 - **`sort=popular` is removed (Phase 12)** unless PRD open question 4 is answered otherwise.
-- **Tailwind 4 lands in Phase 28 with tokens, before the redesign of pages**, so every phase still builds; pages are re-skinned later one group at a time.
+- **Tailwind 4 lands in Phase 28b with tokens, before the redesign of pages**, so every phase still builds; pages are re-skinned later one group at a time.
 - **Shared constants first, Zod later (Phases 14, 20 and 25).** The constants module is what Zod schemas read their limits from.
 - **Zod is split by domain, not by package.** Phase 20 (auth) and Phase 25 (everything else) each move one domain's server routes and client forms together. Phase 20 runs before client TypeScript, so its client schemas start as `.js` and get converted in Phases 23–24.

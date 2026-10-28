@@ -14,6 +14,7 @@ Install: `npm install && npm install --prefix client && npm install --prefix ser
 - `npm run lint --prefix server`: flat ESLint config (`server/eslint.config.js`).
 - `npm run typecheck --prefix client`: `tsc --noEmit`, strict with `allowJs: false`: all of `client/src` is `.ts`/`.tsx` (only the Vite, ESLint, PostCSS and Tailwind configs are `.js`). API data is typed against `src/types/api.ts`.
 - `npm test --prefix server`: Vitest + Supertest behavior tests (`server/tests/`) against an in-memory MongoDB (the first run downloads a ~600MB mongod binary). They pin current behavior, including the bugs listed in `docs/known-bugs.md`.
+- `npm run i18n:check --prefix client`: fails when a translation key is in only one of `src/i18n/fa.json`/`en.json` (runs in CI).
 - `npm test --prefix client`: Vitest + Testing Library (jsdom) characterization tests next to the code (`*.test.ts(x)`), pinning current behavior.
 - `npm run e2e` (root): Playwright suite in `e2e/`. Global setup starts an in-memory MongoDB (seeded with one category), the server and the Vite dev server on free ports, so nothing needs to be running. First run: `npx playwright install chromium`.
 
@@ -32,6 +33,8 @@ The data flow is layered, and each feature follows it:
 **Auth/roles:** login is OTP by phone (`SendOTPForm` → `CheckOTPForm` → `CompleteProfileForm`). The session is httpOnly JWT cookies. `httpService` retries a request once after a 401 by calling `/user/refresh-token`. Routes live in `App.tsx` under `/owner`, `/freelancer` and `/admin`, each wrapped in `ProtectedRoute`. `useAuthorize` reads the role from the **first URL segment** and compares it with `user.role` (`OWNER`/`FREELANCER`/`ADMIN`). It also requires `user.status === 2` (verified). So a new role-scoped page must sit under its role's path prefix.
 
 List filtering and sorting are driven by URL query params: `useProjects` passes `location.search` directly to `/project/list`.
+
+**i18n:** `react-i18next`, `fa` (default) and `en` in `src/i18n/`. UI text goes through `t()` (`react/jsx-no-literals` flags literals). The `httpService` interceptor translates every server `message` by its `code` (`server.<CODE>` keys; fa keeps the server's Persian text), so toasts need nothing extra; a new server code needs a key in both locales and in the copied list in `src/i18n/serverCodes.test.ts`.
 
 Dark mode lives in `context/DarkModeContext.tsx` and is stored via `useLocalStorageState`. Persian numbers and dates come from `utils/`.
 

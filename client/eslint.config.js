@@ -33,6 +33,12 @@ export default [
       "react/prop-types": 0,
     },
   },
+  {
+    // UI text goes through t(); a warning until Phase 27b extracts the remaining features
+    files: ["src/**/*.tsx"],
+    ignores: ["**/*.test.tsx"],
+    rules: { "react/jsx-no-literals": ["warn", { allowedStrings: ["-", "*"] }] },
+  },
   ...tseslint.configs.recommended.map((config) => ({
     ...config,
     files: ["**/*.{ts,tsx}"],

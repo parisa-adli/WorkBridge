@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AuthContainer from "./AuthContainer";
 import useUser from "./useUser";
 import { checkOtp, getOtp, loginApi } from "../../services/authService";
+import i18n from "../../i18n";
 
 vi.mock("./useUser");
 vi.mock("../../services/authService");
@@ -138,5 +139,17 @@ describe("AuthContainer", () => {
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith("too many requests")
     );
+  });
+
+  it("reads in English after a language switch", async () => {
+    await i18n.changeLanguage("en");
+    try {
+      renderAuth();
+      expect(screen.getByRole("tab", { name: "Log in with email" })).toHaveAttribute("aria-selected", "true");
+      expect(screen.getByLabelText(/^Email/)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Log in" })).toBeInTheDocument();
+    } finally {
+      await i18n.changeLanguage("fa");
+    }
   });
 });

@@ -17,3 +17,11 @@ void i18n.use(initReactI18next).init({
 export const activeLocale = () => (i18n.language === "en" ? "en-US" : "fa-IR");
 
 export default i18n;
+
+// Server messages by `code`. The server writes Persian and one code can carry several texts
+// (each validation rule has its own), so fa shows the message as sent; unknown codes keep it too.
+export function apiMessage({ code, message, ...params }: { code?: string; message?: string }) {
+  if (i18n.language === "fa" && message) return message;
+  const key = `server.${code}`;
+  return code && i18n.exists(key) ? i18n.t(key, params) : message;
+}

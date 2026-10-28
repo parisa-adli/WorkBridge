@@ -39,6 +39,8 @@ jobs:
         run: npm run lint --prefix client
       - name: Lint server
         run: npm run lint --prefix server
+      - name: Translation key parity
+        run: npm run i18n:check --prefix client
 
       - name: Typecheck server
         run: npm run typecheck --prefix server
