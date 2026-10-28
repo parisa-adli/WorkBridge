@@ -47,6 +47,8 @@ for (const language of ["fa", "en"]) {
   for (const theme of ["light", "dark"]) {
     for (const { name, path, owner } of PAGES) {
       test(`${name} ${language} ${theme}`, async ({ page }) => {
+        // The home footer prints the current year.
+        await page.clock.setFixedTime(new Date("2026-06-01T12:00:00Z"));
         await page.addInitScript(
           ({ language, dark }) => {
             localStorage.setItem("language", JSON.stringify(language));
