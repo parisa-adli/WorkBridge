@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**47 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39c). Next: Phase 39d (shadcn form controls).
+**48 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39d). Next: Phase 39e (shadcn feedback and overlays).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 3/11 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 4/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -587,14 +587,14 @@ Files: `src/index.css`, `client/components.json`, `src/components/ui/`, `src/ui/
 
 Verify: Modal keyboard, Toggle and Pagination tests pass; axe passes on the reference pages in fa/en × light/dark; screenshot diff reviewed, baselines refreshed.
 
-### Phase 39d: shadcn form controls ⬜
+### Phase 39d: shadcn form controls ✅
 Files: `ui/Select`, `RHFSelect`, `StatusSelect`, `FilterDropDown`, `Filter`, `RadioInput`, `RadioInputGroup`, `DatePickerField`, the tag input in `CreateProjectForm`, `Textfield`
 
-- [ ] Every select (forms and URL filters) is the shadcn Select, wired to React Hook Form through `Controller`. It is keyboard-operable and labelled, and RHF values and validation are unchanged. Client tests and e2e steps that used `selectOption` move to the new interaction.
-- [ ] Radios become RadioGroup; `Filter` becomes ToggleGroup (URL params unchanged); `Textfield` is replaced by `Input`.
-- [ ] Date picker: shadcn Calendar + Popover if react-day-picker's Persian calendar keeps Jalali input and display; otherwise the current picker is restyled with the shadcn tokens and the reason recorded in design.md §9.
-- [ ] Tag input: no shadcn equivalent, so it is restyled with the Input and Badge styles.
-- [ ] Every replaced library is uninstalled.
+- [x] Every select (forms and URL filters) is the shadcn Select, wired to React Hook Form through `Controller`. It is keyboard-operable and labelled, and RHF values and validation are unchanged. Client tests and e2e steps that used `selectOption` move to the new interaction.
+- [x] Radios become RadioGroup; `Filter` becomes ToggleGroup (URL params unchanged); `Textfield` is replaced by `Input`.
+- [x] Date picker: shadcn Calendar + Popover if react-day-picker's Persian calendar keeps Jalali input and display; otherwise the current picker is restyled with the shadcn tokens and the reason recorded in design.md §9.
+- [x] Tag input: no shadcn equivalent, so it is restyled with the Input and Badge styles.
+- [x] Every replaced library is uninstalled.
 
 Verify: form and filter tests pass; e2e (create project, filters) passes; screenshot diff reviewed, baselines refreshed.
 

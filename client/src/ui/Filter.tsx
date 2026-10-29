@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type FilterProps = {
   options: { value: string; label: string }[];
@@ -11,7 +12,8 @@ function Filter({ options, filterField }: FilterProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentFilter = searchParams.get(filterField) || options[0].value;
 
-  function handleClick(value: string) {
+  function handleChange(value: string) {
+    if (!value) return; // clicking the active item would clear it; one filter is always on
     searchParams.set(filterField, value);
     searchParams.delete("page"); // a new filter starts on its first page
     setSearchParams(searchParams);
@@ -19,26 +21,19 @@ function Filter({ options, filterField }: FilterProps) {
   return (
     <div className="flex items-center gap-x-2 text-xs">
       <span>{t("common.status")}</span>
-      <div className="flex items-center gap-x-2 p-1 border border-secondary-100 bg-secondary-0 rounded-lg">
-        {options.map(({ label, value }) => {
-          const isActive = value === currentFilter;
-          return (
-            <button
-              key={value}
-                  onClick={() => handleClick(value)}
-                  disabled={isActive}
-              className={`whitespace-nowrap rounded-md px-4 py-2 font-bold transition-all decoration-neutral-300
-                ${
-                  isActive
-                    ? "bg-primary! text-primary-foreground"
-                    : "bg-secondary-0 text-secondary-800"
-                }`}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+      <ToggleGroup
+        type="single"
+        variant="outline"
+        value={currentFilter}
+        onValueChange={handleChange}
+        aria-label={t("common.status")}
+      >
+        {options.map(({ label, value }) => (
+          <ToggleGroupItem key={value} value={value}>
+            {label}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
     </div>
   );
 }

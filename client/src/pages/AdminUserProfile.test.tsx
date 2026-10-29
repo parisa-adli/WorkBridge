@@ -49,7 +49,7 @@ describe("AdminUserProfile", () => {
     expect(screen.getByRole("heading", { name: "کاربر" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "فروشگاه" })).toHaveAttribute("href", "/admin/projects/فروشگاه");
     expect(screen.getByRole("link", { name: "سایت" })).toBeInTheDocument();
-    expect(screen.getByRole("combobox")).toHaveValue("1");
+    expect(screen.getByRole("combobox", { name: "تغییر وضعیت" })).toHaveTextContent("در انتظار تایید");
   });
 
   it("changes the status in place and refreshes the user and the users list", async () => {
@@ -63,7 +63,8 @@ describe("AdminUserProfile", () => {
         </MemoryRouter>
       </QueryClientProvider>
     );
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "2" } });
+    fireEvent.keyDown(screen.getByRole("combobox", { name: "تغییر وضعیت" }), { key: "Enter" });
+    fireEvent.keyDown(screen.getByRole("option", { name: "تایید شده" }), { key: "Enter" });
     fireEvent.click(screen.getByRole("button", { name: "تایید" }));
 
     await waitFor(() => expect(invalidate).toHaveBeenCalledWith({ queryKey: ["admin-user"] }));

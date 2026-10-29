@@ -117,7 +117,8 @@ test("owner accepts a proposal, the freelancer sees it accepted", async ({ page 
   await demoLogin(page, "کارفرما", "demo-owner", "/owner");
   await page.goto(url(`/owner/projects/${projectId}`));
   await page.getByRole("button", { name: "تغییر وضعیت درخواست" }).click();
-  await page.getByRole("combobox", { name: "تغییر وضعیت" }).selectOption({ label: "تایید شده" });
+  await page.getByRole("combobox", { name: "تغییر وضعیت" }).click();
+  await page.getByRole("option", { name: "تایید شده" }).click();
   await page.getByRole("button", { name: "تایید", exact: true }).click();
   await expect(page.getByRole("cell", { name: "تایید شده" })).toBeVisible();
   await page.getByRole("button", { name: "خروج" }).click();
@@ -129,6 +130,17 @@ test("owner accepts a proposal, the freelancer sees it accepted", async ({ page 
   await expect(page.getByRole("heading", { name: title })).toBeVisible();
   await expect(page.getByText("بسته", { exact: true })).toBeVisible();
   await expect(page.getByText("تایید شده", { exact: true })).toBeVisible();
+});
+
+test("freelancer filters write the URL params", async ({ page }) => {
+  await demoLogin(page, "فریلنسر", "demo-freelancer", "/freelancer");
+  await page.goto(url("/freelancer/projects"));
+  await page.getByRole("radio", { name: "باز" }).click();
+  await expect(page).toHaveURL(/status=OPEN/);
+  await page.getByRole("combobox", { name: "دسته بندی" }).click();
+  await page.getByRole("option", { name: "برنامه نویسی" }).click();
+  await expect(page).toHaveURL(/category=/);
+  await expect(page).toHaveURL(/status=OPEN/);
 });
 
 test("admin edits the profile and uploads an avatar, the header updates", async ({ page }) => {
@@ -183,14 +195,14 @@ test.describe.serial("OTP login", () => {
     await page.getByLabel("عنوان پروژه").fill(title);
     await page.getByLabel("توضیحات").fill("توضیحات پروژه برای تست انتها به انتها");
     await page.getByLabel("بودجه").fill("200000");
-    await page.getByLabel("دسته بندی").selectOption({ label: "برنامه نویسی" });
+    await page.getByRole("combobox", { name: "دسته بندی" }).click();
+    await page.getByRole("option", { name: "برنامه نویسی" }).click();
 
-    // The deadline has no default (submitting without one is refused), so pick a day.
-    const deadline = page.locator(".rmdp-container input");
+    // The deadline has no default (submitting without one is refused), so pick a day; the calendar closes on pick.
+    const deadline = page.getByRole("button", { name: "ددلاین" });
     await deadline.click();
-    await page.locator(".rmdp-day-picker .rmdp-day:not(.rmdp-deactive):not(.rmdp-disabled):not(.rmdp-day-hidden) span").last().click();
-    await expect(deadline).not.toHaveValue("");
-    await page.getByText("اضافه کردن پروژه جدید").click(); // close the calendar
+    await page.locator("[data-slot=calendar] button[data-day]").last().click();
+    await expect(deadline).not.toHaveText("انتخاب تاریخ");
 
     await page.getByRole("button", { name: "تایید", exact: true }).click();
     await expect(page.getByRole("cell", { name: title, exact: true })).toBeVisible();

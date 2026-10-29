@@ -15,7 +15,7 @@ type ChangeProposalStatusProps = {
 
 function ChangeProposalStatus({ proposalId, onClose, proposalStatus }: ChangeProposalStatusProps) {
   const { t } = useTranslation();
-  const { register, handleSubmit } = useForm<StatusInput, unknown, StatusValues>({
+  const { control, handleSubmit } = useForm<StatusInput, unknown, StatusValues>({
     defaultValues: { status: proposalStatus },
     resolver: zodResolver(proposalStatusSchema),
   });
@@ -28,7 +28,7 @@ function ChangeProposalStatus({ proposalId, onClose, proposalStatus }: ChangePro
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <StatusSelect register={register} />
+        <StatusSelect control={control} />
         <div className="mt-8!">
           {isUpdating ? (
             <Loading />

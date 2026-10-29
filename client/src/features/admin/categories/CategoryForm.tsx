@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Textfield from "../../../ui/Textfield";
+import Input from "../../../ui/Input";
 import RHFSelect from "../../../ui/RHFSelect";
 import Loading from "../../../ui/Loading";
 import useCategories from "../../../hooks/useCategories";
@@ -20,6 +20,7 @@ function CategoryForm({ onClose, categoryToEdit }: CategoryFormProps) {
   const { t } = useTranslation();
   const {
     register,
+    control,
     formState: { errors },
     handleSubmit,
   } = useForm<CategoryValues>({
@@ -48,25 +49,13 @@ function CategoryForm({ onClose, categoryToEdit }: CategoryFormProps) {
 
   return (
     <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-      <Textfield label={t("category.title")} name="title" register={register} required errors={errors} />
-      <Textfield
-        label={t("category.englishTitle")}
-        name="englishTitle"
-        register={register}
-        required
-        errors={errors}
-      />
-      <Textfield
-        label={t("common.description")}
-        name="description"
-        register={register}
-        required
-        errors={errors}
-      />
+      <Input label={t("category.title")} required error={errors.title?.message} {...register("title")} />
+      <Input label={t("category.englishTitle")} required error={errors.englishTitle?.message} {...register("englishTitle")} />
+      <Input label={t("common.description")} required error={errors.description?.message} {...register("description")} />
       <RHFSelect
         label={t("category.type")}
         name="type"
-        register={register}
+        control={control}
         required
         options={CATEGORY_TYPES.map((type) => ({ value: type, label: t(`category.types.${type}`) }))}
       />
@@ -74,7 +63,7 @@ function CategoryForm({ onClose, categoryToEdit }: CategoryFormProps) {
         <RHFSelect
           label={t("category.parent")}
           name="parentId"
-          register={register}
+          control={control}
           options={[{ value: "", label: t("category.noParent") }, ...categories]}
         />
       )}

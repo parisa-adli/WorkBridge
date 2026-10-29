@@ -1,39 +1,35 @@
-import type { FieldValues, Path, UseFormRegister } from "react-hook-form";
-
-export type SelectOption = { value: string | number; label: string };
+import { Controller, type Control, type FieldValues, type Path } from "react-hook-form";
+import Select, { type SelectOption } from "./Select";
 
 type RHFSelectProps<T extends FieldValues> = {
   label: string;
   name: Path<T>;
-  register: UseFormRegister<T>;
+  control: Control<T>;
   options: SelectOption[];
   required?: boolean;
 };
 
-function RHFSelect<T extends FieldValues>({
-  label,
-  name,
-  register,
-  options,
-  required,
-}: RHFSelectProps<T>) {
+// The shadcn Select is not a native <select>, so it joins the form through Controller instead of register.
+function RHFSelect<T extends FieldValues>({ label, name, control, options, required }: RHFSelectProps<T>) {
   return (
-    <div>
-      <label htmlFor={name} className="mb-2 block text-secondary-700">
-        {label} {required && <span className="text-error">*</span>}
-      </label>
-      <select
-        {...register(name)}
-        id={name}
-        className="textField__input"
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
+    <Controller
+      name={name}
+      control={control}
+      render={({ field, fieldState }) => (
+        <Select
+          label={label}
+          required={required}
+          options={options}
+          name={field.name}
+          value={field.value ?? ""}
+          onValueChange={field.onChange}
+          onBlur={field.onBlur}
+          ref={field.ref}
+          disabled={field.disabled}
+          error={fieldState.error?.message}
+        />
+      )}
+    />
   );
 }
 export default RHFSelect;

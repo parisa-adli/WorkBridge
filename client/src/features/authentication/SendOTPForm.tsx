@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { FormEventHandler } from "react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
-import Textfield from "../../ui/Textfield";
+import Input from "../../ui/Input";
 import Loading from "../../ui/Loading";
 import type { SendOtpValues } from "../../schemas/auth";
 
@@ -17,12 +17,7 @@ function SendOTPForm({ onSubmit, isSendingOtp, register, errors }: SendOTPFormPr
   return (
     <div>
       <form className="space-y-8" onSubmit={onSubmit}>
-        <Textfield
-          label={t("auth.phoneNumber")}
-          name="phoneNumber"
-          register={register}
-          errors={errors}
-        />
+        <Input label={t("auth.phoneNumber")} error={errors.phoneNumber?.message} {...register("phoneNumber")} />
         {isSendingOtp ? (
           <Loading />
         ) : (

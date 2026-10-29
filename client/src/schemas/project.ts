@@ -13,7 +13,7 @@ export const numberField = (required: Msg, invalid: Msg, min: number, max: numbe
 
 const invalidBudget = msg("validation.invalidAmount");
 
-// tags and deadline live outside the form (TagsInput, DatePickerField), so they are not in the schema.
+// tags and deadline live outside the form (TagInput, DatePickerField), so they are not in the schema.
 export const projectSchema = z.object({
   title: z
     .string()

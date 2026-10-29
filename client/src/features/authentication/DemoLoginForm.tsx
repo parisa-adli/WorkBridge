@@ -4,9 +4,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import type { ChangeEvent } from "react";
 import type { AxiosError } from "axios";
-import Textfield from "../../ui/Textfield";
+import Input from "../../ui/Input";
 import RadioInputGroup from "../../ui/RadioInputGroup";
 import Loading from "../../ui/Loading";
 import { demoLoginApi } from "../../services/authService";
@@ -20,6 +19,7 @@ function DemoLoginForm() {
   const { t } = useTranslation();
   const {
     register,
+    control,
     handleSubmit,
     watch,
     setValue,
@@ -42,8 +42,8 @@ function DemoLoginForm() {
   };
 
   // picking a role swaps in that role's demo account
-  const fillDemoUser = (e: ChangeEvent<HTMLInputElement>) => {
-    const { username, password } = DEMO_USERS[e.target.value as DemoLoginValues["role"]];
+  const fillDemoUser = (role: string) => {
+    const { username, password } = DEMO_USERS[role as DemoLoginValues["role"]];
     setValue("username", username);
     setValue("password", password);
   };
@@ -53,28 +53,18 @@ function DemoLoginForm() {
   return (
     <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
       <RadioInputGroup
-        errors={errors}
-        register={register}
-        watch={watch}
-        configs={{
-          name: "role",
-          validationSchema: { onChange: fillDemoUser },
-          options: [
-            { value: ROLES.OWNER, label: t("roles.owner") },
-            { value: ROLES.FREELANCER, label: t("roles.freelancer") },
-            { value: ROLES.ADMIN, label: t("roles.admin") },
-          ],
-        }}
+        label={t("user.role")}
+        control={control}
+        name="role"
+        onValueChange={fillDemoUser}
+        options={[
+          { value: ROLES.OWNER, label: t("roles.owner") },
+          { value: ROLES.FREELANCER, label: t("roles.freelancer") },
+          { value: ROLES.ADMIN, label: t("roles.admin") },
+        ]}
       />
-      <Textfield label={t("auth.username")} name="username" register={register} required errors={errors} />
-      <Textfield
-        label={t("auth.password")}
-        name="password"
-        type="password"
-        register={register}
-        required
-        errors={errors}
-      />
+      <Input label={t("auth.username")} required error={errors.username?.message} {...register("username")} />
+      <Input label={t("auth.password")} type="password" required error={errors.password?.message} {...register("password")} />
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm text-text-muted">
         <dt>{t("auth.username")}</dt>
         <dd className="font-mono"><bdi>{shown.username}</bdi></dd>

@@ -1,17 +1,16 @@
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
-import Textfield from "../../ui/Textfield";
+import Input from "../../ui/Input";
 import RHFSelect from "../../ui/RHFSelect";
-import { TagsInput } from "react-tag-input-component";
 import { useState } from "react";
 import DatePickerField from "../../ui/DatePickerField";
+import TagInput from "../../ui/TagInput";
 import useCategories from "../../hooks/useCategories";
 import useCreateProject from "./useCreateProject";
 import Loading from "../../ui/Loading";
 import useEditProject from "./useEditProject";
 import toast from "react-hot-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type DateObject from "react-date-object";
 import type { Project } from "../../types/api";
 import { projectSchema, type ProjectInput, type ProjectValues } from "../../schemas/project";
 
@@ -47,6 +46,7 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
 
   const {
     register,
+    control,
     formState: { errors },
     handleSubmit,
     reset,
@@ -56,7 +56,7 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
   });
 
   const [tags, setTags] = useState(prevTags || []);
-  const [date, setDate] = useState<Date | DateObject | null>(
+  const [date, setDate] = useState<Date | null>(
     deadline ? new Date(deadline) : null
   );
   const { categories } = useCategories();
@@ -67,7 +67,7 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
     if (!date) return toast.error(t("validation.deadlineRequired"));
     const newProject = {
       ...data,
-      deadline: new Date(date.valueOf()).toISOString(),
+      deadline: date.toISOString(),
       tags,
     };
     if (editId) {
@@ -92,41 +92,17 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
 
   return (
     <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-      <Textfield
-        label={t("project.title")}
-        name="title"
-        register={register}
-        required
-        errors={errors}
-      />
-      <Textfield
-        label={t("common.description")}
-        name="description"
-        register={register}
-        required
-        errors={errors}
-      />
-      <Textfield
-        label={t("project.budget")}
-        name="budget"
-        type="number"
-        register={register}
-        required
-        errors={errors}
-      />
+      <Input label={t("project.title")} required error={errors.title?.message} {...register("title")} />
+      <Input label={t("common.description")} required error={errors.description?.message} {...register("description")} />
+      <Input label={t("project.budget")} type="number" required error={errors.budget?.message} {...register("budget")} />
       <RHFSelect
         label={t("project.category")}
         required
         name="category"
-        register={register}
+        control={control}
         options={categories}
       />
-      <div>
-        <label htmlFor="tags" className="mb-2 block text-secondary-700">
-          {t("project.tag")}
-        </label>
-        <TagsInput value={tags} onChange={setTags} name="tags" />
-      </div>
+      <TagInput label={t("project.tag")} value={tags} onChange={setTags} />
       <DatePickerField date={date} setDate={setDate} label={t("project.deadline")} />
       <div className="mt-8!">
         {isCreating || isEditing ? (

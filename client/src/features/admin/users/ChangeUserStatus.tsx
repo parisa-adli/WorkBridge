@@ -16,7 +16,7 @@ type ChangeUserStatusProps = {
 
 function ChangeUserStatus({ userId, onClose, userStatus }: ChangeUserStatusProps) {
   const { t } = useTranslation();
-  const { register, handleSubmit } = useForm<StatusInput, unknown, StatusValues>({
+  const { control, handleSubmit } = useForm<StatusInput, unknown, StatusValues>({
     defaultValues: { status: userStatus },
     resolver: zodResolver(userStatusSchema),
   });
@@ -32,7 +32,7 @@ function ChangeUserStatus({ userId, onClose, userStatus }: ChangeUserStatusProps
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <StatusSelect register={register} />
+        <StatusSelect control={control} />
         <div className="mt-8!">
           {isUpdating ? (
             <Loading />
