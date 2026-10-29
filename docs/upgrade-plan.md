@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**44 of 49 phases done** (Parts A, B, C, D and E). Next: Phase 39 (re-skin public and auth pages).
+**45 of 52 phases done** (Parts A, B, C, D and E; Phase 39a). Next: Phase 39b (lucide icons).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
+| F. Finish | 39a–43 (39a, 39b added; 41 split into 41a–b) | shadcn/ui foundation, re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 1/8 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -549,6 +549,25 @@ Verify: server test for the counts; Home shows seeded numbers.
 
 ## Part F: Finish ⬜
 
+Decision (2026-10-29): Part F builds on shadcn/ui components and lucide icons while keeping the current design exactly (`docs/design.md` §9).
+
+### Phase 39a: shadcn/ui foundation ✅
+Files: `client/components.json`, `vite.config.js`, `tsconfig.json`, `src/lib/utils.ts`, `src/components/ui/`, `src/index.css`, the Phase 29 components in `src/ui/`
+
+- [x] shadcn initialised for Vite + Tailwind 4: `components.json`, `@/` alias (Vite `resolve.alias`, tsconfig `paths`), `cn` helper.
+- [x] shadcn variables point at the §2 tokens, so they follow `.dark-mode`; no new colors.
+- [x] Button, Input, Textarea, Badge, Table, Card, Skeleton, Modal (shadcn Dialog) and Toggle (shadcn Switch) rebuilt with unchanged props; Select stays a native `<select>` styled like shadcn's trigger.
+- [x] `@headlessui/react` uninstalled.
+
+Verify: screenshot baselines pass without being updated; Modal keyboard and Pagination tests pass; axe passes on the reference pages.
+
+### Phase 39b: lucide icons ⬜
+Files: every `react-icons` import
+
+- [ ] Replace `react-icons` with `lucide-react` (shadcn's icon library) at the same sizes; uninstall `react-icons`.
+
+Verify: screenshots differ only in icon glyphs (reviewed, then baselines refreshed); e2e passes.
+
 ### Phase 39: Re-skin public and auth pages ⬜
 Files: `pages/Home`, `Auth`, `CompleteProfile`, `NotFound`, auth feature components
 
@@ -563,10 +582,17 @@ Files: `ui/AppLayout`, `Sidebar`, headers, the three `DashboardLayout`/`Stats` s
 
 Verify: screenshots at 360px and desktop.
 
-### Phase 41: Re-skin tables and detail pages ⬜
-Files: project/proposal tables and rows, project detail, freelancer project detail, profile, admin users, admin user profile, admin categories
+### Phase 41a: Re-skin tables ⬜
+Files: project/proposal tables and rows, admin users, admin categories
 
 - [ ] Tables become cards or scroll on mobile; every list has loading, empty and error states.
+
+Verify: screenshots; e2e passes.
+
+### Phase 41b: Re-skin detail pages ⬜
+Files: project detail, freelancer project detail, profile, admin user profile
+
+- [ ] Rebuild on the design-system components; loading, empty and error states.
 
 Verify: screenshots; e2e passes.
 
@@ -576,6 +602,7 @@ Files: locale files, `e2e/` screenshot specs
 - [ ] Screenshot tests for every F9 page in fa/en × light/dark.
 - [ ] axe check per page in CI (WCAG 2.2 AA contrast in both themes).
 - [ ] Zero untranslated strings (lint + parity check already enforce it; fix anything left).
+- [ ] Delete the old `primary-*`/`secondary-*` scale, the Tailwind 3 default colors and the `.btn`/`.badge`/`.textField__input` utilities from `index.css` once a grep finds no use (`docs/design.md` §2).
 
 Verify: CI green with the new suites.
 

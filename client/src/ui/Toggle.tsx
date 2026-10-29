@@ -1,4 +1,5 @@
-import { Field, Label, Switch } from "@headlessui/react";
+import { useId } from "react";
+import { Switch } from "@/components/ui/switch";
 
 type ToggleProps = {
   label: string;
@@ -7,21 +8,12 @@ type ToggleProps = {
 };
 
 function Toggle({ label, enabled, onChange }: ToggleProps) {
+  const id = useId();
   return (
-    <Field>
-      <div className="flex items-center gap-x-2">
-        <Label>{label}</Label>
-        <Switch
-          checked={enabled}
-          onChange={onChange}
-          className={`${
-            enabled ? "bg-primary-900" : "bg-secondary-300"
-          } group inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition `}
-        >
-          <span className="size-4 translate-x-1 rtl:-translate-x-1 rounded-full bg-secondary-0 transition group-data-checked:translate-x-6 rtl:group-data-checked:-translate-x-6" />
-        </Switch>
-      </div>
-    </Field>
+    <div className="flex items-center gap-x-2">
+      <label htmlFor={id}>{label}</label>
+      <Switch id={id} checked={enabled} onCheckedChange={onChange} />
+    </div>
   );
 }
 export default Toggle;

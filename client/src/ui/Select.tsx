@@ -1,14 +1,16 @@
 import type { ComponentProps } from "react";
+import { cn } from "@/lib/utils";
 import Field, { controlClass, type FieldProps } from "./Field";
 import type { SelectOption } from "./RHFSelect";
 
 type SelectProps = ComponentProps<"select"> & FieldProps & { options: SelectOption[] };
 
-export default function Select({ id, label, error, required, options, className = "", ...props }: SelectProps) {
+// A native <select> on purpose (docs/design.md §9): styled like shadcn's Select trigger, keeps RHF register and the browser's own picker.
+export default function Select({ id, label, error, required, options, className, ...props }: SelectProps) {
   return (
     <Field id={id} label={label} error={error} required={required}>
       {(control) => (
-        <select {...props} {...control} className={`${controlClass} ${className}`}>
+        <select data-slot="select" {...props} {...control} className={cn(controlClass, className)}>
           {options.map((item) => (
             <option key={item.value} value={item.value}>
               {item.label}

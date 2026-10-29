@@ -1,7 +1,7 @@
-import { useEffect, useId, type KeyboardEvent, type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { HiOutlineX } from "react-icons/hi";
-import useOutsideClick from "../hooks/useOutsideClick";
+import { Dialog, DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogTitle } from "@/components/ui/dialog";
 
 type ModalProps = {
   open: boolean;
@@ -10,67 +10,39 @@ type ModalProps = {
   children: ReactNode;
 };
 
-const FOCUSABLE =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
+// Radix Dialog traps focus and closes on Escape and outside press.
 function Modal({ open, onClose, title, children }: ModalProps) {
   const { t } = useTranslation();
-  const ref = useOutsideClick<HTMLDivElement>(onClose);
-  const titleId = useId();
-
-  // Focus moves into the dialog on open and back to whatever had it (the trigger) on close.
-  useEffect(() => {
-    if (!open) return;
-    const trigger = document.activeElement as HTMLElement | null;
-    (ref.current?.querySelector<HTMLElement>(FOCUSABLE) ?? ref.current)?.focus();
-    return () => trigger?.focus();
-  }, [open, ref]);
-
-  function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-    if (e.key === "Escape") return onClose();
-    if (e.key !== "Tab" || !ref.current) return;
-    const focusable = ref.current.querySelectorAll<HTMLElement>(FOCUSABLE);
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault();
-      first.focus();
-    }
-  }
+  // Radix returns focus only to a <Dialog.Trigger>; our callers open it from their own buttons.
+  const trigger = useRef<HTMLElement | null>(null);
 
   return (
-    open && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-backdrop">
-        <div
-          ref={ref}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={titleId}
-          tabIndex={-1}
-          onKeyDown={handleKeyDown}
-          className="w-[calc(100vw-2rem)] sm:max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto
-            rounded-lg border border-border bg-surface text-text shadow-xl"
-        >
-          <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
-            <h2 id={titleId} className="text-lg font-bold">
-              {title}
-            </h2>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label={t("common.close")}
-              className="grid h-11 w-11 place-items-center rounded-md text-text-muted hover:bg-surface-muted hover:text-text"
-            >
-              <HiOutlineX aria-hidden="true" className="h-5 w-5" />
-            </button>
-          </div>
-          <div className="p-4 md:p-6">{children}</div>
-        </div>
-      </div>
-    )
+    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
+      <DialogPortal>
+        <DialogOverlay>
+          <DialogContent
+            aria-describedby={undefined}
+            onOpenAutoFocus={() => (trigger.current = document.activeElement as HTMLElement | null)}
+            onCloseAutoFocus={(e) => {
+              e.preventDefault();
+              trigger.current?.focus();
+            }}
+            className="w-[calc(100vw-2rem)] sm:max-w-md max-h-[calc(100vh-2rem)] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 md:px-6">
+              <DialogTitle className="text-lg font-bold">{title}</DialogTitle>
+              <DialogClose
+                aria-label={t("common.close")}
+                className="grid h-11 w-11 place-items-center rounded-md text-text-muted hover:bg-surface-muted hover:text-text"
+              >
+                <HiOutlineX aria-hidden="true" className="h-5 w-5" />
+              </DialogClose>
+            </div>
+            <div className="p-4 md:p-6">{children}</div>
+          </DialogContent>
+        </DialogOverlay>
+      </DialogPortal>
+    </Dialog>
   );
 }
 export default Modal;

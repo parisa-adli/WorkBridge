@@ -10,23 +10,25 @@ const CELLS =
 
 function Table({ children }: Props) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-border bg-surface">
-      <table className={CELLS}>{children}</table>
+    <div data-slot="table-container" className="overflow-x-auto rounded-lg border border-border bg-surface">
+      <table data-slot="table" className={CELLS}>
+        {children}
+      </table>
     </div>
   );
 }
 export default Table;
 
 function TableHeader({ children }: Props) {
-  return <thead>{children}</thead>;
+  return <thead data-slot="table-header">{children}</thead>;
 }
 
 function TableBody({ children }: Props) {
-  return <tbody>{children}</tbody>;
+  return <tbody data-slot="table-body">{children}</tbody>;
 }
 
 function TableRow({ children }: Props) {
-  return <tr>{children}</tr>;
+  return <tr data-slot="table-row">{children}</tr>;
 }
 
 Table.Header = TableHeader;
