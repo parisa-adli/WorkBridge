@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**46 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39b). Next: Phase 39c (shadcn theme and stock component styles).
+**47 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39c). Next: Phase 39d (shadcn form controls).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 2/11 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 3/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -575,15 +575,15 @@ Files: every `react-icons` import
 
 Verify: the screenshot diff shows only icon changes (reviewed, then baselines refreshed); e2e passes.
 
-### Phase 39c: shadcn theme and stock component styles ⬜
+### Phase 39c: shadcn theme and stock component styles ✅
 Files: `src/index.css`, `client/components.json`, `src/components/ui/`, `src/ui/` (Button, Input, Textarea, Badge, Card, Table, Skeleton, Modal, Toggle, Field), `docs/design.md` §2–§6
 
-- [ ] `index.css` takes shadcn's default theme (base color `neutral`, oklch values, light on `:root`, dark under `.dark-mode`) and its `--radius` scale, with the `@theme inline` mapping shadcn generates.
-- [ ] The Phase 28b tokens (`bg`, `surface`, `text-muted`, `on-primary`, `success`, ...) become aliases of the shadcn variables, so pages not yet re-skinned take the new palette.
-- [ ] The shadcn primitives in `src/components/ui/` are the stock shadcn source (`button`, `input`, `textarea`, `badge`, `card`, `table`, `skeleton`, `dialog`, `switch`, `label`), changed only for RTL (logical classes) and accessibility. `src/ui/` wraps them with the current props.
-- [ ] Badge statuses use shadcn variants with their text (open/accepted/verified `default`, pending `secondary`, rejected/closed `destructive`); no success/warning colors.
-- [ ] shadcn's focus ring replaces the global 2px outline.
-- [ ] design.md §2 records the measured contrast pairs. A pair that fails WCAG AA is the only allowed deviation, recorded with its value.
+- [x] `index.css` takes shadcn's default theme (base color `neutral`, oklch values, light on `:root`, dark under `.dark-mode`) and its `--radius` scale, with the `@theme inline` mapping shadcn generates.
+- [x] The Phase 28b tokens (`bg`, `surface`, `text-muted`, `on-primary`, `success`, ...) become aliases of the shadcn variables, so pages not yet re-skinned take the new palette.
+- [x] The shadcn primitives in `src/components/ui/` are the stock shadcn source (`button`, `input`, `textarea`, `badge`, `card`, `table`, `skeleton`, `dialog`, `switch`, `label`), changed only for RTL (logical classes) and accessibility. `src/ui/` wraps them with the current props.
+- [x] Badge statuses use shadcn variants with their text (open/accepted/verified `default`, pending `secondary`, rejected/closed `destructive`); no success/warning colors.
+- [x] shadcn's focus ring replaces the global 2px outline.
+- [x] design.md §2 records the measured contrast pairs. A pair that fails WCAG AA is the only allowed deviation, recorded with its value.
 
 Verify: Modal keyboard, Toggle and Pagination tests pass; axe passes on the reference pages in fa/en × light/dark; screenshot diff reviewed, baselines refreshed.
 

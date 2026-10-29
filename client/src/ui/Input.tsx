@@ -1,13 +1,13 @@
 import type { ComponentProps } from "react";
-import { cn } from "@/lib/utils";
-import Field, { controlClass, type FieldProps } from "./Field";
+import { Input as ShadcnInput } from "@/components/ui/input";
+import Field, { type FieldProps } from "./Field";
 
 type InputProps = ComponentProps<"input"> & FieldProps;
 
-function Input({ id, label, error, required, className, ...props }: InputProps) {
+function Input({ id, label, error, required, ...props }: InputProps) {
   return (
     <Field id={id} label={label} error={error} required={required}>
-      {(control) => <input data-slot="input" {...props} {...control} className={cn(controlClass, className)} />}
+      {(control) => <ShadcnInput {...props} {...control} />}
     </Field>
   );
 }

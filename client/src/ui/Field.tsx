@@ -1,5 +1,6 @@
 import { useId, type ReactNode } from "react";
 import { CircleAlert } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 export type FieldProps = {
   label: string;
@@ -13,8 +14,9 @@ type ControlProps = {
   "aria-describedby"?: string;
 };
 
-export const controlClass =
-  "w-full min-h-11 rounded-md border border-border-strong bg-surface px-4 py-2.5 text-base text-text transition-colors placeholder:text-text-muted hover:border-text-muted focus-visible:border-primary aria-invalid:border-error disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted";
+// A native <select> styled like shadcn's SelectTrigger until Phase 39d; options get the popover colors so dark mode stays readable.
+export const selectClass =
+  "h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30 dark:aria-invalid:ring-destructive/40 [&_option]:bg-popover [&_option]:text-popover-foreground";
 
 // Label, error and their ids for one form control (docs/design.md §6: visible label, error linked by aria-describedby).
 function Field({
@@ -29,15 +31,15 @@ function Field({
   const errorId = `${fieldId}-error`;
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={fieldId} className="text-sm font-medium text-text">
+    <div className="flex flex-col gap-2">
+      <Label htmlFor={fieldId}>
         {label}
         {required && (
-          <span aria-hidden="true" className="ms-0.5 text-error">
+          <span aria-hidden="true" className="text-destructive">
             *
           </span>
         )}
-      </label>
+      </Label>
       {children({
         id: fieldId,
         "aria-required": required || undefined,
@@ -45,7 +47,7 @@ function Field({
         "aria-describedby": error ? errorId : undefined,
       })}
       {error && (
-        <p id={errorId} role="alert" className="flex items-center gap-1.5 text-sm text-error">
+        <p id={errorId} role="alert" className="flex items-center gap-1.5 text-sm text-destructive">
           <CircleAlert aria-hidden="true" className="size-4 shrink-0" />
           {error}
         </p>

@@ -30,7 +30,7 @@ function Filter({ options, filterField }: FilterProps) {
               className={`whitespace-nowrap rounded-md px-4 py-2 font-bold transition-all decoration-neutral-300
                 ${
                   isActive
-                    ? "bg-primary-900! text-white"
+                    ? "bg-primary! text-primary-foreground"
                     : "bg-secondary-0 text-secondary-800"
                 }`}
             >

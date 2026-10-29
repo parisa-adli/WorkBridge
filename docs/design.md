@@ -46,9 +46,37 @@ shadcn's semantic variables: light values on `:root`, dark values under the exis
 
 **Contrast:** WCAG 2.2 AA stays the bar (§6). Phase 39c measures the token pairs in both themes and records them here. A shadcn pair that fails AA is the only allowed deviation from the stock values, recorded with its measurement.
 
+Measured in Phase 39c (oklch → sRGB, alpha blended in sRGB over the surface; WCAG 2.x ratio):
+
+| Pair | Light | Dark | Needs |
+|---|---|---|---|
+| `foreground` on `background` | 19.79 | 18.96 | 4.5 |
+| `card-foreground` on `card` | 19.79 | 17.16 | 4.5 |
+| `muted-foreground` on `background` / `card` | 4.96 / 4.96 | 7.63 / 6.91 | 4.5 |
+| `muted-foreground` on `muted` | 4.54 | 5.83 | 4.5 |
+| `primary-foreground` on `primary` | 17.16 | 14.22 | 4.5 |
+| `secondary-foreground` on `secondary` (= `accent` pair) | 16.42 | 14.48 | 4.5 |
+| `destructive` on `background` / `card` | 4.76 / 4.76 | 6.84 / 6.19 | 4.5 |
+| white on `destructive` (dark: `destructive/60`, as in Button and Badge) | 4.76 | 6.48 | 4.5 |
+| `input` (control border) on `background` / `card` | 3.11 / 3.11 | 3.02 / 3.12 | 3 |
+| `ring` (focus) on `background` / `card` | 4.73 / 4.73 | 4.18 / 3.79 | 3 |
+| `border` (dividers only, not a control boundary) | 1.26 | 1.25 | n/a |
+
+**Deviations** (the stock pairs that failed AA; each value carries an `AA:` comment in `index.css`):
+
+| Variable | Stock | Used | Stock measurement |
+|---|---|---|---|
+| light `--muted-foreground` | `oklch(0.556 0 0)` | `oklch(0.545 0 0)` | 4.34 on `muted` |
+| light `--input` | `oklch(0.922 0 0)` | `oklch(0.66 0 0)` | 1.26 on `background` |
+| light `--ring` | `oklch(0.708 0 0)` | `oklch(0.556 0 0)` | 2.59 on `background` |
+| dark `--input` | `oklch(1 0 0 / 15%)` | `oklch(1 0 0 / 34%)` | 1.47 on `background` |
+| light `--sidebar-ring` | `oklch(0.708 0 0)` | `oklch(0.556 0 0)` | 2.59 on `sidebar` (same fix as `--ring`) |
+
+The base layer draws the browser focus outline in full `ring` (shadcn: `ring/50`), so elements not yet on shadcn components keep a 3:1 outline.
+
 ### Migration from the Phase 28b tokens
 
-- Phase 39c makes the Phase 28b tokens (`bg`, `surface`, `surface-muted`, `border-strong`, `text`, `text-muted`, `on-primary`, `primary-soft`, `success`, `warning`, `error`, `backdrop`, ...) aliases of the shadcn variables, so pages not yet re-skinned take the new palette.
+- Phase 39c makes the Phase 28b tokens (`bg`, `surface`, `surface-muted`, `border-strong`, `text`, `text-muted`, `on-primary`, `primary-soft`, `success`, `warning`, `error`, ...) aliases of the shadcn variables (`backdrop` is deleted: shadcn's Dialog overlay uses `bg-black/50`), so pages not yet re-skinned take the new palette.
 - Re-skinned pages use only the shadcn token utilities.
 - The aliases, the old `primary-*`/`secondary-*` scale and the `.btn`/`.badge`/`.textField__input` classes are deleted in Phase 42, once a grep finds no use of them.
 
@@ -179,3 +207,5 @@ The same day the project owner revised it: the look follows shadcn as shipped (�
 | Tables on mobile | Table, one mobile approach | 41a |
 
 A replaced library is uninstalled in the phase that replaces it.
+
+Phase 39c: the primitives in `src/components/ui/` are the CLI's stock source (`npx shadcn add`), changed only where a comment says RTL, i18n or a11y; `tw-animate-css` provides their animations. `src/ui/` wraps them with the Phase 29 props (`Button` maps `primary`/`danger`/`md` to `default`/`destructive`/`default`). The unused Phase 29 `Badge` wrapper is gone: `StatusBadge` renders the shadcn Badge with the variant from `constants/`.

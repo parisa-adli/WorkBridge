@@ -23,23 +23,23 @@ export const DEMO_USERS = Object.freeze({
 // User verification and proposal review share these codes (ACCEPTED = a verified user).
 export const STATUS = Object.freeze({ REJECTED: 0, PENDING: 1, ACCEPTED: 2 });
 
-// Badge labels are translation keys.
+// Badge labels are translation keys; variants are shadcn Badge variants (docs/design.md §2).
 export const STATUS_BADGES = Object.freeze({
-  [STATUS.REJECTED]: { label: "status.rejected", className: "badge--danger" },
-  [STATUS.PENDING]: { label: "status.pending", className: "badge--secondary" },
-  [STATUS.ACCEPTED]: { label: "status.accepted", className: "badge--success" },
+  [STATUS.REJECTED]: { label: "status.rejected", variant: "destructive" as const },
+  [STATUS.PENDING]: { label: "status.pending", variant: "secondary" as const },
+  [STATUS.ACCEPTED]: { label: "status.accepted", variant: "default" as const },
 });
 
 export const PROJECT_STATUS = Object.freeze({ OPEN: "OPEN", CLOSED: "CLOSED" });
 
 export const PROJECT_STATUS_BADGES = Object.freeze({
-  [PROJECT_STATUS.OPEN]: { label: "projectStatus.open", className: "badge--success" },
-  [PROJECT_STATUS.CLOSED]: { label: "projectStatus.closed", className: "badge--danger" },
+  [PROJECT_STATUS.OPEN]: { label: "projectStatus.open", variant: "default" as const },
+  [PROJECT_STATUS.CLOSED]: { label: "projectStatus.closed", variant: "destructive" as const },
 });
 
 export const UNKNOWN_STATUS = Object.freeze({
   label: "status.unknown",
-  className: "badge--secondary",
+  variant: "secondary" as const,
 });
 
 export const LIMITS = Object.freeze({

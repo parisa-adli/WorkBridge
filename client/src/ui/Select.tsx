@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
-import Field, { controlClass, type FieldProps } from "./Field";
+import Field, { selectClass, type FieldProps } from "./Field";
 import type { SelectOption } from "./RHFSelect";
 
 type SelectProps = ComponentProps<"select"> & FieldProps & { options: SelectOption[] };
@@ -10,7 +10,7 @@ export default function Select({ id, label, error, required, options, className,
   return (
     <Field id={id} label={label} error={error} required={required}>
       {(control) => (
-        <select data-slot="select" {...props} {...control} className={cn(controlClass, className)}>
+        <select data-slot="select" {...props} {...control} className={cn(selectClass, className)}>
           {options.map((item) => (
             <option key={item.value} value={item.value}>
               {item.label}
