@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { HiCollection, HiCurrencyDollar, HiUser } from "react-icons/hi";
+import { CircleDollarSign, Layers, User } from "lucide-react";
 
 import Stat from "../../ui/Stat";
 
@@ -13,19 +13,19 @@ function Stats({ users, projects, proposals }: StatsProps) {
         color="primary"
         title={t("stats.users")}
         value={users}
-        icon={<HiUser className="w-20 h-20" />}
+        icon={<User className="size-20" />}
       />
       <Stat
         color="green"
         title={t("stats.proposals")}
         value={proposals}
-        icon={<HiCurrencyDollar className="w-20 h-20" />}
+        icon={<CircleDollarSign className="size-20" />}
       />
       <Stat
         color="sky"
         title={t("stats.projects")}
         value={projects}
-        icon={<HiCollection className="w-20 h-20" />}
+        icon={<Layers className="size-20" />}
       />
     </div>
   );

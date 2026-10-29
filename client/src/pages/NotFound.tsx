@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { HiArrowRight, HiOutlineHome } from "react-icons/hi";
+import { ArrowRight, House } from "lucide-react";
 import { Link } from "react-router-dom";
 import useMoveBack from "../hooks/useMoveBack";
 import Button, { buttonClass } from "../ui/Button";
@@ -24,11 +24,11 @@ function NotFound() {
         description={t("pages.notFoundBody")}
       >
         <Link to="/" className={buttonClass()}>
-          <HiOutlineHome aria-hidden="true" className="h-5 w-5" />
+          <House aria-hidden="true" className="size-5" />
           {t("pages.home")}
         </Link>
         <Button variant="outline" onClick={moveBack}>
-          <HiArrowRight aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
+          <ArrowRight aria-hidden="true" className="size-5 ltr:-scale-x-100" />
           {t("common.back")}
         </Button>
       </EmptyState>

@@ -1,9 +1,5 @@
 import { useTranslation } from "react-i18next";
-import {
-  HiCollection,
-  HiCurrencyDollar,
-  HiOutlineViewGrid,
-} from "react-icons/hi";
+import { CircleDollarSign, Layers, LayoutGrid } from "lucide-react";
 import Stat from "../../ui/Stat";
 import type { Project } from "../../types/api";
 
@@ -26,19 +22,19 @@ function Stats({ projects, total }: { projects: Project[]; total: number }) {
         color="primary"
         title={t("stats.projects")}
         value={numOfProjects}
-        icon={<HiOutlineViewGrid className="w-20 h-20" />}
+        icon={<LayoutGrid className="size-20" />}
       />
       <Stat
         color="green"
         title={t("stats.assignedProjects")}
         value={numOfAcceptedProjects}
-        icon={<HiCurrencyDollar className="w-20 h-20" />}
+        icon={<CircleDollarSign className="size-20" />}
       />
       <Stat
         color="sky"
         title={t("stats.proposals")}
         value={numOfProposals}
-        icon={<HiCollection className="w-20 h-20" />}
+        icon={<Layers className="size-20" />}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 import { useRef, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { HiOutlineX } from "react-icons/hi";
+import { X } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogOverlay, DialogPortal, DialogTitle } from "@/components/ui/dialog";
 
 type ModalProps = {
@@ -35,7 +35,7 @@ function Modal({ open, onClose, title, children }: ModalProps) {
                 aria-label={t("common.close")}
                 className="grid h-11 w-11 place-items-center rounded-md text-text-muted hover:bg-surface-muted hover:text-text"
               >
-                <HiOutlineX aria-hidden="true" className="h-5 w-5" />
+                <X aria-hidden="true" className="size-5" />
               </DialogClose>
             </div>
             <div className="p-4 md:p-6">{children}</div>

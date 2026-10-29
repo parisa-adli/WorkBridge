@@ -1,11 +1,12 @@
+import { useTranslation } from "react-i18next";
 import useUser from "../features/authentication/useUser";
 import HeaderMenu from "./HeaderMenu";
-import { FiMenu } from "react-icons/fi";
-import { RxCross2 } from "react-icons/rx";
+import { Menu, X } from "lucide-react";
 
 type HeaderProps = { isShowSidebar: boolean; toggleSidebar: () => void };
 
 function Header({ isShowSidebar, toggleSidebar }: HeaderProps) {
+  const { t } = useTranslation();
   const { isLoading } = useUser();
 
   return (
@@ -17,12 +18,14 @@ function Header({ isShowSidebar, toggleSidebar }: HeaderProps) {
       >
         <button
           onClick={toggleSidebar}
+          aria-label={t("common.menu")}
+          aria-expanded={isShowSidebar}
           className="md:hidden transition-all duration-300 ease-out"
         >
           {!isShowSidebar ? (
-            <FiMenu className="h-8 w-8 text-primary-900" />
+            <Menu className="size-8 text-primary-900" />
           ) : (
-            <RxCross2 className="h-8 w-8 text-primary-900" />
+            <X className="size-8 text-primary-900" />
           )}
         </button>
         <HeaderMenu />

@@ -1,15 +1,17 @@
-import { HiOutlineMoon, HiOutlineSun } from "react-icons/hi";
+import { useTranslation } from "react-i18next";
+import { Moon, Sun } from "lucide-react";
 import { useDarkMode } from "../context/DarkModeContext";
 
 function DarkModeToggle() {
+  const { t } = useTranslation();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   return (
-    <button onClick={toggleDarkMode}>
+    <button onClick={toggleDarkMode} aria-label={t("common.darkMode")} aria-pressed={isDarkMode}>
       {isDarkMode ? (
-        <HiOutlineSun className="h-5 w-5 text-primary-900" />
+        <Sun className="size-5 text-primary-900" />
       ) : (
-        <HiOutlineMoon className="h-5 w-5 text-primary-900" />
+        <Moon className="size-5 text-primary-900" />
       )}
     </button>
   );

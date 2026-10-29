@@ -5,8 +5,7 @@ import OTPInput from "react-otp-input";
 import { checkOtp } from "../../services/authService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { HiArrowRight } from "react-icons/hi";
-import { FiEdit } from "react-icons/fi";
+import { ArrowRight, SquarePen } from "lucide-react";
 import Loading from "../../ui/Loading";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -64,14 +63,14 @@ function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }: CheckOT
 
   return (
     <div>
-      <button onClick={onBack} className="bg-primary-600 p-1 rounded-lg mb-4">
-        <HiArrowRight className="w-6 h-6 text-secondary-50 ltr:-scale-x-100" />
+      <button onClick={onBack} aria-label={t("common.back")} className="bg-primary-600 p-1 rounded-lg mb-4">
+        <ArrowRight className="size-6 text-secondary-50 ltr:-scale-x-100" />
       </button>
       {otpResponse && (
         <p className="flex justify-center items-center gap-x-2 my-4 text-secondary-700">
           <span> {otpResponse?.message}</span>
-          <button onClick={onBack}>
-            <FiEdit className="w-6 h-6 text-primary-700" />
+          <button onClick={onBack} aria-label={t("auth.editPhone")}>
+            <SquarePen className="size-6 text-primary-700" />
           </button>
         </p>
       )}

@@ -17,7 +17,9 @@
     "all": "همه",
     "description": "توضیحات",
     "back": "برگشت",
-    "close": "بستن"
+    "close": "بستن",
+    "menu": "منو",
+    "darkMode": "تغییر حالت تاریک"
   },
   "nav": {
     "home": "خانه",
@@ -52,7 +54,8 @@
     "enterOtp": "کد تایید را وارد کنید",
     "fullName": "نام و نام خانوادگی",
     "profilePending": "پروفایل شما در انتظار تایید است",
-    "profileNotVerified": "پروفایل شما هنوز تایید نشده است"
+    "profileNotVerified": "پروفایل شما هنوز تایید نشده است",
+    "editPhone": "ویرایش شماره موبایل"
   },
   "status": {
     "rejected": "رد شده",
@@ -94,7 +97,8 @@
     "sort": "مرتب سازی",
     "sortLatest": "مرتب سازی (جدید ترین)",
     "sortEarliest": "مرتب سازی (قدیمی ترین)",
-    "allCategories": "دسته بندی (همه)"
+    "allCategories": "دسته بندی (همه)",
+    "view": "مشاهده {{title}}"
   },
   "proposal": {
     "resource": "درخواستی",

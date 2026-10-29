@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { ReactNode } from "react";
-import { GoHomeFill } from "react-icons/go";
+import { House } from "lucide-react";
 import CustomNavLink from "./CustomNavLink";
 
 type SidebarProps = { children: ReactNode; isShowSidebar: boolean };
@@ -15,7 +15,7 @@ function Sidebar({ children, isShowSidebar }: SidebarProps) {
     >
       <ul className="flex flex-col gap-y-4">
         <CustomNavLink to="/">
-          <GoHomeFill />
+          <House />
           <span>{t("nav.home")}</span>
         </CustomNavLink>
         {children}

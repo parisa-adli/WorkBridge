@@ -1,12 +1,18 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { HiArrowLeft } from "react-icons/hi";
-import { FaLinkedin } from "react-icons/fa";
+import { ArrowLeft, createLucideIcon } from "lucide-react";
 import MainHeader from "../ui/MainHeader";
 import Skeleton from "../ui/Skeleton";
 import usePublicStats from "../hooks/usePublicStats";
 import { categoryName } from "../utils/localized";
 import { toPersianNumbers } from "../utils/toPersianNumber";
+
+// lucide 1.x dropped brand icons; this is its former Linkedin icon.
+const Linkedin = createLucideIcon("linkedin", [
+  ["path", { d: "M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z", key: "c2jq9f" }],
+  ["rect", { width: "4", height: "12", x: "2", y: "9", key: "mk3on5" }],
+  ["circle", { cx: "4", cy: "4", r: "2", key: "bt5ra8" }],
+]);
 
 // Images exist only for these englishTitles; other categories get the generic projects icon.
 const CATEGORY_IMAGES = ["development", "design", "marketing", "writing", "music", "video", "architecture", "finance"];
@@ -74,7 +80,7 @@ function Home() {
                   <p className="col-span-3 flex flex-col items-start gap-2 text-nowrap text-sm lg:text-lg text-secondary-800">
                     {categoryName(category)}
                     <span className="flex items-center gap-x-2 text-secondary-400 text-xs ">
-                      {t("home.projectsCount", { n: toPersianNumbers(category.projects) })} <HiArrowLeft className="ltr:-scale-x-100" />
+                      {t("home.projectsCount", { n: toPersianNumbers(category.projects) })} <ArrowLeft className="size-3 ltr:-scale-x-100" />
                     </span>
                   </p>
                 </Link>
@@ -217,7 +223,7 @@ function Home() {
                 rel="noreferrer"
                 aria-label="LinkedIn"
               >
-                <FaLinkedin />
+                <Linkedin className="size-4" />
               </a>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import Modal from "../../ui/Modal";
 import CreateProjectForm from "./CreateProjectForm";
-import { HiOutlinePlus } from "react-icons/hi";
+import { Plus } from "lucide-react";
 
 function ProjectsHeader() {
   const { t } = useTranslation();
@@ -22,7 +22,7 @@ function ProjectsHeader() {
         className="btn btn--primary flex items-center gap-x-2"
         onClick={() => setOpen(true)}
       >
-        <HiOutlinePlus />
+        <Plus className="size-4" />
         <span>{t("project.add")}</span>
       </button>
     </div>

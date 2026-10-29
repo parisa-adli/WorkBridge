@@ -1,9 +1,5 @@
 import { useTranslation } from "react-i18next";
-import {
-  HiCollection,
-  HiCurrencyDollar,
-  HiOutlineViewGrid,
-} from "react-icons/hi";
+import { CircleDollarSign, Layers, LayoutGrid } from "lucide-react";
 import { toPersianNumbersWithComma } from "../../utils/toPersianNumber";
 import Stat from "../../ui/Stat";
 import { STATUS } from "../../constants";
@@ -24,19 +20,19 @@ function Stats({ proposals, total }: { proposals: Proposal[]; total: number }) {
         color="primary"
         title={t("stats.proposals")}
         value={numOfProposals}
-        icon={<HiOutlineViewGrid className="w-20 h-20" />}
+        icon={<LayoutGrid className="size-20" />}
       />
       <Stat
         color="green"
         title={t("stats.acceptedProposals")}
         value={acceptedProposals.length}
-        icon={<HiCurrencyDollar className="w-20 h-20" />}
+        icon={<CircleDollarSign className="size-20" />}
       />
       <Stat
         color="sky"
         title={t("stats.wallet")}
         value={toPersianNumbersWithComma(balance)}
-        icon={<HiCollection className="w-20 h-20" />}
+        icon={<Layers className="size-20" />}
       />
     </div>
   );

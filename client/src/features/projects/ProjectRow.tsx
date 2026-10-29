@@ -4,14 +4,12 @@ import Modal from "../../ui/Modal";
 import Table from "../../ui/Table";
 import toLocalDateShort from "../../utils/toLocalDateShort";
 import truncateText from "../../utils/truncateText";
-import { PiPencilSimpleLineBold } from "react-icons/pi";
-import { PiTrashBold } from "react-icons/pi";
+import { Eye, PencilLine, Trash2 } from "lucide-react";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import { toPersianNumbersWithComma } from "../../utils/toPersianNumber";
 import useRemoveProject from "./useRemoveProjects";
 import CreateProjectForm from "./CreateProjectForm";
 import ToggleProjectStatus from "./ToggleProjectStatus";
-import { HiEye } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import type { Project, UserRef } from "../../types/api";
 import localized, { categoryName } from "../../utils/localized";
@@ -50,8 +48,8 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
       <td>
         <div className="flex items-center gap-x-4">
           <>
-            <button onClick={() => setIsEditOpen(true)}>
-              <PiPencilSimpleLineBold className="w-5 h-5 text-primary-900" />
+            <button onClick={() => setIsEditOpen(true)} aria-label={t("project.edit", { title })}>
+              <PencilLine className="size-5 text-primary-900" />
             </button>
             <Modal
               title={t("project.edit", { title })}
@@ -65,8 +63,8 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
             </Modal>
           </>
           <>
-            <button onClick={() => setIsDeleteOpen(true)}>
-              <PiTrashBold className="w-5 h-5 text-error" />
+            <button onClick={() => setIsDeleteOpen(true)} aria-label={t("project.delete", { title })}>
+              <Trash2 className="size-5 text-error" />
             </button>
             <Modal
               title={t("project.delete", { title })}
@@ -88,8 +86,8 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
         </div>
       </td>
       <td>
-        <Link to={project._id} className="flex justify-center">
-          <HiEye className="h-5 w-5 text-primary-800" />
+        <Link to={project._id} aria-label={t("project.view", { title })} className="flex justify-center">
+          <Eye className="size-5 text-primary-800" />
         </Link>
       </td>
     </Table.Row>

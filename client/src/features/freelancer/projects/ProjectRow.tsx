@@ -3,7 +3,7 @@ import Table from "../../../ui/Table";
 import { toPersianNumbersWithComma } from "../../../utils/toPersianNumber";
 import truncateText from "../../../utils/truncateText";
 import toLocalDateShort from "../../../utils/toLocalDateShort";
-import { MdAssignmentAdd } from "react-icons/md";
+import { ClipboardPlus } from "lucide-react";
 import Modal from "../../../ui/Modal";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -50,7 +50,7 @@ function ProjectRow({ project, index, isAdmin }: { project: Project; index: numb
               />
             </Modal>
             <button onClick={() => setOpen(true)} aria-label={t("proposal.send", { title })}>
-              <MdAssignmentAdd className=" w-5 h-5 text-primary-900" />
+              <ClipboardPlus className="size-5 text-primary-900" />
             </button>
           </>
         )}

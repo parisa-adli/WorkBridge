@@ -4,7 +4,7 @@ import Table from "../../ui/Table";
 import { toPersianNumbersWithComma } from "../../utils/toPersianNumber";
 import truncateText from "../../utils/truncateText";
 import Modal from "../../ui/Modal";
-import { TbChecklist } from "react-icons/tb";
+import { ListChecks } from "lucide-react";
 import ChangeProposalStatus from "./ChangeProposalStatus";
 import StatusBadge from "../../ui/StatusBadge";
 import type { Proposal, UserRef } from "../../types/api";
@@ -43,7 +43,7 @@ function ProposalRow({ proposal, index }: { proposal: Proposal; index: number })
           />
         </Modal>
         <button onClick={() => setOpen(true)} aria-label={t("proposal.changeStatus")}>
-          <TbChecklist className="w-6 h-6 text-primary-800" />
+          <ListChecks className="size-6 text-primary-800" />
         </button>
       </td>
     </Table.Row>

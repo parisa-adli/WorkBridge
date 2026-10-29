@@ -1,38 +1,34 @@
 import { useTranslation } from "react-i18next";
 import AppLayout from "../../ui/AppLayout";
 import CustomNavLink from "../../ui/CustomNavLink";
-import { IoIosApps } from "react-icons/io";
-import { MdOutlinePostAdd } from "react-icons/md";
-import { FaUser } from "react-icons/fa6";
-import { AiFillDashboard } from "react-icons/ai";
-import { BiCategory } from "react-icons/bi";
+import { FilePlus, Grip, LayoutDashboard, LayoutGrid, User } from "lucide-react";
 
 function AdminLayout() {
   const { t } = useTranslation();
   return (
     <AppLayout>
       <CustomNavLink to="dashboard">
-        <AiFillDashboard />
+        <LayoutDashboard />
         <span>{t("nav.dashboard")}</span>
       </CustomNavLink>
 
       <CustomNavLink to="users">
-        <FaUser />
+        <User />
         <span>{t("nav.users")}</span>
       </CustomNavLink>
 
       <CustomNavLink to="categories">
-        <BiCategory />
+        <LayoutGrid />
         <span>{t("nav.categories")}</span>
       </CustomNavLink>
 
       <CustomNavLink to="projects">
-        <IoIosApps />
+        <Grip />
         <span>{t("nav.projects")}</span>
       </CustomNavLink>
 
       <CustomNavLink to="proposals">
-        <MdOutlinePostAdd />
+        <FilePlus />
         <span>{t("nav.proposals")}</span>
       </CustomNavLink>
     </AppLayout>

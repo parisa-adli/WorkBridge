@@ -1,5 +1,5 @@
 import { useId, type ReactNode } from "react";
-import { HiExclamationCircle } from "react-icons/hi";
+import { CircleAlert } from "lucide-react";
 
 export type FieldProps = {
   label: string;
@@ -46,7 +46,7 @@ function Field({
       })}
       {error && (
         <p id={errorId} role="alert" className="flex items-center gap-1.5 text-sm text-error">
-          <HiExclamationCircle aria-hidden="true" className="h-4 w-4 shrink-0" />
+          <CircleAlert aria-hidden="true" className="size-4 shrink-0" />
           {error}
         </p>
       )}

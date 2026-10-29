@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { PiPencilSimpleLineBold, PiTrashBold } from "react-icons/pi";
+import { PencilLine, Trash2 } from "lucide-react";
 import Modal from "../../../ui/Modal";
 import Table from "../../../ui/Table";
 import ConfirmDelete from "../../../ui/ConfirmDelete";
@@ -33,7 +33,7 @@ function CategoryRow({ category, index, parent, childCount }: CategoryRowProps) 
       <td>
         <div className="flex items-center gap-x-4">
           <button onClick={() => setIsEditOpen(true)} title={t("category.edit", { title: name })}>
-            <PiPencilSimpleLineBold className="w-5 h-5 text-primary-900" />
+            <PencilLine className="size-5 text-primary-900" />
           </button>
           <Modal
             title={t("category.edit", { title: name })}
@@ -43,7 +43,7 @@ function CategoryRow({ category, index, parent, childCount }: CategoryRowProps) 
             <CategoryForm categoryToEdit={category} onClose={() => setIsEditOpen(false)} />
           </Modal>
           <button onClick={() => setIsDeleteOpen(true)} title={t("category.delete", { title: name })}>
-            <PiTrashBold className="w-5 h-5 text-error" />
+            <Trash2 className="size-5 text-error" />
           </button>
           <Modal
             title={t("category.delete", { title: name })}

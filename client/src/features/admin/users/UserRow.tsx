@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import Modal from "../../../ui/Modal";
-import { TbChecklist } from "react-icons/tb";
+import { ListChecks } from "lucide-react";
 import Table from "../../../ui/Table";
 import ChangeUserStatus from "./ChangeUserStatus";
 import StatusBadge from "../../../ui/StatusBadge";
@@ -41,8 +41,8 @@ function UserRow({ user, index }: { user: User; index: number }) {
             onClose={() => setOpen(false)}
           />
         </Modal>
-        <button onClick={() => setOpen(true)}>
-          <TbChecklist className="w-6 h-6 text-primary-800" />
+        <button onClick={() => setOpen(true)} aria-label={t("user.changeStatus")}>
+          <ListChecks className="size-6 text-primary-800" />
         </button>
       </td>
     </Table.Row>

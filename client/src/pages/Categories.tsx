@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { HiOutlinePlus } from "react-icons/hi";
+import { Plus } from "lucide-react";
 import Modal from "../ui/Modal";
 import CategoriesTable from "../features/admin/categories/CategoriesTable";
 import CategoryForm from "../features/admin/categories/CategoryForm";
@@ -17,7 +17,7 @@ function Categories() {
           <CategoryForm onClose={() => setOpen(false)} />
         </Modal>
         <button className="btn btn--primary flex items-center gap-x-2" onClick={() => setOpen(true)}>
-          <HiOutlinePlus />
+          <Plus className="size-4" />
           <span>{t("category.add")}</span>
         </button>
       </div>

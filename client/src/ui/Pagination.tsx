@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { toPersianNumbers } from "../utils/toPersianNumber";
 import { buttonClass } from "./Button";
 
@@ -38,7 +38,7 @@ function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
             onClick={() => onPageChange(page - 1)}
             className={iconButton}
           >
-            <HiChevronRight aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
+            <ChevronRight aria-hidden="true" className="size-5 ltr:-scale-x-100" />
           </button>
         </li>
         {pageItems(page, totalPages).map((item, i) => (
@@ -67,7 +67,7 @@ function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
             onClick={() => onPageChange(page + 1)}
             className={iconButton}
           >
-            <HiChevronLeft aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
+            <ChevronLeft aria-hidden="true" className="size-5 ltr:-scale-x-100" />
           </button>
         </li>
       </ul>

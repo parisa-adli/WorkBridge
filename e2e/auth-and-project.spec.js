@@ -193,6 +193,6 @@ test.describe.serial("OTP login", () => {
     await page.getByText("اضافه کردن پروژه جدید").click(); // close the calendar
 
     await page.getByRole("button", { name: "تایید", exact: true }).click();
-    await expect(page.getByRole("cell", { name: title })).toBeVisible();
+    await expect(page.getByRole("cell", { name: title, exact: true })).toBeVisible();
   });
 });

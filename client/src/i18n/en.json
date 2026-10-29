@@ -17,7 +17,9 @@
     "all": "All",
     "description": "Description",
     "back": "Back",
-    "close": "Close"
+    "close": "Close",
+    "menu": "Menu",
+    "darkMode": "Toggle dark mode"
   },
   "nav": {
     "home": "Home",
@@ -52,7 +54,8 @@
     "enterOtp": "Enter the verification code",
     "fullName": "Full name",
     "profilePending": "Your profile is awaiting approval",
-    "profileNotVerified": "Your profile has not been approved yet"
+    "profileNotVerified": "Your profile has not been approved yet",
+    "editPhone": "Edit phone number"
   },
   "status": {
     "rejected": "Rejected",
@@ -94,7 +97,8 @@
     "sort": "Sort",
     "sortLatest": "Sort (newest)",
     "sortEarliest": "Sort (oldest)",
-    "allCategories": "Category (all)"
+    "allCategories": "Category (all)",
+    "view": "View {{title}}"
   },
   "proposal": {
     "resource": "Proposal",

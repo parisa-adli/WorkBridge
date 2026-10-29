@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { HiArrowRight } from "react-icons/hi";
+import { ArrowRight } from "lucide-react";
 import useUserProfile from "../features/admin/users/useUserProfile";
 import ChangeUserStatus from "../features/admin/users/ChangeUserStatus";
 import { Avatar } from "../features/authentication/UserAvatar";
@@ -57,7 +57,7 @@ function AdminUserProfile() {
     <div className="space-y-6">
       <div className="flex items-center gap-x-4">
         <button onClick={moveBack} aria-label={t("common.back")} className="btn btn--primary">
-          <HiArrowRight className="w-6 h-6 ltr:-scale-x-100" />
+          <ArrowRight className="size-6 ltr:-scale-x-100" />
         </button>
         <Avatar user={user} className="w-12 h-12 text-base" />
         <h1 className="font-black text-text text-xl" dir="auto">

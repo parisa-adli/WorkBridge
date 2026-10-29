@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**45 of 55 phases done** (Parts A, B, C, D and E; Phase 39a). Next: Phase 39b (lucide icons).
+**46 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39b). Next: Phase 39c (shadcn theme and stock component styles).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 1/11 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 2/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -567,11 +567,11 @@ Verify: screenshot baselines pass without being updated; Modal keyboard and Pagi
 
 Done under the first "same design" decision. The revision above leaves this setup in place; Phase 39c replaces its token mapping and restyles its components.
 
-### Phase 39b: lucide icons ⬜
+### Phase 39b: lucide icons ✅
 Files: every `react-icons` import
 
-- [ ] Replace `react-icons` with `lucide-react` (shadcn's icon library); uninstall `react-icons`.
-- [ ] Icons use shadcn's sizing (`size-4` inside components unless the component sets another) and `currentColor`. Directional icons keep `ltr:-scale-x-100`.
+- [x] Replace `react-icons` with `lucide-react` (shadcn's icon library); uninstall `react-icons`.
+- [x] Icons use shadcn's sizing (`size-4` inside components unless the component sets another) and `currentColor`. Directional icons keep `ltr:-scale-x-100` (except the header's login icon: lucide's `LogIn` points the other way, so it flips in `rtl:` and still matches the old icon in both languages).
 
 Verify: the screenshot diff shows only icon changes (reviewed, then baselines refreshed); e2e passes.
 
