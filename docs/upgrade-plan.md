@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**45 of 52 phases done** (Parts A, B, C, D and E; Phase 39a). Next: Phase 39b (lucide icons).
+**45 of 55 phases done** (Parts A, B, C, D and E; Phase 39a). Next: Phase 39b (lucide icons).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39a–43 (39a, 39b added; 41 split into 41a–b) | shadcn/ui foundation, re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 1/8 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 1/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -549,7 +549,11 @@ Verify: server test for the counts; Home shows seeded numbers.
 
 ## Part F: Finish ⬜
 
-Decision (2026-10-29): Part F builds on shadcn/ui components and lucide icons while keeping the current design exactly (`docs/design.md` §9).
+Decisions (2026-10-29, `docs/design.md` §1 and §9):
+- Part F builds on shadcn/ui components and lucide icons.
+- **Revised the same day by the project owner:** the visual layer follows shadcn/ui as shipped (its theme colors, component styles, radius, focus ring and icons), not the earlier indigo design. Page layout, the placement of elements (tables, modals, menus, filters, forms) and all behavior stay as they are.
+- Every existing UI element is replaced by its shadcn equivalent where one exists (`docs/design.md` §9 lists the mapping).
+- No old color or style is kept just to match a screenshot: a phase that changes the look reviews the screenshot diff and refreshes the baselines (win32 locally, linux from CI).
 
 ### Phase 39a: shadcn/ui foundation ✅
 Files: `client/components.json`, `vite.config.js`, `tsconfig.json`, `src/lib/utils.ts`, `src/components/ui/`, `src/index.css`, the Phase 29 components in `src/ui/`
@@ -561,48 +565,91 @@ Files: `client/components.json`, `vite.config.js`, `tsconfig.json`, `src/lib/uti
 
 Verify: screenshot baselines pass without being updated; Modal keyboard and Pagination tests pass; axe passes on the reference pages.
 
+Done under the first "same design" decision. The revision above leaves this setup in place; Phase 39c replaces its token mapping and restyles its components.
+
 ### Phase 39b: lucide icons ⬜
 Files: every `react-icons` import
 
-- [ ] Replace `react-icons` with `lucide-react` (shadcn's icon library) at the same sizes; uninstall `react-icons`.
+- [ ] Replace `react-icons` with `lucide-react` (shadcn's icon library); uninstall `react-icons`.
+- [ ] Icons use shadcn's sizing (`size-4` inside components unless the component sets another) and `currentColor`. Directional icons keep `ltr:-scale-x-100`.
 
-Verify: screenshots differ only in icon glyphs (reviewed, then baselines refreshed); e2e passes.
+Verify: the screenshot diff shows only icon changes (reviewed, then baselines refreshed); e2e passes.
+
+### Phase 39c: shadcn theme and stock component styles ⬜
+Files: `src/index.css`, `client/components.json`, `src/components/ui/`, `src/ui/` (Button, Input, Textarea, Badge, Card, Table, Skeleton, Modal, Toggle, Field), `docs/design.md` §2–§6
+
+- [ ] `index.css` takes shadcn's default theme (base color `neutral`, oklch values, light on `:root`, dark under `.dark-mode`) and its `--radius` scale, with the `@theme inline` mapping shadcn generates.
+- [ ] The Phase 28b tokens (`bg`, `surface`, `text-muted`, `on-primary`, `success`, ...) become aliases of the shadcn variables, so pages not yet re-skinned take the new palette.
+- [ ] The shadcn primitives in `src/components/ui/` are the stock shadcn source (`button`, `input`, `textarea`, `badge`, `card`, `table`, `skeleton`, `dialog`, `switch`, `label`), changed only for RTL (logical classes) and accessibility. `src/ui/` wraps them with the current props.
+- [ ] Badge statuses use shadcn variants with their text (open/accepted/verified `default`, pending `secondary`, rejected/closed `destructive`); no success/warning colors.
+- [ ] shadcn's focus ring replaces the global 2px outline.
+- [ ] design.md §2 records the measured contrast pairs. A pair that fails WCAG AA is the only allowed deviation, recorded with its value.
+
+Verify: Modal keyboard, Toggle and Pagination tests pass; axe passes on the reference pages in fa/en × light/dark; screenshot diff reviewed, baselines refreshed.
+
+### Phase 39d: shadcn form controls ⬜
+Files: `ui/Select`, `RHFSelect`, `StatusSelect`, `FilterDropDown`, `Filter`, `RadioInput`, `RadioInputGroup`, `DatePickerField`, the tag input in `CreateProjectForm`, `Textfield`
+
+- [ ] Every select (forms and URL filters) is the shadcn Select, wired to React Hook Form through `Controller`. It is keyboard-operable and labelled, and RHF values and validation are unchanged. Client tests and e2e steps that used `selectOption` move to the new interaction.
+- [ ] Radios become RadioGroup; `Filter` becomes ToggleGroup (URL params unchanged); `Textfield` is replaced by `Input`.
+- [ ] Date picker: shadcn Calendar + Popover if react-day-picker's Persian calendar keeps Jalali input and display; otherwise the current picker is restyled with the shadcn tokens and the reason recorded in design.md §9.
+- [ ] Tag input: no shadcn equivalent, so it is restyled with the Input and Badge styles.
+- [ ] Every replaced library is uninstalled.
+
+Verify: form and filter tests pass; e2e (create project, filters) passes; screenshot diff reviewed, baselines refreshed.
+
+### Phase 39e: shadcn feedback and overlays ⬜
+Files: `ui/ConfirmDelete`, `Pagination`, `TablePagination`, `Loading`, `Empty`, `EmptyState`, `features/authentication/UserAvatar`, toasts (`App.tsx`, `useAppMutation`, every `toast` call)
+
+- [ ] ConfirmDelete becomes AlertDialog; Pagination is the shadcn Pagination (current props, `aria-current`, language digits).
+- [ ] `Loading` becomes shadcn Spinner (`react-loader-spinner` uninstalled); `Empty` and `EmptyState` become Empty; `UserAvatar` becomes Avatar (initials fallback).
+- [ ] `react-hot-toast` is replaced by Sonner; `toast.success`/`toast.error` calls keep their messages and the server-code translation.
+
+Verify: Pagination, TablePagination and UserAvatar tests pass; e2e (toasts, delete flows) passes; screenshot diff reviewed, baselines refreshed.
 
 ### Phase 39: Re-skin public and auth pages ⬜
 Files: `pages/Home`, `Auth`, `CompleteProfile`, `NotFound`, auth feature components
 
-- [ ] Rebuild on the design-system components; loading/empty/error states; responsive from 360px.
+- [ ] Rebuild on the shadcn components with each page's current layout: Auth's OTP/demo switch becomes Tabs, and the OTP field becomes InputOTP (`react-otp-input` uninstalled).
+- [ ] Loading, empty and error states; responsive from 360px.
 
 Verify: screenshots fa/en × light/dark; e2e passes.
 
 ### Phase 40: Re-skin layouts and dashboards ⬜
 Files: `ui/AppLayout`, `Sidebar`, headers, the three `DashboardLayout`/`Stats` sets
 
-- [ ] Sidebar becomes a drawer on mobile; merge the three dashboard/stats copies if they now differ only in data.
+- [ ] Sidebar becomes the shadcn Sidebar (Sheet drawer below `lg`, opening from the start side); header menu becomes DropdownMenu; the dark-mode and language toggles become ghost icon Buttons; `Stat` becomes a Card.
+- [ ] Merge the three dashboard/stats copies if they now differ only in data.
 
 Verify: screenshots at 360px and desktop.
 
-### Phase 41a: Re-skin tables ⬜
-Files: project/proposal tables and rows, admin users, admin categories
+### Phase 41a: Mobile-ready tables and the four list pages ⬜
+Files: project/proposal tables and rows, admin users
 
-- [ ] Tables become cards or scroll on mobile; every list has loading, empty and error states.
+- [ ] The shadcn Table works at 360px, with one approach (cards or horizontal scroll) for every table.
+- [ ] Owner projects, projects list, proposals and admin users each have loading, empty and error states; pagination and URL filters unchanged.
 
-Verify: screenshots; e2e passes.
+Verify: screenshots fa/en × light/dark at 360px and desktop; e2e passes.
 
-### Phase 41b: Re-skin detail pages ⬜
-Files: project detail, freelancer project detail, profile, admin user profile
+### Phase 41b: Re-skin project detail; check profile, admin user profile, categories ⬜
+Files: project detail and its proposals table, freelancer project detail, profile, admin user profile, admin categories
 
-- [ ] Rebuild on the design-system components; loading, empty and error states.
+- [ ] Project detail and its proposals table rebuilt with the 41a table behavior; loading, empty and error states.
+- [ ] Profile, admin user profile and admin categories use only shadcn components, with no old color or token left.
 
 Verify: screenshots; e2e passes.
 
 ### Phase 42: Translation coverage, screenshot and accessibility tests ⬜
-Files: locale files, `e2e/` screenshot specs
+Files: locale files, `e2e/` screenshot specs, `src/index.css`
 
 - [ ] Screenshot tests for every F9 page in fa/en × light/dark.
 - [ ] axe check per page in CI (WCAG 2.2 AA contrast in both themes).
 - [ ] Zero untranslated strings (lint + parity check already enforce it; fix anything left).
-- [ ] Delete the old `primary-*`/`secondary-*` scale, the Tailwind 3 default colors and the `.btn`/`.badge`/`.textField__input` utilities from `index.css` once a grep finds no use (`docs/design.md` §2).
+- [ ] Once a grep finds no use, delete from `index.css`:
+  - the old `primary-*`/`secondary-*` scale and the Tailwind 3 default colors;
+  - the Phase 28b token aliases (`bg`, `surface`, `text-muted`, ...);
+  - the `.btn`/`.badge`/`.textField__input` utilities and the old table/button base styles.
+- [ ] No `ui/` element is left that isn't built on shadcn (`docs/design.md` §9).
 
 Verify: CI green with the new suites.
 

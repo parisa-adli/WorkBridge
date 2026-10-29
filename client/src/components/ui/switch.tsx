@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { Switch as SwitchPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
 
-// shortcut: old-scale colors kept from the headless Toggle so screenshots match, move to semantic tokens in the Part F re-skin.
+// shortcut: old-scale colors kept from the headless Toggle so screenshots match, replace with stock shadcn classes in Phase 39c.
 function Switch({ className, ...props }: ComponentProps<typeof SwitchPrimitive.Root>) {
   return (
     <SwitchPrimitive.Root

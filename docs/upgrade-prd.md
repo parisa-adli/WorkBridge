@@ -163,6 +163,7 @@ Acceptance criteria:
 - The layout is responsive from 360px up. The sidebar becomes a drawer on mobile, and tables become cards or scroll horizontally.
 - Accessibility: WCAG 2.2 AA contrast in both themes, visible focus, keyboard-operable modals and menus, labelled form fields, and Persian-friendly and Latin fonts (for example Vazirmatn plus a Latin font) with `font-display: swap`.
 - Every list has loading, empty and error states.
+- Decision (2026-10-29): the visual layer follows shadcn/ui as shipped: its theme colors, components, styling conventions and lucide icons (`docs/design.md` §1, §9). Every UI element is replaced by its shadcn equivalent where one exists. Layout, element placement and behavior stay as they are.
 - Playwright screenshot tests cover key pages in fa/en × light/dark.
 
 ### F10. Bilingual (Persian and English)
