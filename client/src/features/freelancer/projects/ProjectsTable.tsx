@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import useProjects from "../../../hooks/useProjects";
-import Empty from "../../../ui/Empty";
-import Loading from "../../../ui/Loading";
+import ListState from "../../../ui/ListState";
 import Table from "../../../ui/Table";
 import TablePagination from "../../../ui/TablePagination";
 import ProjectRow from "./ProjectRow";
@@ -10,18 +9,15 @@ import { ROLES } from "../../../constants";
 
 function ProjectsTable() {
   const { t } = useTranslation();
-  const { isLoading, projects, total, page, limit } = useProjects();
+  const { isLoading, isError, projects, total, page, limit } = useProjects();
   const { user } = useUser();
   const isAdmin = user?.role === ROLES.ADMIN;
 
-  if (isLoading) return <Loading />;
-  if (!total) return <Empty resourceName={t("project.resource")} />;
-
   return (
-    <>
+    <ListState isLoading={isLoading} isError={isError} total={total} resourceName={t("project.resource")}>
       <Table>
         <Table.Header>
-          <tr className="title-row">
+          <Table.Row>
             <th>#</th>
             <th>{t("project.title")}</th>
             <th>{t("project.category")}</th>
@@ -30,7 +26,7 @@ function ProjectsTable() {
             <th>{t("project.deadline")}</th>
             <th>{t("common.status")}</th>
             <th>{t("common.actions")}</th>
-          </tr>
+          </Table.Row>
         </Table.Header>
         <Table.Body>
           {projects.map((project, index) => (
@@ -39,7 +35,7 @@ function ProjectsTable() {
         </Table.Body>
       </Table>
       <TablePagination page={page} total={total} limit={limit} />
-    </>
+    </ListState>
   );
 }
 export default ProjectsTable;

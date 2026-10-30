@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import useOwnerProjects from "./useOwnerProjects";
-import Loading from "../../ui/Loading";
-import Empty from "../../ui/Empty";
+import ListState from "../../ui/ListState";
 import Table from "../../ui/Table";
 import TablePagination from "../../ui/TablePagination";
 import ProjectRow from "./ProjectRow";
@@ -9,16 +8,13 @@ import ProjectRow from "./ProjectRow";
 
 function ProjectTable() {
   const { t } = useTranslation();
-  const { isLoading, projects, total, page, limit } = useOwnerProjects();
-
-  if (isLoading) return <Loading />;
-  if (!total) return <Empty resourceName={t("project.resource")} />;
+  const { isLoading, isError, projects, total, page, limit } = useOwnerProjects();
 
   return (
-    <>
+    <ListState isLoading={isLoading} isError={isError} total={total} resourceName={t("project.resource")}>
       <Table>
         <Table.Header>
-          <tr className="title-row">
+          <Table.Row>
             <th>#</th>
             <th>{t("project.title")}</th>
             <th>{t("project.category")}</th>
@@ -29,7 +25,7 @@ function ProjectTable() {
             <th>{t("common.status")}</th>
             <th>{t("common.actions")}</th>
             <th>{t("project.proposals")}</th>
-          </tr>
+          </Table.Row>
         </Table.Header>
         <Table.Body>
           {projects.map((project, index) => (
@@ -38,7 +34,7 @@ function ProjectTable() {
         </Table.Body>
       </Table>
       <TablePagination page={page} total={total} limit={limit} />
-    </>
+    </ListState>
   );
 }
 export default ProjectTable;

@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
-import Empty from "../../../ui/Empty";
-import Loading from "../../../ui/Loading";
+import ListState from "../../../ui/ListState";
 import Table from "../../../ui/Table";
 import TablePagination from "../../../ui/TablePagination";
 import useUsers from "../useUsers";
@@ -8,16 +7,13 @@ import UserRow from "./UserRow";
 
 function UsersTable() {
   const { t } = useTranslation();
-  const { isLoading, users, total, page, limit } = useUsers();
-
-  if (isLoading) return <Loading />;
-  if (!total) return <Empty resourceName={t("user.resource")} />;
+  const { isLoading, isError, users, total, page, limit } = useUsers();
 
   return (
-    <>
+    <ListState isLoading={isLoading} isError={isError} total={total} resourceName={t("user.resource")}>
       <Table>
         <Table.Header>
-          <tr className="title-row">
+          <Table.Row>
             <th>#</th>
             <th>{t("user.name")}</th>
             <th>{t("auth.email")}</th>
@@ -25,7 +21,7 @@ function UsersTable() {
             <th>{t("user.role")}</th>
             <th>{t("common.status")}</th>
             <th>{t("common.actions")}</th>
-          </tr>
+          </Table.Row>
         </Table.Header>
         <Table.Body>
           {users.map((user, index) => (
@@ -34,7 +30,7 @@ function UsersTable() {
         </Table.Body>
       </Table>
       <TablePagination page={page} total={total} limit={limit} />
-    </>
+    </ListState>
   );
 }
 export default UsersTable;

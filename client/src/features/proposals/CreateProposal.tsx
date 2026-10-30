@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "../../ui/Input";
+import Button from "../../ui/Button";
 import Loading from "../../ui/Loading";
 import useCreateProposal from "./useCreateProposal";
 import { proposalSchema, type ProposalInput, type ProposalValues } from "../../schemas/proposal";
@@ -35,9 +36,9 @@ function CreateProposal({ onClose, projectId }: { onClose: () => void; projectId
           {isCreating ? (
             <Loading />
           ) : (
-            <button type="submit" className="btn btn--primary w-full">
+            <Button type="submit" className="w-full">
               {t("common.confirm")}
-            </button>
+            </Button>
           )}
         </div>
       </form>

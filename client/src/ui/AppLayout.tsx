@@ -13,7 +13,8 @@ function AppLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <Sidebar>{children}</Sidebar>
-      <SidebarInset className="h-svh">
+      {/* min-w-0: beside the fixed sidebar (lg+) a wide table scrolls in its own container, not the page */}
+      <SidebarInset className="h-svh min-w-0">
         <header className="border-b py-4">
           <div
             className={cn(

@@ -7,7 +7,7 @@ import { LIMITS } from "../../constants";
 export default function useOwnerProjects(qs?: string) {
   const { search } = useLocation();
   const query = qs ?? search;
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["owner-projects", query],
     queryFn: () => getOwnerProjectsApi(query),
     retry: false,
@@ -15,5 +15,5 @@ export default function useOwnerProjects(qs?: string) {
 
   const { items: projects = [], total = 0, page = 1, limit = LIMITS.PAGE_SIZE } = data || {};
 
-  return { projects, total, page, limit, isLoading };
+  return { projects, total, page, limit, isLoading, isError };
 }

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Button from "../../../ui/Button";
 import Loading from "../../../ui/Loading";
 import StatusSelect from "../../../ui/StatusSelect";
 import useChangeUserStatus from "./useChangeUserStatus";
@@ -37,9 +38,9 @@ function ChangeUserStatus({ userId, onClose, userStatus }: ChangeUserStatusProps
           {isUpdating ? (
             <Loading />
           ) : (
-            <button type="submit" className="btn btn--primary w-full">
+            <Button type="submit" className="w-full">
               {t("common.confirm")}
-            </button>
+            </Button>
           )}
         </div>
       </form>

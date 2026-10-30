@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
-import Empty from "../../ui/Empty";
-import Loading from "../../ui/Loading";
+import ListState from "../../ui/ListState";
 import Table from "../../ui/Table";
 import TablePagination from "../../ui/TablePagination";
 import ProposalRow from "./ProposalRow";
@@ -10,17 +9,15 @@ import { ROLES } from "../../constants";
 
 function ProposalTable() {
   const { t } = useTranslation();
-  const { isLoading, proposals, total, page, limit } = useProposals();
+  const { isLoading, isError, proposals, total, page, limit } = useProposals();
   const { user } = useUser();
   const isAdmin = user?.role === ROLES.ADMIN;
-  if (isLoading) return <Loading />;
-  if (!total) return <Empty resourceName={t("project.resource")} />;
 
   return (
-    <>
+    <ListState isLoading={isLoading} isError={isError} total={total} resourceName={t("proposal.resource")}>
       <Table>
         <Table.Header>
-          <tr className="title-row">
+          <Table.Row>
             <th>#</th>
             <th>{t("project.title")}</th>
             <th>{t("common.description")}</th>
@@ -29,7 +26,7 @@ function ProposalTable() {
             <th>{t("proposal.deliveryTime")}</th>
             <th>{t("proposal.cost")}</th>
             <th>{t("common.status")}</th>
-          </tr>
+          </Table.Row>
         </Table.Header>
         <Table.Body>
           {proposals.map((proposal, index) => (
@@ -43,7 +40,7 @@ function ProposalTable() {
         </Table.Body>
       </Table>
       <TablePagination page={page} total={total} limit={limit} />
-    </>
+    </ListState>
   );
 }
 export default ProposalTable;

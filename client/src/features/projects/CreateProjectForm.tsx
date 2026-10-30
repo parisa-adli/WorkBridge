@@ -7,6 +7,7 @@ import DatePickerField from "../../ui/DatePickerField";
 import TagInput from "../../ui/TagInput";
 import useCategories from "../../hooks/useCategories";
 import useCreateProject from "./useCreateProject";
+import Button from "../../ui/Button";
 import Loading from "../../ui/Loading";
 import useEditProject from "./useEditProject";
 import { toast } from "sonner";
@@ -108,9 +109,9 @@ function CreateProjectForm({ onClose, projectToEdit = {} }: CreateProjectFormPro
         {isCreating || isEditing ? (
           <Loading />
         ) : (
-          <button type="submit" className="btn btn--primary w-full">
+          <Button type="submit" className="w-full">
             {t("common.confirm")}
-          </button>
+          </Button>
         )}
       </div>
     </form>

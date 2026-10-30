@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**51 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e, 39 and 40). Next: Phase 41a (mobile-ready tables and the four list pages).
+**52 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e, 39, 40 and 41a). Next: Phase 41b (project detail; check profile, admin user profile, categories).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 7/11 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 8/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -623,11 +623,11 @@ Files: `ui/AppLayout`, `Sidebar`, headers, the three `DashboardLayout`/`Stats` s
 
 Verify: screenshots at 360px and desktop.
 
-### Phase 41a: Mobile-ready tables and the four list pages ⬜
+### Phase 41a: Mobile-ready tables and the four list pages ✅
 Files: project/proposal tables and rows, admin users
 
-- [ ] The shadcn Table works at 360px, with one approach (cards or horizontal scroll) for every table.
-- [ ] Owner projects, projects list, proposals and admin users each have loading, empty and error states; pagination and URL filters unchanged.
+- [x] The shadcn Table works at 360px, with one approach (cards or horizontal scroll) for every table.
+- [x] Owner projects, projects list, proposals and admin users each have loading, empty and error states; pagination and URL filters unchanged.
 
 Verify: screenshots fa/en × light/dark at 360px and desktop; e2e passes.
 

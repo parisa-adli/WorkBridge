@@ -16,6 +16,7 @@
     "select": "Select",
     "removeTag": "Remove {{tag}}",
     "notFound": "{{name}} not found.",
+    "loadError": "Couldn't load the list. Try again later.",
     "confirmDelete": "Are you sure you want to delete {{name}}?",
     "actions": "Actions",
     "all": "All",

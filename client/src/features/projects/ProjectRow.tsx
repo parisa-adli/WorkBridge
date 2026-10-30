@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import Modal from "../../ui/Modal";
+import Button, { buttonClass } from "../../ui/Button";
+import { Badge } from "@/components/ui/badge";
 import Table from "../../ui/Table";
 import toLocalDateShort from "../../utils/toLocalDateShort";
 import truncateText from "../../utils/truncateText";
@@ -35,9 +37,9 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
       <td>
         <div className="flex flex-wrap items-center gap-2 max-w-[200px]">
           {localized(project, "tags").map((tag) => (
-            <span key={tag} dir="auto" className="badge badge--secondary">
+            <Badge key={tag} variant="secondary" dir="auto">
               {tag}
-            </span>
+            </Badge>
           ))}
         </div>
       </td>
@@ -46,11 +48,11 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
         <ToggleProjectStatus project={project} />
       </td>
       <td>
-        <div className="flex items-center gap-x-4">
+        <div className="flex items-center gap-x-2">
           <>
-            <button onClick={() => setIsEditOpen(true)} aria-label={t("project.edit", { title })}>
-              <PencilLine className="size-5 text-primary-900" />
-            </button>
+            <Button variant="ghost" size="icon" onClick={() => setIsEditOpen(true)} aria-label={t("project.edit", { title })}>
+              <PencilLine />
+            </Button>
             <Modal
               title={t("project.edit", { title })}
               open={isEditOpen}
@@ -68,9 +70,9 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
             title={t("project.delete", { title })}
             resourceName={title}
             trigger={
-              <button aria-label={t("project.delete", { title })}>
-                <Trash2 className="size-5 text-destructive" />
-              </button>
+              <Button variant="ghost" size="icon" aria-label={t("project.delete", { title })}>
+                <Trash2 className="text-destructive" />
+              </Button>
             }
             onConfirm={() =>
               removeProject(project._id, {
@@ -82,8 +84,8 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
         </div>
       </td>
       <td>
-        <Link to={project._id} aria-label={t("project.view", { title })} className="flex justify-center">
-          <Eye className="size-5 text-primary-800" />
+        <Link to={project._id} aria-label={t("project.view", { title })} className={buttonClass({ variant: "ghost", size: "icon" })}>
+          <Eye />
         </Link>
       </td>
     </Table.Row>

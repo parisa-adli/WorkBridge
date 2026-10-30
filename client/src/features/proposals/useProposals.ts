@@ -7,11 +7,11 @@ import { LIMITS } from "../../constants";
 export default function useProposals(qs?: string) {
   const { search } = useLocation();
   const query = qs ?? search;
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["proposals", query],
     queryFn: () => getProposalsApi(query),
   });
 
   const { items: proposals = [], total = 0, page = 1, limit = LIMITS.PAGE_SIZE } = data || {};
-  return { proposals, total, page, limit, isLoading };
+  return { proposals, total, page, limit, isLoading, isError };
 }

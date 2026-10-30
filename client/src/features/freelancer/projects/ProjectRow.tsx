@@ -5,6 +5,7 @@ import truncateText from "../../../utils/truncateText";
 import toLocalDateShort from "../../../utils/toLocalDateShort";
 import { ClipboardPlus } from "lucide-react";
 import Modal from "../../../ui/Modal";
+import Button from "../../../ui/Button";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import CreateProposal from "../../proposals/CreateProposal";
@@ -49,9 +50,9 @@ function ProjectRow({ project, index, isAdmin }: { project: Project; index: numb
                 onClose={() => setOpen(false)}
               />
             </Modal>
-            <button onClick={() => setOpen(true)} aria-label={t("proposal.send", { title })}>
-              <ClipboardPlus className="size-5 text-primary-900" />
-            </button>
+            <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label={t("proposal.send", { title })}>
+              <ClipboardPlus />
+            </Button>
           </>
         )}
       </td>
