@@ -96,7 +96,7 @@ function Home() {
               <p className="text-justify leading-relaxed text-sm md:text-lg md:leading-7">{t("home.intro")}</p>
             </div>
             <div className="max-w-xl mt-8">
-              <img src="Images/freelancer.png" alt="freelancer-home" />
+              <img src="Images/freelancer.png" alt="" />
             </div>
           </div>
         </div>

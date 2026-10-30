@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**53 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e, 39, 40, 41a and 41b). Next: Phase 42 (translation coverage, screenshot and accessibility tests).
+**54 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e, 39, 40, 41a, 41b and 42). Next: Phase 43 (final audit against the PRD success criteria).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 9/11 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 10/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -639,17 +639,17 @@ Files: project detail and its proposals table, freelancer project detail, profil
 
 Verify: screenshots; e2e passes.
 
-### Phase 42: Translation coverage, screenshot and accessibility tests ⬜
+### Phase 42: Translation coverage, screenshot and accessibility tests ✅
 Files: locale files, `e2e/` screenshot specs, `src/index.css`
 
-- [ ] Screenshot tests for every F9 page in fa/en × light/dark.
-- [ ] axe check per page in CI (WCAG 2.2 AA contrast in both themes).
-- [ ] Zero untranslated strings (lint + parity check already enforce it; fix anything left).
-- [ ] Once a grep finds no use, delete from `index.css`:
+- [x] Screenshot tests for every F9 page in fa/en × light/dark.
+- [x] axe check per page in CI (WCAG 2.2 AA contrast in both themes).
+- [x] Zero untranslated strings (lint + parity check already enforce it; fix anything left).
+- [x] Once a grep finds no use, delete from `index.css`:
   - the old `primary-*`/`secondary-*` scale and the Tailwind 3 default colors;
   - the Phase 28b token aliases (`bg`, `surface`, `text-muted`, ...);
   - the `.btn`/`.badge`/`.textField__input` utilities and the old table/button base styles.
-- [ ] No `ui/` element is left that isn't built on shadcn (`docs/design.md` §9).
+- [x] No `ui/` element is left that isn't built on shadcn (`docs/design.md` §9).
 
 Verify: CI green with the new suites.
 

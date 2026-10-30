@@ -55,59 +55,6 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Aliases of the shadcn variables for pages not yet re-skinned; deleted in Phase 42 (docs/design.md §2). */
-@theme inline {
-  /* Old scale and the Tailwind 3 default colors still in use. */
-  --color-primary-900: var(--primary);
-  --color-primary-800: var(--primary);
-  --color-primary-700: var(--primary);
-  --color-primary-600: var(--primary);
-  --color-primary-500: var(--primary);
-  --color-primary-400: var(--accent);
-  --color-primary-300: var(--accent);
-  --color-primary-200: var(--accent);
-  --color-primary-100: var(--accent);
-  --color-primary-50: var(--accent);
-  --color-secondary-900: var(--foreground);
-  --color-secondary-800: var(--foreground);
-  --color-secondary-700: var(--foreground);
-  --color-secondary-600: var(--muted-foreground);
-  --color-secondary-500: var(--muted-foreground);
-  --color-secondary-400: var(--muted-foreground);
-  --color-secondary-300: var(--border);
-  --color-secondary-200: var(--border);
-  --color-secondary-100: var(--muted);
-  --color-secondary-50: var(--muted);
-  --color-secondary-0: var(--card);
-  --color-gray-200: var(--border);
-  --color-gray-300: var(--input);
-  --color-gray-700: var(--foreground);
-  --color-green-100: var(--secondary);
-  --color-green-500: var(--primary);
-  --color-green-700: var(--secondary-foreground);
-  --color-red-500: var(--destructive);
-  --color-rose-500: var(--destructive);
-  --color-rose-700: var(--destructive);
-  --color-sky-100: var(--secondary);
-  --color-sky-700: var(--secondary-foreground);
-  /* Phase 28b tokens. */
-  --color-bg: var(--background);
-  --color-surface: var(--card);
-  --color-surface-muted: var(--muted);
-  --color-border-strong: var(--input);
-  --color-text: var(--foreground);
-  --color-text-muted: var(--muted-foreground);
-  --color-primary-hover: var(--primary);
-  --color-on-primary: var(--primary-foreground);
-  --color-primary-soft: var(--accent);
-  --color-success: var(--primary);
-  --color-success-soft: var(--accent);
-  --color-warning: var(--secondary-foreground);
-  --color-warning-soft: var(--secondary);
-  --color-error: var(--destructive);
-  --color-error-soft: var(--accent);
-}
-
 /* shadcn's default theme, base color `neutral` (registry values); dark under `.dark-mode`. The five `AA:` values are the only deviations (docs/design.md §2). */
 :root {
   --radius: 0.625rem;
@@ -190,46 +137,6 @@
   body {
     @apply bg-background text-foreground;
   }
-}
-
-@utility btn {
-  @apply px-3 py-1 font-bold rounded-xl transition-all duration-300;
-}
-
-@utility btn--primary {
-  @apply px-4 py-3 bg-primary-900 hover:bg-primary-800 text-secondary-50 shadow-md shadow-secondary-200;
-}
-
-@utility btn--secondary {
-  @apply bg-secondary-500 text-secondary-100 hover:bg-secondary-400;
-}
-
-@utility btn--outline {
-  @apply border border-secondary-700 text-secondary-700;
-}
-
-@utility btn--danger {
-  @apply border border-rose-700 text-rose-700;
-}
-
-@utility badge {
-  @apply inline-block whitespace-nowrap rounded-xl px-2 py-0.5;
-}
-
-@utility badge--primary {
-  @apply bg-primary text-primary-foreground;
-}
-
-@utility badge--secondary {
-  @apply bg-secondary-200 text-secondary-600;
-}
-
-@utility badge--success {
-  @apply bg-primary text-primary-foreground;
-}
-
-@utility badge--danger {
-  @apply bg-red-500 text-white;
 }
 
 /* In a layer so utilities (also layered in Tailwind 4) still override these resets. */

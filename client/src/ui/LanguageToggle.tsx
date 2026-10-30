@@ -7,7 +7,7 @@ function LanguageToggle() {
   const { t } = useTranslation();
 
   return (
-    <Button variant="ghost" size="icon" onClick={toggleLanguage} aria-label={t("language.switch")} className="font-bold">
+    <Button variant="ghost" size="icon" onClick={toggleLanguage} aria-label={`${t("language.other")} ${t("language.switch")}`} className="font-bold">
       {t("language.other")}
     </Button>
   );

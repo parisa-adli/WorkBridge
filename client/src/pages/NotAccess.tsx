@@ -13,11 +13,11 @@ function NotAccess() {
   const home = user && ROLE_HOME[user.role];
 
   return (
-    <main className="grid min-h-screen place-items-center bg-bg px-4">
+    <main className="grid min-h-screen place-items-center bg-background px-4">
       <EmptyState
         titleAs="h1"
         icon={
-          <span className="grid h-18 w-18 place-items-center rounded-full bg-error-soft text-error">
+          <span className="grid h-18 w-18 place-items-center rounded-full bg-accent text-destructive">
             <Lock aria-hidden="true" className="size-8" />
           </span>
         }

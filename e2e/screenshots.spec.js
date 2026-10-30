@@ -1,7 +1,8 @@
 const { test, expect } = require("@playwright/test");
 const { MongoClient } = require("mongodb");
+const { default: AxeBuilder } = require("@axe-core/playwright");
 
-// Visual baselines of the re-skinned pages; the list and project detail pages also at 360px.
+// Every F9 page (docs/design.md §7): a visual baseline and no WCAG 2.2 AA violations; the lists, project detail pages and the app layout (drawer closed and open) also at 360px.
 // Update with `npm run e2e -- screenshots --update-snapshots` only when a visual change is intended.
 const ACCOUNTS = {
   owner: { username: "demo-owner", password: "Owner@1234" },
@@ -87,20 +88,38 @@ const PINNED = {
 };
 
 const PAGES = [
+  { name: "404", path: "/no-such-page" },
+  { name: "not-access", path: "/not-access" },
   { name: "home", path: "/" },
   { name: "auth", path: "/auth" },
-  { name: "owner-dashboard", path: "/owner/dashboard", account: "owner" },
+  // `open` brings up a state the URL alone doesn't: the phone tab, the mobile drawer.
+  { name: "auth-phone", path: "/auth", open: (page) => page.getByRole("tab").nth(1).click() },
+  { name: "complete-profile", path: "/complete-profile" },
+  { name: "owner-dashboard", path: "/owner/dashboard", account: "owner", narrow: true },
+  {
+    name: "owner-dashboard-drawer-360",
+    path: "/owner/dashboard",
+    account: "owner",
+    mobile: true,
+    open: async (page) => {
+      await page.locator('[data-sidebar="trigger"]').click();
+      await expect(page.getByRole("dialog")).toBeVisible();
+    },
+  },
+  { name: "freelancer-dashboard", path: "/freelancer/dashboard", account: "freelancer" },
+  { name: "admin-dashboard", path: "/admin/dashboard", account: "admin" },
   { name: "owner-projects", path: "/owner/projects", account: "owner", narrow: true },
   { name: "owner-project", path: "/owner/projects/p0", account: "owner", narrow: true },
   { name: "owner-profile", path: "/owner/profile", account: "owner" },
   { name: "freelancer-projects", path: "/freelancer/projects", account: "freelancer", narrow: true },
   { name: "freelancer-project", path: "/freelancer/projects/p0", account: "freelancer", narrow: true },
   { name: "freelancer-proposals", path: "/freelancer/proposals", account: "freelancer", narrow: true },
+  { name: "admin-projects", path: "/admin/projects", account: "admin" },
+  { name: "admin-proposals", path: "/admin/proposals", account: "admin" },
   { name: "admin-users", path: "/admin/users", account: "admin", narrow: true },
   { name: "admin-user", path: "/admin/users/u0", account: "admin" },
   { name: "admin-categories", path: "/admin/categories", account: "admin" },
 ];
-// The lists and the project detail pages are also shot at 360px, the narrowest supported width.
 const SHOTS = PAGES.flatMap((p) => (p.narrow ? [p, { ...p, name: `${p.name}-360`, mobile: true }] : [p]));
 
 // Fixed data so nothing in the shots depends on today's date or on other specs.
@@ -135,7 +154,7 @@ test.beforeAll(async () => {
 
 for (const language of ["fa", "en"]) {
   for (const theme of ["light", "dark"]) {
-    for (const { name, path, account, mobile } of SHOTS) {
+    for (const { name, path, account, mobile, open } of SHOTS) {
       test(`${name} ${language} ${theme}`, async ({ page }) => {
         // The home footer prints the current year.
         await page.clock.setFixedTime(new Date("2026-06-01T12:00:00Z"));
@@ -157,6 +176,7 @@ for (const language of ["fa", "en"]) {
         await expect(page.locator("html")).toHaveAttribute("lang", language);
         await page.waitForLoadState("networkidle");
         await page.evaluate(() => document.fonts.ready);
+        if (open) await open(page);
         // A wide table scrolls inside its own container; neither the page nor the content area scrolls sideways.
         const overflow = await page.evaluate(() =>
           [document.documentElement, document.querySelector('[data-slot="sidebar-inset"] .overflow-y-auto')]
@@ -164,6 +184,10 @@ for (const language of ["fa", "en"]) {
             .map((el) => el.scrollWidth - el.clientWidth)
         );
         expect(overflow.every((px) => px <= 0)).toBe(true);
+        const { violations } = await new AxeBuilder({ page })
+          .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+          .analyze();
+        expect(violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(", ")}`)).toEqual([]);
         await expect(page).toHaveScreenshot(`${name}-${language}-${theme}.png`, { fullPage: true, animations: "disabled" });
       });
     }

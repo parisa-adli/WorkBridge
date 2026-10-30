@@ -72,13 +72,13 @@ Measured in Phase 39c (oklch → sRGB, alpha blended in sRGB over the surface; W
 | dark `--input` | `oklch(1 0 0 / 15%)` | `oklch(1 0 0 / 34%)` | 1.47 on `background` |
 | light `--sidebar-ring` | `oklch(0.708 0 0)` | `oklch(0.556 0 0)` | 2.59 on `sidebar` (same fix as `--ring`) |
 
-The base layer draws the browser focus outline in full `ring` (shadcn: `ring/50`), so elements not yet on shadcn components keep a 3:1 outline.
+The base layer draws the browser focus outline in full `ring` (shadcn: `ring/50`), so elements without their own shadcn ring keep a 3:1 outline.
 
 ### Migration from the Phase 28b tokens
 
-- Phase 39c makes the Phase 28b tokens (`bg`, `surface`, `surface-muted`, `border-strong`, `text`, `text-muted`, `on-primary`, `primary-soft`, `success`, `warning`, `error`, ...) aliases of the shadcn variables (`backdrop` is deleted: shadcn's Dialog overlay uses `bg-black/50`), so pages not yet re-skinned take the new palette.
+- Phase 39c made the Phase 28b tokens (`bg`, `surface`, `surface-muted`, `border-strong`, `text`, `text-muted`, `on-primary`, `primary-soft`, `success`, `warning`, `error`, ...) aliases of the shadcn variables (`backdrop` is deleted: shadcn's Dialog overlay uses `bg-black/50`), so pages not yet re-skinned took the new palette.
 - Re-skinned pages use only the shadcn token utilities.
-- The aliases, the old `primary-*`/`secondary-*` scale and the `.btn`/`.badge` classes are deleted in Phase 42 (`.textField__input` went in Phase 39d with its last use), once a grep finds no use of them.
+- Phase 42 deleted the aliases, the old `primary-*`/`secondary-*` scale, the Tailwind 3 default colors and the `.btn`/`.badge` classes (`.textField__input` went in Phase 39d with its last use); `index.css` now defines only the shadcn variables and their mapping.
 
 ## 3. Spacing
 
@@ -136,7 +136,7 @@ Text inside shadcn components keeps shadcn's sizes and weights. The scale below 
 - Forms: every field has a visible `<label>`; errors are linked with `aria-describedby` and announced.
 - Status is never color-only: badges always carry text.
 - Motion: transitions respect `prefers-reduced-motion`.
-- Checked by an axe run per page in CI (Phase 42) and on the reference page (Phase 29).
+- Checked by an axe run on every F9 page in fa/en × light/dark in CI (`e2e/screenshots.spec.js`, Phase 42) and on the reference pages (Phase 29).
 
 ## 7. F9 page list and re-skin order
 
@@ -161,7 +161,7 @@ From PRD F9. Every page is redesigned on the shadcn components (§9) with its cu
 | 14 | 41b | Admin user profile (built in Phase 36, F5) | added in Phase 36 |
 | 15 | 41b | Admin categories (built in Phase 35, F4) | added in Phase 35 |
 
-Pages 13–15 were created in Part E on the Phase 29 components; Phase 41b moves them onto shadcn and checks them against this document. Phase 42 adds screenshot tests for every row.
+Pages 13–15 were created in Part E on the Phase 29 components; Phase 41b moves them onto shadcn and checks them against this document. Phase 42 adds screenshot tests and an axe check for every row (`e2e/screenshots.spec.js`; row 2 with both tabs, row 4 through the three dashboards and the owner dashboard at 360px with the drawer closed and open).
 
 ## 8. Agreement
 
