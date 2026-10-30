@@ -28,7 +28,7 @@ function ProfileForm({ user }: { user: User }) {
   return (
     <div className="max-w-xl space-y-6">
       <Card className="flex-row items-center gap-4">
-        <Avatar user={user} className="h-20 w-20 text-2xl" />
+        <Avatar user={user} className="size-20 text-2xl" />
         <div className="space-y-2">
           <Button variant="outline" size="sm" disabled={isUploading} onClick={() => fileInput.current?.click()}>
             {t("profile.changeAvatar")}

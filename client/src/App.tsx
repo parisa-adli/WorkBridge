@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Auth from "./pages/Auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "@/components/ui/sonner";
 import CompleteProfile from "./pages/CompleteProfile";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
@@ -34,7 +34,7 @@ function App() {
       <LanguageProvider>
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools initialIsOpen={false} />
-          <Toaster />
+          <Toaster position="top-center" />
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/complete-profile" element={<CompleteProfile />} />

@@ -42,26 +42,25 @@ function CategoryRow({ category, index, parent, childCount }: CategoryRowProps) 
           >
             <CategoryForm categoryToEdit={category} onClose={() => setIsEditOpen(false)} />
           </Modal>
-          <button onClick={() => setIsDeleteOpen(true)} title={t("category.delete", { title: name })}>
-            <Trash2 className="size-5 text-error" />
-          </button>
-          <Modal
-            title={t("category.delete", { title: name })}
+          <ConfirmDelete
             open={isDeleteOpen}
-            onClose={() => setIsDeleteOpen(false)}
+            onOpenChange={setIsDeleteOpen}
+            title={t("category.delete", { title: name })}
+            resourceName={name}
+            trigger={
+              <button title={t("category.delete", { title: name })}>
+                <Trash2 className="size-5 text-destructive" />
+              </button>
+            }
+            onConfirm={() =>
+              removeCategory(category._id, { onSuccess: () => setIsDeleteOpen(false) })
+            }
+            disabled={isDeleting}
           >
             {childCount > 0 && (
-              <p className="text-error mb-4">{t("category.childrenWarning", { count: childCount })}</p>
+              <p className="text-sm text-destructive">{t("category.childrenWarning", { count: childCount })}</p>
             )}
-            <ConfirmDelete
-              recourseName={name}
-              onClose={() => setIsDeleteOpen(false)}
-              onConfirm={() =>
-                removeCategory(category._id, { onSuccess: () => setIsDeleteOpen(false) })
-              }
-              disabled={isDeleting}
-            />
-          </Modal>
+          </ConfirmDelete>
         </div>
       </td>
     </Table.Row>

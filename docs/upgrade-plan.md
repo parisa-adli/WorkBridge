@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**48 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39d). Next: Phase 39e (shadcn feedback and overlays).
+**49 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e). Next: Phase 39 (re-skin public and auth pages).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 4/11 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 5/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -598,12 +598,12 @@ Files: `ui/Select`, `RHFSelect`, `StatusSelect`, `FilterDropDown`, `Filter`, `Ra
 
 Verify: form and filter tests pass; e2e (create project, filters) passes; screenshot diff reviewed, baselines refreshed.
 
-### Phase 39e: shadcn feedback and overlays ⬜
+### Phase 39e: shadcn feedback and overlays ✅
 Files: `ui/ConfirmDelete`, `Pagination`, `TablePagination`, `Loading`, `Empty`, `EmptyState`, `features/authentication/UserAvatar`, toasts (`App.tsx`, `useAppMutation`, every `toast` call)
 
-- [ ] ConfirmDelete becomes AlertDialog; Pagination is the shadcn Pagination (current props, `aria-current`, language digits).
-- [ ] `Loading` becomes shadcn Spinner (`react-loader-spinner` uninstalled); `Empty` and `EmptyState` become Empty; `UserAvatar` becomes Avatar (initials fallback).
-- [ ] `react-hot-toast` is replaced by Sonner; `toast.success`/`toast.error` calls keep their messages and the server-code translation.
+- [x] ConfirmDelete becomes AlertDialog; Pagination is the shadcn Pagination (current props, `aria-current`, language digits).
+- [x] `Loading` becomes shadcn Spinner (`react-loader-spinner` uninstalled); `Empty` and `EmptyState` become Empty; `UserAvatar` becomes Avatar (initials fallback).
+- [x] `react-hot-toast` is replaced by Sonner; `toast.success`/`toast.error` calls keep their messages and the server-code translation.
 
 Verify: Pagination, TablePagination and UserAvatar tests pass; e2e (toasts, delete flows) passes; screenshot diff reviewed, baselines refreshed.
 

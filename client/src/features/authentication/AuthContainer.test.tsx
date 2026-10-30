@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter, useLocation } from "react-router-dom";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AuthContainer from "./AuthContainer";
 import useUser from "./useUser";
@@ -10,7 +10,7 @@ import i18n from "../../i18n";
 
 vi.mock("./useUser");
 vi.mock("../../services/authService");
-vi.mock("react-hot-toast");
+vi.mock("sonner");
 
 const getOtpMock = vi.mocked(getOtp);
 const checkOtpMock = vi.mocked(checkOtp);

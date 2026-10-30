@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import SendOTPForm from "./SendOTPForm";
 import DemoLoginForm from "./DemoLoginForm";
 import CheckOTPForm from "./CheckOTPForm";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { getOtp } from "../../services/authService";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";

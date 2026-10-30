@@ -9,7 +9,7 @@ import useCategories from "../../hooks/useCategories";
 import useCreateProject from "./useCreateProject";
 import Loading from "../../ui/Loading";
 import useEditProject from "./useEditProject";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Project } from "../../types/api";
 import { projectSchema, type ProjectInput, type ProjectValues } from "../../schemas/project";

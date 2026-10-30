@@ -144,7 +144,8 @@ test("freelancer filters write the URL params", async ({ page }) => {
 });
 
 test("admin edits the profile and uploads an avatar, the header updates", async ({ page }) => {
-  const PNG = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(64)]);
+  // a real 1x1 PNG: the Avatar shows the image only once the browser decodes it
+  const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
   await demoLogin(page, "مدیر", "demo-admin", "/admin");
   const header = page.getByRole("link", { name: "مدیر نمونه" });
   await expect(header.getByText("من", { exact: true })).toBeVisible(); // initials before any upload

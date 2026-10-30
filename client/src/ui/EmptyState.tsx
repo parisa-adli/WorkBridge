@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 
 type EmptyStateProps = {
   icon?: ReactNode;
@@ -12,12 +13,17 @@ type EmptyStateProps = {
 
 function EmptyState({ icon, title, description, titleAs: Title = "h2", children }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-3 px-4 py-8 text-center">
-      {icon}
-      <Title className={Title === "h1" ? "text-2xl font-bold text-text" : "text-lg font-bold text-text"}>{title}</Title>
-      {description && <p className="max-w-md text-text-muted">{description}</p>}
-      {children && <div className="mt-2 flex flex-wrap justify-center gap-3">{children}</div>}
-    </div>
+    <Empty>
+      <EmptyHeader>
+        {icon && <EmptyMedia>{icon}</EmptyMedia>}
+        {/* a11y: EmptyTitle is a div; the heading inside keeps the page outline */}
+        <EmptyTitle>
+          <Title className={Title === "h1" ? "text-2xl" : undefined}>{title}</Title>
+        </EmptyTitle>
+        {description && <EmptyDescription>{description}</EmptyDescription>}
+      </EmptyHeader>
+      {children && <EmptyContent className="flex-row flex-wrap justify-center">{children}</EmptyContent>}
+    </Empty>
   );
 }
 export default EmptyState;

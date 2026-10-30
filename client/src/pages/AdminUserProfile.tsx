@@ -59,7 +59,7 @@ function AdminUserProfile() {
         <button onClick={moveBack} aria-label={t("common.back")} className="btn btn--primary">
           <ArrowRight className="size-6 ltr:-scale-x-100" />
         </button>
-        <Avatar user={user} className="w-12 h-12 text-base" />
+        <Avatar user={user} className="size-12 text-base" />
         <h1 className="font-black text-text text-xl" dir="auto">
           {localized(user, "name")}
         </h1>

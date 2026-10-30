@@ -1,12 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ProtectedRoute from "./ProtectedRoute";
 import useUser from "../features/authentication/useUser";
 
 vi.mock("../features/authentication/useUser");
-vi.mock("react-hot-toast");
+vi.mock("sonner");
 
 // user is a stub: only role and status
 function renderAt(pathname: string, user?: object) {

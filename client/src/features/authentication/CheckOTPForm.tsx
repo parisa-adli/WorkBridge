@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import OTPInput from "react-otp-input";
 import { checkOtp } from "../../services/authService";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, SquarePen } from "lucide-react";
 import Loading from "../../ui/Loading";

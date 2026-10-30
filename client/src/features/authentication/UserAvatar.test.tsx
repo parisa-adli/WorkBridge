@@ -31,6 +31,9 @@ describe("UserAvatar", () => {
   });
 
   it("shows the uploaded avatar, or the initials without one", () => {
+    // jsdom never loads images; Radix's Avatar shows the <img> only once it has
+    vi.spyOn(HTMLImageElement.prototype, "complete", "get").mockReturnValue(true);
+    vi.spyOn(HTMLImageElement.prototype, "naturalWidth", "get").mockReturnValue(1);
     mockUser({ name: "Test User", role: "OWNER", avatarUrl: null });
     const { container, unmount } = render(<UserAvatar />, { wrapper: MemoryRouter });
     expect(screen.getByText("TU")).toBeInTheDocument();

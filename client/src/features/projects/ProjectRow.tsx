@@ -18,7 +18,7 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
   const { t } = useTranslation();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const { removeProject } = useRemoveProject();
+  const { removeProject, isDeleting } = useRemoveProject();
   const title = localized(project, "title");
   const freelancer = project.freelancer as UserRef | null;
   const freelancerName = freelancer && localized(freelancer, "name");
@@ -62,27 +62,23 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
               />
             </Modal>
           </>
-          <>
-            <button onClick={() => setIsDeleteOpen(true)} aria-label={t("project.delete", { title })}>
-              <Trash2 className="size-5 text-error" />
-            </button>
-            <Modal
-              title={t("project.delete", { title })}
-              open={isDeleteOpen}
-              onClose={() => setIsDeleteOpen(false)}
-            >
-              <ConfirmDelete
-                recourseName={title}
-                onClose={() => setIsDeleteOpen(false)}
-                onConfirm={() =>
-                  removeProject(project._id, {
-                    onSuccess: () => setIsDeleteOpen(false),
-                  })
-                }
-                disabled={false}
-              />
-            </Modal>
-          </>
+          <ConfirmDelete
+            open={isDeleteOpen}
+            onOpenChange={setIsDeleteOpen}
+            title={t("project.delete", { title })}
+            resourceName={title}
+            trigger={
+              <button aria-label={t("project.delete", { title })}>
+                <Trash2 className="size-5 text-destructive" />
+              </button>
+            }
+            onConfirm={() =>
+              removeProject(project._id, {
+                onSuccess: () => setIsDeleteOpen(false),
+              })
+            }
+            disabled={isDeleting}
+          />
         </div>
       </td>
       <td>

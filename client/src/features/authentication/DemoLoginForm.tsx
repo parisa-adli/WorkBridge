@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import type { AxiosError } from "axios";
 import Input from "../../ui/Input";
 import RadioInputGroup from "../../ui/RadioInputGroup";
