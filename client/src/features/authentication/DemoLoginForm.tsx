@@ -8,6 +8,7 @@ import type { AxiosError } from "axios";
 import Input from "../../ui/Input";
 import RadioInputGroup from "../../ui/RadioInputGroup";
 import Loading from "../../ui/Loading";
+import Button from "../../ui/Button";
 import { demoLoginApi } from "../../services/authService";
 import { DEMO_USERS, ROLES } from "../../constants";
 import { demoLoginSchema, type DemoLoginValues } from "../../schemas/auth";
@@ -65,7 +66,7 @@ function DemoLoginForm() {
       />
       <Input label={t("auth.username")} required error={errors.username?.message} {...register("username")} />
       <Input label={t("auth.password")} type="password" required error={errors.password?.message} {...register("password")} />
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm text-text-muted">
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm text-muted-foreground">
         <dt>{t("auth.username")}</dt>
         <dd className="font-mono"><bdi>{shown.username}</bdi></dd>
         <dt>{t("auth.password")}</dt>
@@ -74,9 +75,9 @@ function DemoLoginForm() {
       {isPending ? (
         <Loading />
       ) : (
-        <button type="submit" className="btn btn--primary w-full">
+        <Button type="submit" className="w-full">
           {t("auth.login")}
-        </button>
+        </Button>
       )}
     </form>
   );

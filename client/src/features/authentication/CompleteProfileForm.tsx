@@ -3,6 +3,7 @@ import Input from "../../ui/Input";
 import { useMutation } from "@tanstack/react-query";
 import { completeProfile } from "../../services/authService";
 import Loading from "../../ui/Loading";
+import Button from "../../ui/Button";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -65,7 +66,9 @@ function CompleteProfileForm() {
           {isPending ? (
             <Loading />
           ) : (
-            <button className="btn btn--primary w-full">{t("common.confirm")}</button>
+            <Button type="submit" className="w-full">
+              {t("common.confirm")}
+            </Button>
           )}
         </form>
       </div>

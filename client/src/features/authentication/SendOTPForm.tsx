@@ -3,6 +3,7 @@ import type { FormEventHandler } from "react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import Input from "../../ui/Input";
 import Loading from "../../ui/Loading";
+import Button from "../../ui/Button";
 import type { SendOtpValues } from "../../schemas/auth";
 
 type SendOTPFormProps = {
@@ -21,9 +22,9 @@ function SendOTPForm({ onSubmit, isSendingOtp, register, errors }: SendOTPFormPr
         {isSendingOtp ? (
           <Loading />
         ) : (
-          <button type="submit" className="btn btn--primary w-full">
+          <Button type="submit" className="w-full">
             {t("auth.sendOtp")}
-          </button>
+          </Button>
         )}
       </form>
     </div>

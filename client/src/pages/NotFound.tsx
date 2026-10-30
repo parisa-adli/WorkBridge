@@ -12,7 +12,7 @@ function NotFound() {
   const moveBack = useMoveBack();
 
   return (
-    <main className="grid min-h-screen place-items-center bg-bg px-4">
+    <main className="grid min-h-screen place-items-center bg-background px-4">
       <EmptyState
         titleAs="h1"
         icon={

@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**49 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e). Next: Phase 39 (re-skin public and auth pages).
+**50 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e and 39). Next: Phase 40 (re-skin layouts and dashboards).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 5/11 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 6/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -607,11 +607,11 @@ Files: `ui/ConfirmDelete`, `Pagination`, `TablePagination`, `Loading`, `Empty`, 
 
 Verify: Pagination, TablePagination and UserAvatar tests pass; e2e (toasts, delete flows) passes; screenshot diff reviewed, baselines refreshed.
 
-### Phase 39: Re-skin public and auth pages ⬜
+### Phase 39: Re-skin public and auth pages ✅
 Files: `pages/Home`, `Auth`, `CompleteProfile`, `NotFound`, auth feature components
 
-- [ ] Rebuild on the shadcn components with each page's current layout: Auth's OTP/demo switch becomes Tabs, and the OTP field becomes InputOTP (`react-otp-input` uninstalled).
-- [ ] Loading, empty and error states; responsive from 360px.
+- [x] Rebuild on the shadcn components with each page's current layout: Auth's OTP/demo switch becomes Tabs, and the OTP field becomes InputOTP (`react-otp-input` uninstalled).
+- [x] Loading, empty and error states; responsive from 360px.
 
 Verify: screenshots fa/en × light/dark; e2e passes.
 

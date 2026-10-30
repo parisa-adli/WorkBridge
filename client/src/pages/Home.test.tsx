@@ -15,7 +15,7 @@ const stats = {
   categories: [{ _id: "c1", title: "برنامه نویسی", englishTitle: "development", projects: 5 }],
 };
 const mockStats = (isLoading = false) =>
-  vi.mocked(usePublicStats).mockReturnValue({ isLoading, stats: isLoading ? undefined : stats });
+  vi.mocked(usePublicStats).mockReturnValue({ isLoading, isError: false, stats: isLoading ? undefined : stats });
 
 describe("Home", () => {
   it("shows the server's numbers and categories in Persian", () => {
@@ -36,6 +36,19 @@ describe("Home", () => {
     expect(container.querySelectorAll("[aria-busy=true]")).toHaveLength(2);
     expect(container.querySelectorAll(".animate-pulse")).toHaveLength(4 + 3);
     expect(screen.queryByText("۱۲")).not.toBeInTheDocument();
+  });
+
+  it("says so when there are no categories", () => {
+    vi.mocked(usePublicStats).mockReturnValue({ isLoading: false, isError: false, stats: { ...stats, categories: [] } });
+    render(<Home />, { wrapper: MemoryRouter });
+    expect(screen.getByText("هنوز دسته بندی‌ای نیست")).toBeInTheDocument();
+  });
+
+  it("shows an error and no numbers when the stats fail to load", () => {
+    vi.mocked(usePublicStats).mockReturnValue({ isLoading: false, isError: true, stats: undefined });
+    render(<Home />, { wrapper: MemoryRouter });
+    expect(screen.getByText("آمار بارگذاری نشد. بعدا دوباره امتحان کنید.")).toBeInTheDocument();
+    expect(screen.queryByText("۰")).not.toBeInTheDocument();
   });
 
   it("shows the numbers and the English category title in English, and every link goes somewhere", async () => {

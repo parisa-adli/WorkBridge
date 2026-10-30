@@ -219,7 +219,9 @@
       "freelancers": "Freelancers",
       "findProject": "Find a project",
       "buildProfile": "Build a profile"
-    }
+    },
+    "statsError": "Couldn't load the stats. Try again later.",
+    "noCategories": "No categories yet"
   },
   "server": {
     "BAD_REQUEST": "Invalid request",

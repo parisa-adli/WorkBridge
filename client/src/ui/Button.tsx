@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { Button as ShadcnButton, buttonVariants } from "@/components/ui/button";
 
 // The Phase 29 variant and size names, mapped onto shadcn's.
-const VARIANTS = { primary: "default", secondary: "secondary", outline: "outline", danger: "destructive", ghost: "ghost" } as const;
+const VARIANTS = { primary: "default", secondary: "secondary", outline: "outline", danger: "destructive", ghost: "ghost", link: "link" } as const;
 const SIZES = { md: "default", sm: "sm", icon: "icon" } as const;
 
 type Look = { variant?: keyof typeof VARIANTS; size?: keyof typeof SIZES };

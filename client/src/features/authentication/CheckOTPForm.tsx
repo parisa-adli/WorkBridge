@@ -1,12 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import OTPInput from "react-otp-input";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { checkOtp } from "../../services/authService";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, SquarePen } from "lucide-react";
 import Loading from "../../ui/Loading";
+import Button from "../../ui/Button";
+import Field from "../../ui/Field";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LIMITS, STATUS } from "../../constants";
@@ -63,57 +65,53 @@ function CheckOTPForm({ phoneNumber, onBack, onResendOtp, otpResponse }: CheckOT
 
   return (
     <div>
-      <button onClick={onBack} aria-label={t("common.back")} className="bg-primary-600 p-1 rounded-lg mb-4">
-        <ArrowRight className="size-6 text-secondary-50 ltr:-scale-x-100" />
-      </button>
+      <Button variant="outline" size="icon" onClick={onBack} aria-label={t("common.back")} className="mb-4">
+        <ArrowRight className="ltr:-scale-x-100" />
+      </Button>
       {otpResponse && (
-        <p className="flex justify-center items-center gap-x-2 my-4 text-secondary-700">
+        <p className="flex justify-center items-center gap-x-2 my-4 text-muted-foreground">
           <span> {otpResponse?.message}</span>
-          <button onClick={onBack} aria-label={t("auth.editPhone")}>
-            <SquarePen className="size-6 text-primary-700" />
-          </button>
+          <Button variant="ghost" size="icon" onClick={onBack} aria-label={t("auth.editPhone")}>
+            <SquarePen />
+          </Button>
         </p>
       )}
-      <div className="mb-6 flex justify-center text-secondary-500">
+      <div className="mb-6 flex justify-center text-sm text-muted-foreground">
         {time > 0 ? (
           <p>{t("auth.resendIn", { time })}</p>
         ) : (
-          <button onClick={onResendOtp} className="text-primary-900">
+          <Button variant="link" onClick={onResendOtp}>
             {t("auth.resend")}
-          </button>
+          </Button>
         )}
       </div>
       <form className="space-y-10" onSubmit={handleSubmit(checkOtpHandler)}>
-        <p className="font-bold text-secondary-800">{t("auth.enterOtp")}</p>
-        <div>
-          <Controller
-            name="otp"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <OTPInput
-                value={value}
-                onChange={onChange}
-                numInputs={LIMITS.OTP_MAX}
-                renderSeparator={<span className="text-secondary-900">-</span>}
-                renderInput={(props) => <input {...props} />}
-                containerStyle="flex rtl:flex-row-reverse gap-x-2 justify-center"
-                inputStyle={{
-                  width: "2.5rem",
-                  padding: "0.5rem 0.2rem",
-                  border: "1px solid var(--color-primary-300)",
-                  borderRadius: "0.5rem",
-                }}
-              />
-            )}
-          />
-          {errors.otp && (
-            <span className="text-error block text-sm mt-2">{errors.otp.message}</span>
+        <Field label={t("auth.enterOtp")} error={errors.otp?.message}>
+          {(ids) => (
+            <Controller
+              name="otp"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                // the code reads left to right in both languages
+                <div dir="ltr" className="flex justify-center">
+                  <InputOTP maxLength={LIMITS.OTP_MAX} value={value} onChange={onChange} {...ids}>
+                    <InputOTPGroup>
+                      {Array.from({ length: LIMITS.OTP_MAX }, (_, i) => (
+                        <InputOTPSlot key={i} index={i} aria-invalid={ids["aria-invalid"]} />
+                      ))}
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
+              )}
+            />
           )}
-        </div>
+        </Field>
         {isPending ? (
           <Loading />
         ) : (
-          <button className="btn btn--primary w-full">{t("common.confirm")}</button>
+          <Button type="submit" className="w-full">
+            {t("common.confirm")}
+          </Button>
         )}
       </form>
     </div>

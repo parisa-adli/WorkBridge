@@ -33,8 +33,11 @@ function renderAuth() {
   );
 }
 
+// Radix Tabs switch on mousedown (and keyboard focus), not on click
+const openPhoneTab = () => fireEvent.mouseDown(screen.getByRole("tab", { name: "ورود با موبایل" }));
+
 async function sendOtp() {
-  fireEvent.click(screen.getByRole("tab", { name: "ورود با موبایل" }));
+  openPhoneTab();
   fireEvent.change(screen.getByLabelText("شماره موبایل"), {
     target: { value: "09120000001" },
   });
@@ -83,6 +86,18 @@ describe("AuthContainer", () => {
     expect(toast.success).toHaveBeenCalledWith("welcome");
   });
 
+  it("switches tabs with the arrow keys", async () => {
+    renderAuth();
+    const demoTab = screen.getByRole("tab", { name: "ورود نمایشی" });
+    act(() => demoTab.focus());
+    fireEvent.keyDown(demoTab, { key: "ArrowRight" });
+    // Radix moves focus in a timeout
+    await waitFor(() =>
+      expect(screen.getByRole("tab", { name: "ورود با موبایل" })).toHaveAttribute("aria-selected", "true")
+    );
+    expect(screen.getByLabelText("شماره موبایل")).toBeInTheDocument();
+  });
+
   it("shows the returned code in the send-OTP toast", async () => {
     getOtpMock.mockResolvedValue({ message: "sent", code: "OTP_SENT", otp: 123456 });
     renderAuth();
@@ -112,7 +127,7 @@ describe("AuthContainer", () => {
 
   it("shows the phone error and sends nothing for a malformed number", async () => {
     renderAuth();
-    fireEvent.click(screen.getByRole("tab", { name: "ورود با موبایل" }));
+    openPhoneTab();
     fireEvent.change(screen.getByLabelText("شماره موبایل"), { target: { value: "0912" } });
     fireEvent.click(screen.getByRole("button", { name: "ارسال کد تایید" }));
     expect(await screen.findByText("شماره موبایل وارد شده صحیح نمیباشد")).toBeInTheDocument();
@@ -139,9 +154,7 @@ describe("AuthContainer", () => {
     renderAuth();
     await sendOtp();
     // the form now checks the code length before calling the server
-    fireEvent.paste(screen.getByLabelText("Please enter OTP character 1"), {
-      clipboardData: { getData: () => "123456" },
-    });
+    fireEvent.change(screen.getByLabelText("کد تایید را وارد کنید"), { target: { value: "123456" } });
     fireEvent.click(screen.getByRole("button", { name: "تایید" }));
     await waitFor(() =>
       expect(checkOtpMock.mock.calls[0][0]).toEqual({ phoneNumber: "09120000001", otp: "123456" })
