@@ -1,10 +1,7 @@
-import DashboardLayout from "../features/admin/DashboardLayout";
+import useAdminDashboardStats from "../features/admin/useAdminDashboardStats";
+import Dashboard from "../ui/Dashboard";
 
 function AdminDashboard() {
-  return (
-    <div>
-      <DashboardLayout />
-    </div>
-  );
+  return <Dashboard {...useAdminDashboardStats()} />;
 }
 export default AdminDashboard;

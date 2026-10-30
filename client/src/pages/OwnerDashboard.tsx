@@ -1,6 +1,7 @@
-import DashboardLayout from "../features/owner/DashboardLayout";
+import useOwnerDashboardStats from "../features/owner/useOwnerDashboardStats";
+import Dashboard from "../ui/Dashboard";
 
 function OwnerDashboard() {
-  return <DashboardLayout />;
+  return <Dashboard {...useOwnerDashboardStats()} />;
 }
 export default OwnerDashboard;

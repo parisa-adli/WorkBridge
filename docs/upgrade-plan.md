@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**50 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e and 39). Next: Phase 40 (re-skin layouts and dashboards).
+**51 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e, 39 and 40). Next: Phase 41a (mobile-ready tables and the four list pages).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 6/11 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 7/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -615,11 +615,11 @@ Files: `pages/Home`, `Auth`, `CompleteProfile`, `NotFound`, auth feature compone
 
 Verify: screenshots fa/en × light/dark; e2e passes.
 
-### Phase 40: Re-skin layouts and dashboards ⬜
+### Phase 40: Re-skin layouts and dashboards ✅
 Files: `ui/AppLayout`, `Sidebar`, headers, the three `DashboardLayout`/`Stats` sets
 
-- [ ] Sidebar becomes the shadcn Sidebar (Sheet drawer below `lg`, opening from the start side); header menu becomes DropdownMenu; the dark-mode and language toggles become ghost icon Buttons; `Stat` becomes a Card.
-- [ ] Merge the three dashboard/stats copies if they now differ only in data.
+- [x] Sidebar becomes the shadcn Sidebar (Sheet drawer below `lg`, opening from the start side); header menu becomes DropdownMenu; the dark-mode and language toggles become ghost icon Buttons; `Stat` becomes a Card.
+- [x] Merge the three dashboard/stats copies if they now differ only in data.
 
 Verify: screenshots at 360px and desktop.
 

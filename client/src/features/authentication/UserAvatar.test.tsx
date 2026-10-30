@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import UserAvatar from "./UserAvatar";
@@ -6,6 +6,8 @@ import initials from "../../utils/initials";
 import useUser from "./useUser";
 
 vi.mock("./useUser");
+const logout = vi.fn();
+vi.mock("./useLogout", () => ({ default: () => ({ isPending: false, logout }) }));
 
 // the tests stub only the fields UserAvatar reads
 const mockUser = (user?: object) =>
@@ -24,10 +26,13 @@ describe("UserAvatar", () => {
     expect(screen.getByText("پریسا")).toBeInTheDocument();
   });
 
-  it("links to the profile under the role's prefix", () => {
+  it("opens a menu with the profile under the role's prefix and logout", () => {
     mockUser({ name: "Test User", role: "FREELANCER" });
     render(<UserAvatar />, { wrapper: MemoryRouter });
-    expect(screen.getByRole("link")).toHaveAttribute("href", "/freelancer/profile");
+    fireEvent.keyDown(screen.getByRole("button", { name: "Test User" }), { key: "Enter" });
+    expect(screen.getByRole("menuitem", { name: "پروفایل" })).toHaveAttribute("href", "/freelancer/profile");
+    fireEvent.click(screen.getByRole("menuitem", { name: "خروج" }));
+    expect(logout).toHaveBeenCalled();
   });
 
   it("shows the uploaded avatar, or the initials without one", () => {

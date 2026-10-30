@@ -1,23 +1,37 @@
 import type { ReactNode } from "react";
 import { Outlet } from "react-router-dom";
-import Header from "./Header";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Sidebar from "./Sidebar";
-import useShowSidebar from "../hooks/useShowSidebar";
+import HeaderMenu from "./HeaderMenu";
+import useUser from "../features/authentication/useUser";
+import { cn } from "@/lib/utils";
 
 // children: the role's sidebar links (CustomNavLink items)
 function AppLayout({ children }: { children: ReactNode }) {
-  const { isShowSidebar, toggleSidebar } = useShowSidebar();
+  const { isLoading } = useUser();
 
   return (
-    <div className="grid h-screen grid-cols-1 md:grid-rows-[auto_1fr] md:grid-cols-[15rem_1fr]">
-      <Header toggleSidebar={toggleSidebar} isShowSidebar={isShowSidebar} />
-      <Sidebar isShowSidebar={isShowSidebar}>{children}</Sidebar>
-      <div className="bg-secondary-100 p-8 overflow-y-auto">
-        <div className="max-w-(--breakpoint-lg) mx-auto flex flex-col gap-y-12">
-          <Outlet />
+    <SidebarProvider>
+      <Sidebar>{children}</Sidebar>
+      <SidebarInset className="h-svh">
+        <header className="border-b py-4">
+          <div
+            className={cn(
+              "container flex items-center justify-between gap-x-8 lg:justify-end xl:max-w-(--breakpoint-lg)",
+              isLoading && "opacity-50 blur-xs"
+            )}
+          >
+            <SidebarTrigger className="lg:hidden" />
+            <HeaderMenu />
+          </div>
+        </header>
+        <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-8">
+          <div className="mx-auto flex max-w-(--breakpoint-lg) flex-col gap-y-12">
+            <Outlet />
+          </div>
         </div>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
 export default AppLayout;

@@ -1,24 +1,22 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
+import { SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 
 function CustomNavLink({ children, to }: { children: ReactNode; to: string }) {
-  // Unsized nav icons take shadcn's size-4.
-  const navlinkClass =
-    "flex items-center xs:w-64 md:w-auto gap-x-2 hover:bg-primary-100/80 hover:text-primary-900 px-2 py-1.5 rounded-lg  transition-all duration-300 [&_svg:not([class*='size-'])]:size-4";
+  const { setOpenMobile } = useSidebar();
 
+  // NavLink marks the current page with aria-current; the drawer closes once a page is picked.
   return (
-    <li>
-      <NavLink
-        to={to}
-        className={({ isActive }) =>
-          isActive
-            ? `${navlinkClass} bg-primary-100/80 text-primary-900`
-            : `${navlinkClass} text-secondary-600`
-        }
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        asChild
+        className="aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium aria-[current=page]:text-sidebar-accent-foreground"
       >
-        {children}
-      </NavLink>
-    </li>
+        <NavLink to={to} end={to === "/"} onClick={() => setOpenMobile(false)}>
+          {children}
+        </NavLink>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }
 export default CustomNavLink;

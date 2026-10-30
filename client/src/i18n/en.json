@@ -23,6 +23,7 @@
     "back": "Back",
     "close": "Close",
     "menu": "Menu",
+    "menuDescription": "Links to the pages of your panel",
     "darkMode": "Toggle dark mode"
   },
   "nav": {

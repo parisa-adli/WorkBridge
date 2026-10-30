@@ -46,6 +46,16 @@ async function demoLogin(page, role, username, home) {
   await expect(page).toHaveURL(new RegExp(`${home}/dashboard$`));
 }
 
+// logout is an item of the header's user menu; retry opening it, a click while the header re-renders can be lost
+async function logout(page) {
+  const item = page.getByRole("menuitem", { name: "خروج" });
+  await expect(async () => {
+    await page.locator('header [aria-haspopup="menu"]').click();
+    await expect(item).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await item.click();
+}
+
 test.describe("demo login", () => {
   for (const [role, username, home] of DEMO_ROLES) {
     test(`${username} lands on its dashboard`, async ({ page }) => {
@@ -58,13 +68,27 @@ test.describe("logout", () => {
   for (const [role, username, home] of DEMO_ROLES) {
     test(`${username} logs out, then ${home} redirects to auth`, async ({ page }) => {
       await demoLogin(page, role, username, home);
-      await page.getByRole("button", { name: "خروج" }).click();
+      await logout(page);
       await expect(page).toHaveURL(url("/"));
 
       await page.goto(url(home));
       await expect(page).toHaveURL(url("/auth"));
     });
   }
+});
+
+test("below lg the sidebar is a drawer that opens and closes by keyboard", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await demoLogin(page, "کارفرما", "demo-owner", "/owner");
+  const trigger = page.getByRole("button", { name: "منو" });
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  const drawer = page.getByRole("dialog", { name: "منو" });
+  await expect(drawer.getByRole("link", { name: "پروژه ها" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(drawer).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
 });
 
 test("home shows the database's counts", async ({ page }) => {
@@ -121,7 +145,7 @@ test("owner accepts a proposal, the freelancer sees it accepted", async ({ page 
   await page.getByRole("option", { name: "تایید شده" }).click();
   await page.getByRole("button", { name: "تایید", exact: true }).click();
   await expect(page.getByRole("cell", { name: "تایید شده" })).toBeVisible();
-  await page.getByRole("button", { name: "خروج" }).click();
+  await logout(page);
 
   await demoLogin(page, "فریلنسر", "demo-freelancer", "/freelancer");
   await page.goto(url("/freelancer/proposals"));
@@ -147,18 +171,19 @@ test("admin edits the profile and uploads an avatar, the header updates", async 
   // a real 1x1 PNG: the Avatar shows the image only once the browser decodes it
   const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", "base64");
   await demoLogin(page, "مدیر", "demo-admin", "/admin");
-  const header = page.getByRole("link", { name: "مدیر نمونه" });
+  const header = page.getByRole("button", { name: "مدیر نمونه" });
   await expect(header.getByText("من", { exact: true })).toBeVisible(); // initials before any upload
   await header.click();
+  await page.getByRole("menuitem", { name: "پروفایل" }).click();
   await expect(page).toHaveURL(url("/admin/profile"));
   await expect(page.getByLabel("شماره موبایل")).toBeDisabled();
 
   await page.getByLabel("نام و نام خانوادگی").fill("مدیر ویرایش شده");
   await page.getByRole("button", { name: "ذخیره تغییرات" }).click();
-  await expect(page.getByRole("link", { name: "مدیر ویرایش شده" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "مدیر ویرایش شده" })).toBeVisible();
 
   await page.locator('input[type="file"]').setInputFiles({ name: "a.png", mimeType: "image/png", buffer: PNG });
-  await expect(page.getByRole("link", { name: "مدیر ویرایش شده" }).locator("img")).toHaveAttribute(
+  await expect(page.getByRole("button", { name: "مدیر ویرایش شده" }).locator("img")).toHaveAttribute(
     "src",
     new RegExp(`^${process.env.E2E_SERVER_URL}/uploads/[a-f0-9]{24}-\\d+\\.png$`)
   );
