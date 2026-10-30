@@ -1,12 +1,12 @@
 # WorkBridge: Upgrade Plan
 
-Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential phases. Section references (§) point to `docs/current-state.md`. Bug numbers (#) point to `docs/known-bugs.md`.
+Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential phases. Section references (§) point to `docs/current-state.md`. Bug numbers (#) point to `docs/known-bugs.md` (deleted in Phase 43 once every bug was fixed; see git history).
 
 **Next.js is not in this plan.** The PRD rules it out (§5 "Switching frameworks"): the client stays a Vite SPA. If that decision changes, a Next.js migration would replace Phases 22–24 (Vite 8 and client TypeScript) and must still come after Part A.
 
 ## Progress
 
-**54 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e, 39, 40, 41a, 41b and 42). Next: Phase 43 (final audit against the PRD success criteria).
+**55 of 55 phases done** (Parts A–F). Next: none; deploy waits on PRD open question 1 (hosting).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 10/11 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ✅ 11/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -547,7 +547,7 @@ Verify: server test for the counts; Home shows seeded numbers.
 
 ---
 
-## Part F: Finish ⬜
+## Part F: Finish ✅
 
 Decisions (2026-10-29, `docs/design.md` §1 and §9):
 - Part F builds on shadcn/ui components and lucide icons.
@@ -653,12 +653,12 @@ Files: locale files, `e2e/` screenshot specs, `src/index.css`
 
 Verify: CI green with the new suites.
 
-### Phase 43: Final audit against the PRD success criteria ⬜
+### Phase 43: Final audit against the PRD success criteria ✅
 Files: `README.md`, `CLAUDE.md`, `docs/current-state.md`, `docs/known-bugs.md`
 
-- [ ] Walk PRD §1 success criteria 1–6 and §2 must-preserve table; tick each with evidence (test name or screenshot).
-- [ ] `npm audit` 0 high/critical in both packages; every dependency on its current major.
-- [ ] Update README and CLAUDE.md to the new stack and commands; `known-bugs.md` should be empty or deleted.
+- [x] Walk PRD §1 success criteria 1–6 and §2 must-preserve table; tick each with evidence (test name or screenshot).
+- [x] `npm audit` 0 high/critical in both packages; every dependency on its current major (two blocked upstream: TypeScript stays on 6 because typescript-eslint 8 needs `<6.1`, the client's ESLint on 9 because eslint-plugin-react 7.37 supports up to ESLint 9).
+- [x] Update README and CLAUDE.md to the new stack and commands; `known-bugs.md` should be empty or deleted.
 
 Verify: every success criterion has evidence in the PR description.
 

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -22,7 +22,6 @@ function DemoLoginForm() {
     register,
     control,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors },
   } = useForm<DemoLoginValues>({
@@ -49,7 +48,7 @@ function DemoLoginForm() {
     setValue("password", password);
   };
 
-  const shown = DEMO_USERS[watch("role")];
+  const shown = DEMO_USERS[useWatch({ control, name: "role" })];
 
   return (
     <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>

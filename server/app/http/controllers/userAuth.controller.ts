@@ -173,7 +173,7 @@ class userAuthController extends Controller {
     const { _id: userId } = req.user!;
     const { name, email, biography, phoneNumber } = req.body;
 
-    // No "nothing changed" check: timestamps bump updatedAt, so modifiedCount is never 0 (known-bugs.md).
+    // No "nothing changed" check: timestamps bump updatedAt, so modifiedCount is never 0.
     await UserModel.updateOne(
       { _id: userId },
       {

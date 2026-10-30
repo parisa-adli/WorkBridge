@@ -2,6 +2,16 @@
 
 Snapshot of the codebase as of 2026-10-27 (commit `8c488c2`). This report is based on reading the code. Nothing was changed. The only things run were `npm ls`, `npm outdated`, `npm audit` and `eslint`.
 
+## Status after the upgrade (2026-10-30, Phase 43)
+
+Everything below describes the code **before** the upgrade. It stays as the baseline that `docs/upgrade-prd.md` and `docs/upgrade-plan.md` refer to by section (§). The finished stack and commands are in `README.md` and `CLAUDE.md`, and each phase's evidence is in the PRD §7 Progress table.
+
+- §1, §2: both packages are strict TypeScript. Client: React 19, Vite 8, Tailwind 4, shadcn/ui on Radix, lucide icons, react-i18next (fa/en). Server: Express 5, Mongoose 9, Zod, helmet, express-rate-limit, run by `tsx`. Joi, kavenegar, axios (server), moment-jalali, react-icons, the date/OTP/tag/toast/spinner libraries and the extraneous packages are gone. `npm audit`: 0 vulnerabilities in the root, client and server packages. Every dependency is on its current major except TypeScript (6, because typescript-eslint 8 supports `<6.1`) and the client's ESLint (9, because eslint-plugin-react 7.37 supports up to ESLint 9).
+- §3, §4: routes and models are validated with Zod and answer in one envelope with error and success codes (`CLAUDE.md`, "Server architecture"). New: `/stats`, demo login, logout, avatar, category and user-profile admin routes, and paging on the four lists.
+- §6.1: all twelve security items are closed, each with a regression test in `server/tests/` (see the PRD §7 rows for Phases 8–13b).
+- §6.2–§7: fixed during the upgrade. Every bug the behavior tests pinned (formerly `docs/known-bugs.md`) is fixed and its test flipped. One finding in §6 was wrong: `updateProject`, `changeProjectStatus` and `verifyUser` never returned 500 on unchanged data, because `timestamps: true` bumps `updatedAt`, so `modifiedCount` is never 0 (covered by the "succeeds when ..." tests in `project.test.ts` and `admin.test.ts`).
+- §8: server API tests (Vitest, Supertest, mongodb-memory-server), client tests (Vitest, Testing Library), a Playwright e2e suite with screenshots and axe in fa/en × light/dark, and a GitHub Actions workflow running all of them.
+
 ---
 
 ## 1. Architecture
