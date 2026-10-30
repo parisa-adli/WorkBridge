@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
-import Textfield from "../../ui/Textfield";
+import Input from "../../ui/Input";
 import { useMutation } from "@tanstack/react-query";
 import { completeProfile } from "../../services/authService";
 import Loading from "../../ui/Loading";
-import toast from "react-hot-toast";
+import Button from "../../ui/Button";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,7 +19,7 @@ function CompleteProfileForm() {
   const {
     handleSubmit,
     register,
-    watch,
+    control,
     formState: { errors },
   } = useForm<CompleteProfileValues>({ resolver: zodResolver(completeProfileSchema) });
   // const [name, setName] = useState("");
@@ -51,42 +52,23 @@ function CompleteProfileForm() {
     <div className="flex justify-center pt-10">
       <div className="w-full sm:max-w-sm">
         <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-          <Textfield
-            label={t("auth.fullName")}
-            name="name"
-            register={register}
-            required
-            errors={errors}
-          />
-          <Textfield
-            label={t("auth.email")}
-            name="email"
-            register={register}
-            required
-            errors={errors}
-          />
+          <Input label={t("auth.fullName")} required error={errors.name?.message} {...register("name")} />
+          <Input label={t("auth.email")} required error={errors.email?.message} {...register("email")} />
           <RadioInputGroup
-            errors={errors}
-            register={register}
-            watch={watch}
-            configs={{
-              name: "role",
-              options: [
-                {
-                  value: ROLES.OWNER,
-                  label: t("roles.owner"),
-                },
-                {
-                  value: ROLES.FREELANCER,
-                  label: t("roles.freelancer"),
-                },
-              ],
-            }}
+            label={t("user.role")}
+            control={control}
+            name="role"
+            options={[
+              { value: ROLES.OWNER, label: t("roles.owner") },
+              { value: ROLES.FREELANCER, label: t("roles.freelancer") },
+            ]}
           />
           {isPending ? (
             <Loading />
           ) : (
-            <button className="btn btn--primary w-full">{t("common.confirm")}</button>
+            <Button type="submit" className="w-full">
+              {t("common.confirm")}
+            </Button>
           )}
         </form>
       </div>

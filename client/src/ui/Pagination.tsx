@@ -1,15 +1,19 @@
-import { useTranslation } from "react-i18next";
-import { HiChevronLeft, HiChevronRight } from "react-icons/hi";
+import {
+  Pagination as PaginationRoot,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { toPersianNumbers } from "../utils/toPersianNumber";
-import { buttonClass } from "./Button";
 
 type PaginationProps = {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
 };
-
-const iconButton = buttonClass({ variant: "ghost", size: "icon" });
 
 // First, last and the current page's neighbours; a gap of one page shows that page instead of "…".
 function pageItems(page: number, totalPages: number): (number | "…")[] {
@@ -25,53 +29,28 @@ function pageItems(page: number, totalPages: number): (number | "…")[] {
 }
 
 function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
-  const { t } = useTranslation();
-
   return (
-    <nav aria-label={t("pagination.label")}>
-      <ul className="flex flex-wrap items-center gap-1">
-        <li>
-          <button
-            type="button"
-            aria-label={t("pagination.previous")}
-            disabled={page <= 1}
-            onClick={() => onPageChange(page - 1)}
-            className={iconButton}
-          >
-            <HiChevronRight aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
-          </button>
-        </li>
+    <PaginationRoot>
+      <PaginationContent className="flex-wrap">
+        <PaginationItem>
+          <PaginationPrevious disabled={page <= 1} onClick={() => onPageChange(page - 1)} />
+        </PaginationItem>
         {pageItems(page, totalPages).map((item, i) => (
-          <li key={i}>
+          <PaginationItem key={i}>
             {item === "…" ? (
-              <span aria-hidden="true" className="px-2 text-text-muted">
-                {item}
-              </span>
+              <PaginationEllipsis />
             ) : (
-              <button
-                type="button"
-                aria-current={item === page ? "page" : undefined}
-                onClick={() => onPageChange(item)}
-                className={buttonClass({ variant: item === page ? "primary" : "ghost", size: "sm" })}
-              >
+              <PaginationLink isActive={item === page} onClick={() => onPageChange(item)}>
                 {toPersianNumbers(item)}
-              </button>
+              </PaginationLink>
             )}
-          </li>
+          </PaginationItem>
         ))}
-        <li>
-          <button
-            type="button"
-            aria-label={t("pagination.next")}
-            disabled={page >= totalPages}
-            onClick={() => onPageChange(page + 1)}
-            className={iconButton}
-          >
-            <HiChevronLeft aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
-          </button>
-        </li>
-      </ul>
-    </nav>
+        <PaginationItem>
+          <PaginationNext disabled={page >= totalPages} onClick={() => onPageChange(page + 1)} />
+        </PaginationItem>
+      </PaginationContent>
+    </PaginationRoot>
   );
 }
 export default Pagination;

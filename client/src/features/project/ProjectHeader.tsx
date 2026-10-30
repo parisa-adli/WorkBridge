@@ -1,7 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { HiArrowRight } from "react-icons/hi";
+import { ArrowRight } from "lucide-react";
+import Button from "../../ui/Button";
 import useMoveBack from "../../hooks/useMoveBack";
 import type { Project } from "../../types/api";
+import localized from "../../utils/localized";
 
 function ProjectHeader({ project }: { project: Project }) {
   const { t } = useTranslation();
@@ -9,14 +11,11 @@ function ProjectHeader({ project }: { project: Project }) {
 
   return (
     <div className="flex items-center gap-x-4 mb-8">
-      <button
-        onClick={moveBack}
-        className="flex items-center gap-x-2 bg-primary-600 py-2 px-4 rounded-lg mb-4 text-secondary-50 "
-      >
-        <HiArrowRight className="w-6 h-6 text-secondary-50 ltr:-scale-x-100" />
-      </button>
-      <h1 className="font-black text-secondary-700 text-xl">
-        {t("project.proposalsOf", { title: project.title })}
+      <Button variant="outline" size="icon" onClick={moveBack} aria-label={t("common.back")}>
+        <ArrowRight className="ltr:-scale-x-100" />
+      </Button>
+      <h1 className="font-black text-xl">
+        {t("project.proposalsOf", { title: localized(project, "title") })}
       </h1>
     </div>
   );

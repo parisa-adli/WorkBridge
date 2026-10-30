@@ -20,7 +20,7 @@ router.get(
 );
 router.post(
   "/add",
-  authorize(ROLES.FREELANCER, ROLES.ADMIN),
+  authorize(ROLES.FREELANCER),
   validate(addProposalSchema),
   ProposalController.addNewProposal
 );

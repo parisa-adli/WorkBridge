@@ -1,5 +1,5 @@
 import http from "./httpService";
-import type { ApiResponse, MessageData, Role, Status, User } from "../types/api";
+import type { ApiResponse, MessageData, Page, Project, Proposal, Role, Status, Translations, User } from "../types/api";
 
 export function getOtp(data: { phoneNumber: string }) {
   return http
@@ -13,9 +13,9 @@ export function checkOtp(data: { phoneNumber: string; otp: string }) {
     .then(({ data }) => data.data);
 }
 
-export function loginApi(data: { email: string; password: string }) {
+export function demoLoginApi(data: { username: string; password: string }) {
   return http
-    .post<ApiResponse<MessageData & { user: User }>>("/user/login", data)
+    .post<ApiResponse<MessageData & { user: User }>>("/user/demo-login", data)
     .then(({ data }) => data.data);
 }
 
@@ -31,15 +31,44 @@ export function getUser() {
     .then(({ data }) => data.data);
 }
 
+export function updateProfileApi(data: { name: string; email: string; biography?: string }) {
+  return http
+    .patch<ApiResponse<MessageData>>("/user/update", data)
+    .then(({ data }) => data.data);
+}
+
+// The server reads the file as the raw body and checks its type and size (jpg/png/webp, 2 MB).
+export function updateAvatarApi(file: File) {
+  return http
+    .patch<ApiResponse<MessageData & { avatarUrl: string }>>("/user/avatar", file, {
+      headers: { "Content-Type": file.type },
+    })
+    .then(({ data }) => data.data);
+}
+
 export function logoutApi() {
   return http
     .post<ApiResponse<MessageData>>("/user/logout")
     .then(({ data }) => data.data);
 }
 
-export function getUsersApi() {
+export function getUsersApi(qs: string) {
   return http
-    .get<ApiResponse<{ users: User[] }>>("/admin/user/list")
+    .get<ApiResponse<Page<User>>>(`/admin/user/list${qs}`)
+    .then(({ data }) => data.data);
+}
+
+export type UserProfile = {
+  user: User;
+  createdProjects: Project[];
+  completedProjects: Project[];
+  // the project is populated with its title only
+  proposals: (Omit<Proposal, "project"> & { project: { _id: string; title: string } & Translations<{ title: string }> })[];
+};
+
+export function getUserProfileApi(userId: string) {
+  return http
+    .get<ApiResponse<UserProfile>>(`/admin/user/profile/${userId}`)
     .then(({ data }) => data.data);
 }
 

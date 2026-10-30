@@ -29,7 +29,7 @@ app.interceptors.response.use(
     const originalConfig = err.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
 
     // a login 401 means wrong credentials, not an expired session: refreshing would replace its error
-    const isLogin = originalConfig?.url === "/user/login";
+    const isLogin = originalConfig?.url === "/user/demo-login";
     if (err.response?.status === 401 && originalConfig && !originalConfig._retry && !isLogin) {
       originalConfig._retry = true;
       try {

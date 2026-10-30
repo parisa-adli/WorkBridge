@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import StatusSelect from "../../ui/StatusSelect";
 import useChangeProposalStatus from "./useChangeProposalStatus";
+import Button from "../../ui/Button";
 import Loading from "../../ui/Loading";
 import type { Status } from "../../types/api";
 import { proposalStatusSchema, type StatusInput, type StatusValues } from "../../schemas/status";
@@ -15,7 +16,7 @@ type ChangeProposalStatusProps = {
 
 function ChangeProposalStatus({ proposalId, onClose, proposalStatus }: ChangeProposalStatusProps) {
   const { t } = useTranslation();
-  const { register, handleSubmit } = useForm<StatusInput, unknown, StatusValues>({
+  const { control, handleSubmit } = useForm<StatusInput, unknown, StatusValues>({
     defaultValues: { status: proposalStatus },
     resolver: zodResolver(proposalStatusSchema),
   });
@@ -28,14 +29,14 @@ function ChangeProposalStatus({ proposalId, onClose, proposalStatus }: ChangePro
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <StatusSelect register={register} />
+        <StatusSelect control={control} />
         <div className="mt-8!">
           {isUpdating ? (
             <Loading />
           ) : (
-            <button type="submit" className="btn btn--primary w-full">
+            <Button type="submit" className="w-full">
               {t("common.confirm")}
-            </button>
+            </Button>
           )}
         </div>
       </form>

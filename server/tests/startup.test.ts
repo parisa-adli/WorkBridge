@@ -50,7 +50,7 @@ describe("Application.start", () => {
       order.push("connect");
       return mongoose;
     });
-    vi.spyOn(UserModel, "updateOne").mockResolvedValue({} as never); // demo-user seeding, no real DB here
+    const seed = vi.spyOn(UserModel, "updateOne");
     listen.mockImplementation(() => {
       order.push("listen");
       return undefined as never;
@@ -59,5 +59,20 @@ describe("Application.start", () => {
 
     expect(order).toEqual(["connect", "listen"]);
     expect(exit).not.toHaveBeenCalled();
+    expect(seed).not.toHaveBeenCalled(); // demo users come from `npm run seed`, not startup
+  });
+
+  it.each(["", "yes"])("exits when DEMO_LOGIN_ENABLED is %j", async (value) => {
+    const connect = vi.spyOn(mongoose, "connect");
+    process.env.DEMO_LOGIN_ENABLED = value;
+    try {
+      await new Application().start();
+    } finally {
+      process.env.DEMO_LOGIN_ENABLED = "true";
+    }
+
+    expect(exit).toHaveBeenCalledWith(1);
+    expect(error.mock.calls[0].join(" ")).toMatch(/DEMO_LOGIN_ENABLED/);
+    expect(connect).not.toHaveBeenCalled();
   });
 });

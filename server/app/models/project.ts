@@ -15,6 +15,10 @@ const ProjectSchema = new mongoose.Schema(
     category: { type: ObjectId, ref: "Category", required: true },
     budget: { type: Number, required: true },
     tags: [{ type: String }],
+    // optional English version of the Persian base fields (PRD F10)
+    translations: {
+      en: { title: String, description: String, tags: { type: [String], default: undefined } },
+    },
     proposals: { type: [ObjectId], ref: "Proposal", default: [] },
     deadline: { type: Date, required: true },
     owner: { type: ObjectId, required: true, ref: "User" },

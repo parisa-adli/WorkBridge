@@ -1,5 +1,5 @@
 import http from "./httpService";
-import type { ApiResponse, MessageData, Project, ProjectStatus } from "../types/api";
+import type { ApiResponse, MessageData, Page, Project, ProjectStatus } from "../types/api";
 
 export type NewProject = {
   title: string;
@@ -10,9 +10,9 @@ export type NewProject = {
   deadline: string;
 };
 
-export function getOwnerProjectsApi() {
+export function getOwnerProjectsApi(qs: string) {
   return http
-    .get<ApiResponse<{ projects: Project[] }>>("project/owner-projects")
+    .get<ApiResponse<Page<Project>>>(`project/owner-projects${qs}`)
     .then(({ data }) => data.data);
 }
 
@@ -48,6 +48,6 @@ export function getProjectApi(id: string) {
 
 export function getProjectsApi(qs: string) {
   return http
-    .get<ApiResponse<{ projects: Project[] }>>(`/project/list${qs}`)
+    .get<ApiResponse<Page<Project>>>(`/project/list${qs}`)
     .then(({ data }) => data.data);
 }

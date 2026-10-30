@@ -200,6 +200,33 @@ describe("session", () => {
     expect(res.get("Set-Cookie")!.join(";")).not.toMatch(/Secure/);
   });
 
+  it("POST /logout ends the session: the next request is a 401", async () => {
+    const agent = await login(app, PHONE);
+    await agent.get("/api/user/profile").expect(200);
+    await agent.post("/api/user/logout").expect(200);
+    const res = await agent.get("/api/user/profile");
+    expect(res.status).toBe(401);
+    expect(res.body.code).toBe(ERROR_CODES.LOGIN_REQUIRED);
+  });
+
+  it("POST /logout clears both cookies with the login cookie options", async () => {
+    const domain = process.env.DOMAIN;
+    process.env.DOMAIN = "localhost";
+    try {
+      const res = await request(app).post("/api/user/logout");
+      for (const name of ["accessToken", "refreshToken"]) {
+        const cookie = res.get("Set-Cookie")!.find((c) => c.startsWith(`${name}=`))!;
+        expect(cookie).toMatch(/Max-Age=0/);
+        expect(cookie).toMatch(/Domain=localhost/);
+        expect(cookie).toMatch(/Path=\//);
+        expect(cookie).toMatch(/HttpOnly/);
+        expect(cookie).toMatch(/SameSite=Lax/);
+      }
+    } finally {
+      process.env.DOMAIN = domain;
+    }
+  });
+
   it("cookieOptions is secure everywhere but development", () => {
     expect(cookieOptions({ NODE_ENV: "development", DOMAIN: "x.ir" })).toEqual({
       httpOnly: true,

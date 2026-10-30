@@ -1,12 +1,12 @@
 # WorkBridge: Upgrade Plan
 
-Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential phases. Section references (§) point to `docs/current-state.md`. Bug numbers (#) point to `docs/known-bugs.md`.
+Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential phases. Section references (§) point to `docs/current-state.md`. Bug numbers (#) point to `docs/known-bugs.md` (deleted in Phase 43 once every bug was fixed; see git history).
 
 **Next.js is not in this plan.** The PRD rules it out (§5 "Switching frameworks"): the client stays a Vite SPA. If that decision changes, a Next.js migration would replace Phases 22–24 (Vite 8 and client TypeScript) and must still come after Part A.
 
 ## Progress
 
-**35 of 49 phases done** (Parts A, B, C and D). Next: Phase 30 (seed script and bilingual content fields).
+**55 of 55 phases done** (Parts A–F). Next: none; deploy waits on PRD open question 1 (hosting).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -39,8 +39,8 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | B. Security & bugs | 8–14 (12 and 13 split into 12a–c, 13a–b) | Close §6.1, §6.4, §7 on the current stack. | ✅ 10/10 |
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
-| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ⬜ 0/9 |
-| F. Finish | 39–43 | Re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 0/5 |
+| E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ✅ 11/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -460,131 +460,205 @@ Verify: tests pass; the reference page passes an axe check in both themes.
 
 ---
 
-## Part E: Features ⬜
+## Part E: Features ✅
 
 Every feature is built on the new components and in both languages, with server tests and, where it is a user flow, an e2e test.
 
-### Phase 30: Seed script and bilingual content fields (F1 part 1, F10 data) ⬜
+### Phase 30: Seed script and bilingual content fields (F1 part 1, F10 data) ✅
 **Goal:** `npm run seed --prefix server` creates demo data in both languages.
 
 Files: `server/scripts/seed.ts` (new), `server/package.json`, models `project`, `proposal`, `user` (`translations.en`), `server/app/models/user.js` (`username`, `passwordHash`), client display helper for `translations.en` fallback
 
-- [ ] Optional `translations.en` on the text fields listed in PRD F10; API returns it.
-- [ ] Seed: three verified demo accounts with hashed passwords, categories, projects, proposals, both languages. Idempotent.
-- [ ] Client shows `translations.en` in English when present; user content renders with `dir="auto"`; category name by language.
+- [x] Optional `translations.en` on the text fields listed in PRD F10; API returns it.
+- [x] Seed: three verified demo accounts with hashed passwords, categories, projects, proposals, both languages. Idempotent.
+- [x] Client shows `translations.en` in English when present; user content renders with `dir="auto"`; category name by language.
 
 Verify: run seed twice, no duplicates; switching language changes demo content without a refetch.
 
-### Phase 31: Demo login (F1 part 2) ⬜
+### Phase 31: Demo login (F1 part 2) ✅
 **Goal:** a visitor logs in as any role with one click.
 
 Files: `server/app/router/userAuth.js`, `userAuth.controller.js`, env validation (`DEMO_LOGIN_ENABLED`), `client/src/features/authentication/` (demo tab), `services/authService.js`, e2e
 
-- [ ] `POST /user/demo-login`: only seeded usernames, bcrypt/argon2 check, rate-limited, off when the flag is false, same cookies as OTP.
-- [ ] Demo accounts can't change their own role/status or demote other demo accounts.
-- [ ] Auth page tab with role picker, pre-filled credentials, credentials shown as text.
-- [ ] e2e: demo login per role lands on the right dashboard; OTP e2e still passes.
+- [x] `POST /user/demo-login`: only seeded usernames, bcrypt/argon2 check, rate-limited, off when the flag is false, same cookies as OTP.
+- [x] Demo accounts can't change their own role/status or demote other demo accounts.
+- [x] Auth page tab with role picker, pre-filled credentials, credentials shown as text.
+- [x] e2e: demo login per role lands on the right dashboard; OTP e2e still passes.
 
 Verify: tests and e2e pass; flag off returns 404.
 
-### Phase 32: Logout (F2) ⬜
+### Phase 32: Logout (F2) ✅
 Files: `userAuth.controller.ts` (logout), `server/tests/auth.test.ts`, `ui/HeaderMenu.jsx`, `features/authentication/Logout.tsx`, `useLogout.ts`
 
-- [ ] Server: logout clears both cookies with the same options as login (`cookieOptions`); test that a request after logout gets 401.
-- [ ] Client: logout in every authenticated layout header; clears the React Query cache; redirects to `/`.
-- [ ] e2e: logout then visiting `/owner` redirects to auth.
+- [x] Server: logout clears both cookies with the same options as login (`cookieOptions`); test that a request after logout gets 401.
+- [x] Client: logout in every authenticated layout header; clears the React Query cache; redirects to `/`.
+- [x] e2e: logout then visiting `/owner` redirects to auth.
 
 Verify: e2e passes.
 
-### Phase 33: Proposal workflow (F6) ⬜
+### Phase 33: Proposal workflow (F6) ✅
 Files: `proposal.controller.ts`, `project.controller.ts`, project router (freelancer read access), client proposal lists, `pages/` new freelancer project detail, admin projects page
 
-- [ ] Accept = assign freelancer + close project + reject other pending proposals, in a transaction (memory server needs a replica set — or use a safe sequence).
-- [ ] Only one accepted per project; un-accept clears `freelancer`.
-- [ ] Proposal lists show the linked project title; `/freelancer/projects/:id` read-only without others' proposals.
-- [ ] ADMIN can't send proposals (server 403, button hidden).
+- [x] Accept = assign freelancer + close project + reject other pending proposals, in a transaction (memory server needs a replica set — or use a safe sequence).
+- [x] Only one accepted per project; un-accept clears `freelancer`.
+- [x] Proposal lists show the linked project title; `/freelancer/projects/:id` read-only without others' proposals.
+- [x] ADMIN can't send proposals (server 403, button hidden).
 
 Verify: server tests for each rule; e2e: owner accepts, freelancer sees it accepted.
 
-### Phase 34: Profile page and avatar (F3) ⬜
+### Phase 34: Profile page and avatar (F3) ✅
 Files: `server/app/router/userAuth.ts` (multer), `userAuth.controller.ts`, `server/uploads/`, `client/src/pages/Profile.tsx` (new), routes under each role, `UserAvatar`
 
-- [ ] `/<role>/profile` form via `/user/profile` + `PATCH /user/update`; phone read-only.
-- [ ] Avatar upload: jpg/png/webp ≤ 2 MB validated on the server, stored in `uploads/`; initials fallback.
-- [ ] Tests: oversized and wrong-type uploads rejected.
+- [x] `/<role>/profile` form via `/user/profile` + `PATCH /user/update`; phone read-only.
+- [x] Avatar upload: jpg/png/webp ≤ 2 MB validated on the server, stored in `uploads/`; initials fallback.
+- [x] Tests: oversized and wrong-type uploads rejected.
 
 Verify: tests pass; header updates after saving.
 
-### Phase 35: Admin category management (F4) ⬜
+### Phase 35: Admin category management (F4) ✅
 Files: `category.controller.ts`, category schemas, `client/src/features/admin/categories/` (new), `services/categoryService.ts`, `App.tsx` route
 
-- [ ] Fix `type: "project"` on update and `parentId` on create.
-- [ ] List + create/edit/delete modals; delete warns about children and is blocked when projects use the category.
+- [x] Fix `type: "project"` on update and `parentId` on create.
+- [x] List + create/edit/delete modals; delete warns about children and is blocked when projects use the category.
 
 Verify: server tests for the two fixes and the delete block.
 
-### Phase 36: Admin user profile view (F5) ⬜
+### Phase 36: Admin user profile view (F5) ✅
 Files: `server/app/http/controllers/admin/user.controller.ts`, `server/tests/admin.test.ts`, `client/src/services/authService.ts`, `client/src/pages/AdminUserProfile.tsx` (new), `features/admin/users/*`, `App.tsx`
 
-- [ ] Server: `/admin/user/profile/:userId` returns 404 for an unknown id, strips `otp`, and populates the project title on proposals; tests for each.
-- [ ] Client: service + query hook; `/admin/users/:id` shows info, created/completed projects, proposals; status change in place.
+- [x] Server: `/admin/user/profile/:userId` returns 404 for an unknown id, strips `otp`, and populates the project title on proposals; tests for each.
+- [x] Client: service + query hook; `/admin/users/:id` shows info, created/completed projects, proposals; status change in place.
 
 Verify: server tests pass; status change invalidates the user and users-list queries.
 
-### Phase 37: Pagination (F7) ⬜
+### Phase 37: Pagination (F7) ✅
 Files: the four list endpoints, the shared filter builder, client list hooks, `ui/Pagination`, admin dashboard stats
 
-- [ ] `page`/`limit` in, `{ items, total, page, limit }` out; page number in the URL; dashboard counts from `total`.
+- [x] `page`/`limit` in, `{ items, total, page, limit }` out; page number in the URL; dashboard counts from `total`.
 
 Verify: server tests for paging bounds; admin user count is no longer capped at 20.
 
-### Phase 38: Real home page stats (F8) ⬜
+### Phase 38: Real home page stats (F8) ✅
 Files: `server/app/router/stats.ts` (new), router, `pages/Home.tsx`
 
-- [ ] `GET /stats/public` (no auth); Home uses it with a skeleton; remove hardcoded numbers; make or remove dead CTAs and footer links.
+- [x] `GET /stats/public` (no auth); Home uses it with a skeleton; remove hardcoded numbers; make or remove dead CTAs and footer links.
 
 Verify: server test for the counts; Home shows seeded numbers.
 
 ---
 
-## Part F: Finish ⬜
+## Part F: Finish ✅
 
-### Phase 39: Re-skin public and auth pages ⬜
+Decisions (2026-10-29, `docs/design.md` §1 and §9):
+- Part F builds on shadcn/ui components and lucide icons.
+- **Revised the same day by the project owner:** the visual layer follows shadcn/ui as shipped (its theme colors, component styles, radius, focus ring and icons), not the earlier indigo design. Page layout, the placement of elements (tables, modals, menus, filters, forms) and all behavior stay as they are.
+- Every existing UI element is replaced by its shadcn equivalent where one exists (`docs/design.md` §9 lists the mapping).
+- No old color or style is kept just to match a screenshot: a phase that changes the look reviews the screenshot diff and refreshes the baselines (win32 locally, linux from CI).
+
+### Phase 39a: shadcn/ui foundation ✅
+Files: `client/components.json`, `vite.config.js`, `tsconfig.json`, `src/lib/utils.ts`, `src/components/ui/`, `src/index.css`, the Phase 29 components in `src/ui/`
+
+- [x] shadcn initialised for Vite + Tailwind 4: `components.json`, `@/` alias (Vite `resolve.alias`, tsconfig `paths`), `cn` helper.
+- [x] shadcn variables point at the §2 tokens, so they follow `.dark-mode`; no new colors.
+- [x] Button, Input, Textarea, Badge, Table, Card, Skeleton, Modal (shadcn Dialog) and Toggle (shadcn Switch) rebuilt with unchanged props; Select stays a native `<select>` styled like shadcn's trigger.
+- [x] `@headlessui/react` uninstalled.
+
+Verify: screenshot baselines pass without being updated; Modal keyboard and Pagination tests pass; axe passes on the reference pages.
+
+Done under the first "same design" decision. The revision above leaves this setup in place; Phase 39c replaces its token mapping and restyles its components.
+
+### Phase 39b: lucide icons ✅
+Files: every `react-icons` import
+
+- [x] Replace `react-icons` with `lucide-react` (shadcn's icon library); uninstall `react-icons`.
+- [x] Icons use shadcn's sizing (`size-4` inside components unless the component sets another) and `currentColor`. Directional icons keep `ltr:-scale-x-100` (except the header's login icon: lucide's `LogIn` points the other way, so it flips in `rtl:` and still matches the old icon in both languages).
+
+Verify: the screenshot diff shows only icon changes (reviewed, then baselines refreshed); e2e passes.
+
+### Phase 39c: shadcn theme and stock component styles ✅
+Files: `src/index.css`, `client/components.json`, `src/components/ui/`, `src/ui/` (Button, Input, Textarea, Badge, Card, Table, Skeleton, Modal, Toggle, Field), `docs/design.md` §2–§6
+
+- [x] `index.css` takes shadcn's default theme (base color `neutral`, oklch values, light on `:root`, dark under `.dark-mode`) and its `--radius` scale, with the `@theme inline` mapping shadcn generates.
+- [x] The Phase 28b tokens (`bg`, `surface`, `text-muted`, `on-primary`, `success`, ...) become aliases of the shadcn variables, so pages not yet re-skinned take the new palette.
+- [x] The shadcn primitives in `src/components/ui/` are the stock shadcn source (`button`, `input`, `textarea`, `badge`, `card`, `table`, `skeleton`, `dialog`, `switch`, `label`), changed only for RTL (logical classes) and accessibility. `src/ui/` wraps them with the current props.
+- [x] Badge statuses use shadcn variants with their text (open/accepted/verified `default`, pending `secondary`, rejected/closed `destructive`); no success/warning colors.
+- [x] shadcn's focus ring replaces the global 2px outline.
+- [x] design.md §2 records the measured contrast pairs. A pair that fails WCAG AA is the only allowed deviation, recorded with its value.
+
+Verify: Modal keyboard, Toggle and Pagination tests pass; axe passes on the reference pages in fa/en × light/dark; screenshot diff reviewed, baselines refreshed.
+
+### Phase 39d: shadcn form controls ✅
+Files: `ui/Select`, `RHFSelect`, `StatusSelect`, `FilterDropDown`, `Filter`, `RadioInput`, `RadioInputGroup`, `DatePickerField`, the tag input in `CreateProjectForm`, `Textfield`
+
+- [x] Every select (forms and URL filters) is the shadcn Select, wired to React Hook Form through `Controller`. It is keyboard-operable and labelled, and RHF values and validation are unchanged. Client tests and e2e steps that used `selectOption` move to the new interaction.
+- [x] Radios become RadioGroup; `Filter` becomes ToggleGroup (URL params unchanged); `Textfield` is replaced by `Input`.
+- [x] Date picker: shadcn Calendar + Popover if react-day-picker's Persian calendar keeps Jalali input and display; otherwise the current picker is restyled with the shadcn tokens and the reason recorded in design.md §9.
+- [x] Tag input: no shadcn equivalent, so it is restyled with the Input and Badge styles.
+- [x] Every replaced library is uninstalled.
+
+Verify: form and filter tests pass; e2e (create project, filters) passes; screenshot diff reviewed, baselines refreshed.
+
+### Phase 39e: shadcn feedback and overlays ✅
+Files: `ui/ConfirmDelete`, `Pagination`, `TablePagination`, `Loading`, `Empty`, `EmptyState`, `features/authentication/UserAvatar`, toasts (`App.tsx`, `useAppMutation`, every `toast` call)
+
+- [x] ConfirmDelete becomes AlertDialog; Pagination is the shadcn Pagination (current props, `aria-current`, language digits).
+- [x] `Loading` becomes shadcn Spinner (`react-loader-spinner` uninstalled); `Empty` and `EmptyState` become Empty; `UserAvatar` becomes Avatar (initials fallback).
+- [x] `react-hot-toast` is replaced by Sonner; `toast.success`/`toast.error` calls keep their messages and the server-code translation.
+
+Verify: Pagination, TablePagination and UserAvatar tests pass; e2e (toasts, delete flows) passes; screenshot diff reviewed, baselines refreshed.
+
+### Phase 39: Re-skin public and auth pages ✅
 Files: `pages/Home`, `Auth`, `CompleteProfile`, `NotFound`, auth feature components
 
-- [ ] Rebuild on the design-system components; loading/empty/error states; responsive from 360px.
+- [x] Rebuild on the shadcn components with each page's current layout: Auth's OTP/demo switch becomes Tabs, and the OTP field becomes InputOTP (`react-otp-input` uninstalled).
+- [x] Loading, empty and error states; responsive from 360px.
 
 Verify: screenshots fa/en × light/dark; e2e passes.
 
-### Phase 40: Re-skin layouts and dashboards ⬜
+### Phase 40: Re-skin layouts and dashboards ✅
 Files: `ui/AppLayout`, `Sidebar`, headers, the three `DashboardLayout`/`Stats` sets
 
-- [ ] Sidebar becomes a drawer on mobile; merge the three dashboard/stats copies if they now differ only in data.
+- [x] Sidebar becomes the shadcn Sidebar (Sheet drawer below `lg`, opening from the start side); header menu becomes DropdownMenu; the dark-mode and language toggles become ghost icon Buttons; `Stat` becomes a Card.
+- [x] Merge the three dashboard/stats copies if they now differ only in data.
 
 Verify: screenshots at 360px and desktop.
 
-### Phase 41: Re-skin tables and detail pages ⬜
-Files: project/proposal tables and rows, project detail, freelancer project detail, profile, admin users, admin user profile, admin categories
+### Phase 41a: Mobile-ready tables and the four list pages ✅
+Files: project/proposal tables and rows, admin users
 
-- [ ] Tables become cards or scroll on mobile; every list has loading, empty and error states.
+- [x] The shadcn Table works at 360px, with one approach (cards or horizontal scroll) for every table.
+- [x] Owner projects, projects list, proposals and admin users each have loading, empty and error states; pagination and URL filters unchanged.
+
+Verify: screenshots fa/en × light/dark at 360px and desktop; e2e passes.
+
+### Phase 41b: Re-skin project detail; check profile, admin user profile, categories ✅
+Files: project detail and its proposals table, freelancer project detail, profile, admin user profile, admin categories
+
+- [x] Project detail and its proposals table rebuilt with the 41a table behavior; loading, empty and error states.
+- [x] Profile, admin user profile and admin categories use only shadcn components, with no old color or token left.
 
 Verify: screenshots; e2e passes.
 
-### Phase 42: Translation coverage, screenshot and accessibility tests ⬜
-Files: locale files, `e2e/` screenshot specs
+### Phase 42: Translation coverage, screenshot and accessibility tests ✅
+Files: locale files, `e2e/` screenshot specs, `src/index.css`
 
-- [ ] Screenshot tests for every F9 page in fa/en × light/dark.
-- [ ] axe check per page in CI (WCAG 2.2 AA contrast in both themes).
-- [ ] Zero untranslated strings (lint + parity check already enforce it; fix anything left).
+- [x] Screenshot tests for every F9 page in fa/en × light/dark.
+- [x] axe check per page in CI (WCAG 2.2 AA contrast in both themes).
+- [x] Zero untranslated strings (lint + parity check already enforce it; fix anything left).
+- [x] Once a grep finds no use, delete from `index.css`:
+  - the old `primary-*`/`secondary-*` scale and the Tailwind 3 default colors;
+  - the Phase 28b token aliases (`bg`, `surface`, `text-muted`, ...);
+  - the `.btn`/`.badge`/`.textField__input` utilities and the old table/button base styles.
+- [x] No `ui/` element is left that isn't built on shadcn (`docs/design.md` §9).
 
 Verify: CI green with the new suites.
 
-### Phase 43: Final audit against the PRD success criteria ⬜
+### Phase 43: Final audit against the PRD success criteria ✅
 Files: `README.md`, `CLAUDE.md`, `docs/current-state.md`, `docs/known-bugs.md`
 
-- [ ] Walk PRD §1 success criteria 1–6 and §2 must-preserve table; tick each with evidence (test name or screenshot).
-- [ ] `npm audit` 0 high/critical in both packages; every dependency on its current major.
-- [ ] Update README and CLAUDE.md to the new stack and commands; `known-bugs.md` should be empty or deleted.
+- [x] Walk PRD §1 success criteria 1–6 and §2 must-preserve table; tick each with evidence (test name or screenshot).
+- [x] `npm audit` 0 high/critical in both packages; every dependency on its current major (two blocked upstream: TypeScript stays on 6 because typescript-eslint 8 needs `<6.1`, the client's ESLint on 9 because eslint-plugin-react 7.37 supports up to ESLint 9).
+- [x] Update README and CLAUDE.md to the new stack and commands; `known-bugs.md` should be empty or deleted.
 
 Verify: every success criterion has evidence in the PR description.
 

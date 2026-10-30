@@ -1,13 +1,13 @@
 import { useTranslation } from "react-i18next";
-import type { UseFormRegister } from "react-hook-form";
+import type { Control } from "react-hook-form";
 import type { StatusInput } from "../schemas/status";
 import { STATUS_BADGES } from "../constants";
 import RHFSelect from "./RHFSelect";
 
 function StatusSelect({
-  register,
+  control,
 }: {
-  register: UseFormRegister<StatusInput>;
+  control: Control<StatusInput>;
 }) {
   const { t } = useTranslation();
   const options = Object.entries(STATUS_BADGES).map(([value, { label }]) => ({
@@ -18,7 +18,7 @@ function StatusSelect({
     <RHFSelect
       name="status"
       label={t("common.changeStatus")}
-      register={register}
+      control={control}
       required
       options={options}
     />

@@ -13,32 +13,33 @@ export const ROLE_HOME = Object.freeze({
   [ROLES.FREELANCER]: "/freelancer",
 });
 
-// Public demo accounts pre-filled in the email login tab. Mirrors DEMO_USERS in server/utils/constants.ts.
+// Public demo accounts pre-filled in the demo login tab. Mirrors DEMO_USERS in server/utils/constants.ts.
 export const DEMO_USERS = Object.freeze({
-  [ROLES.OWNER]: { email: "owner@workbridge.dev", password: "Owner@1234" },
-  [ROLES.FREELANCER]: { email: "freelancer@workbridge.dev", password: "Freelancer@1234" },
+  [ROLES.OWNER]: { username: "demo-owner", password: "Owner@1234" },
+  [ROLES.FREELANCER]: { username: "demo-freelancer", password: "Freelancer@1234" },
+  [ROLES.ADMIN]: { username: "demo-admin", password: "Admin@1234" },
 });
 
 // User verification and proposal review share these codes (ACCEPTED = a verified user).
 export const STATUS = Object.freeze({ REJECTED: 0, PENDING: 1, ACCEPTED: 2 });
 
-// Badge labels are translation keys.
+// Badge labels are translation keys; variants are shadcn Badge variants (docs/design.md §2).
 export const STATUS_BADGES = Object.freeze({
-  [STATUS.REJECTED]: { label: "status.rejected", className: "badge--danger" },
-  [STATUS.PENDING]: { label: "status.pending", className: "badge--secondary" },
-  [STATUS.ACCEPTED]: { label: "status.accepted", className: "badge--success" },
+  [STATUS.REJECTED]: { label: "status.rejected", variant: "destructive" as const },
+  [STATUS.PENDING]: { label: "status.pending", variant: "secondary" as const },
+  [STATUS.ACCEPTED]: { label: "status.accepted", variant: "default" as const },
 });
 
 export const PROJECT_STATUS = Object.freeze({ OPEN: "OPEN", CLOSED: "CLOSED" });
 
 export const PROJECT_STATUS_BADGES = Object.freeze({
-  [PROJECT_STATUS.OPEN]: { label: "projectStatus.open", className: "badge--success" },
-  [PROJECT_STATUS.CLOSED]: { label: "projectStatus.closed", className: "badge--danger" },
+  [PROJECT_STATUS.OPEN]: { label: "projectStatus.open", variant: "default" as const },
+  [PROJECT_STATUS.CLOSED]: { label: "projectStatus.closed", variant: "destructive" as const },
 });
 
 export const UNKNOWN_STATUS = Object.freeze({
   label: "status.unknown",
-  className: "badge--secondary",
+  variant: "secondary" as const,
 });
 
 export const LIMITS = Object.freeze({
@@ -59,6 +60,15 @@ export const LIMITS = Object.freeze({
   NAME_MAX: 100,
   PROFILE_NAME_MAX: 50,
   BIOGRAPHY_MAX: 30,
+  CATEGORY_TITLE_MIN: 3,
+  CATEGORY_TITLE_MAX: 100,
+  CATEGORY_DESCRIPTION_MIN: 3,
+  CATEGORY_DESCRIPTION_MAX: 200,
+  PAGE_SIZE: 10,
+  PAGE_SIZE_MAX: 100,
 });
+
+// The category model's type enum; labels are `category.types.<type>` keys.
+export const CATEGORY_TYPES = ["project", "post", "comment", "ticket"] as const;
 
 export const PHONE_PATTERN = /^09[0-9]{9}$/;

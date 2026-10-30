@@ -20,7 +20,7 @@ describe("LanguageProvider", () => {
 
   it("switches to English ltr and saves the choice", () => {
     renderToggle();
-    fireEvent.click(screen.getByRole("button", { name: "تغییر زبان" }));
+    fireEvent.click(screen.getByRole("button", { name: "EN تغییر زبان" }));
     expect(document.documentElement).toHaveAttribute("lang", "en");
     expect(document.documentElement).toHaveAttribute("dir", "ltr");
     expect(i18n.language).toBe("en");
@@ -30,7 +30,7 @@ describe("LanguageProvider", () => {
   it("restores a saved choice and treats junk as Persian", () => {
     localStorage.setItem("language", '"en"');
     const { unmount } = renderToggle();
-    expect(screen.getByRole("button", { name: "Switch language" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "فا Switch language" })).toBeInTheDocument();
     unmount();
 
     localStorage.setItem("language", '"xx"');

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import useAuthorize from "../features/authentication/useAuthorize";
 import { useEffect, type ReactNode } from "react";
 import Loading from "../ui/Loading";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   // 3. while loading => show loading
   if (isLoading)
     return (
-      <div className="flex items-center justify-center h-screen bg-secondary-100">
+      <div className="flex items-center justify-center h-screen bg-muted">
         <Loading />
       </div>
     );

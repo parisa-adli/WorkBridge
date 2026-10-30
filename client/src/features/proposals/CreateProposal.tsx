@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Textfield from "../../ui/Textfield";
+import Input from "../../ui/Input";
+import Button from "../../ui/Button";
 import Loading from "../../ui/Loading";
 import useCreateProposal from "./useCreateProposal";
 import { proposalSchema, type ProposalInput, type ProposalValues } from "../../schemas/proposal";
@@ -28,36 +29,16 @@ function CreateProposal({ onClose, projectId }: { onClose: () => void; projectId
   return (
     <div>
       <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-        <Textfield
-          label={t("common.description")}
-          name="description"
-          register={register}
-          required
-          errors={errors}
-        />
-        <Textfield
-          label={t("proposal.price")}
-          name="price"
-          type="number"
-          register={register}
-          required
-          errors={errors}
-        />
-        <Textfield
-          label={t("proposal.duration")}
-          name="duration"
-          type="number"
-          register={register}
-          required
-          errors={errors}
-        />
+        <Input label={t("common.description")} required error={errors.description?.message} {...register("description")} />
+        <Input label={t("proposal.price")} type="number" required error={errors.price?.message} {...register("price")} />
+        <Input label={t("proposal.duration")} type="number" required error={errors.duration?.message} {...register("duration")} />
         <div className="mt-8!">
           {isCreating ? (
             <Loading />
           ) : (
-            <button type="submit" className="btn btn--primary w-full">
+            <Button type="submit" className="w-full">
               {t("common.confirm")}
-            </button>
+            </Button>
           )}
         </div>
       </form>

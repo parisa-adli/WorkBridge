@@ -3,7 +3,7 @@ const { default: AxeBuilder } = require("@axe-core/playwright");
 
 // Phase 29 reference pages: no WCAG 2.2 AA violations in either language or theme (docs/design.md §6).
 // Signed in, not-access also shows the link to the user's dashboard.
-const OWNER = { email: "owner@workbridge.dev", password: "Owner@1234" };
+const OWNER = { username: "demo-owner", password: "Owner@1234" };
 const PAGES = [
   { name: "404", path: "/no-such-page" },
   { name: "not-access", path: "/not-access" },
@@ -22,7 +22,7 @@ for (const language of ["fa", "en"]) {
           { language, dark: theme === "dark" }
         );
         // page.request shares the page's cookie jar, so the session cookies reach the client.
-        if (owner) expect((await page.request.post(`${process.env.E2E_SERVER_URL}/api/user/login`, { data: OWNER })).ok()).toBe(true);
+        if (owner) expect((await page.request.post(`${process.env.E2E_SERVER_URL}/api/user/demo-login`, { data: OWNER })).ok()).toBe(true);
         await page.goto(`${process.env.E2E_CLIENT_URL}${path}`);
         await expect(page.locator("html")).toHaveAttribute("lang", language);
         await expect(page.locator("html")).toHaveClass(theme === "dark" ? /dark-mode/ : /^(?!.*dark-mode)/);

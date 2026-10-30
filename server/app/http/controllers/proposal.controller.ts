@@ -5,11 +5,7 @@ import { ProposalModel } from "../../models/proposal";
 import type { AddProposalBody, ChangeProposalStatusBody } from "../validators/proposal.schema";
 import { ProjectModel } from "../../models/project";
 import { assertProjectOwner } from "./project.controller";
-import {
-  copyObject,
-  findByIdOr404,
-  createdAtSort,
-} from "../../../utils/functions";
+import { findByIdOr404, createdAtSort, pagination } from "../../../utils/functions";
 import { ROLES, STATUS, PROJECT_STATUS } from "../../../utils/constants";
 import { apiError, sendData } from "../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES, type SuccessCode } from "../../../utils/errorCodes";
@@ -59,14 +55,24 @@ class ProposalController extends Controller {
       dbQuery["user"] = user._id;
     }
 
-    const proposals = await ProposalModel.find(dbQuery)
-      .populate([
-        { path: "user", select: { name: 1 } },
-        { path: "project", select: { owner: 1 }, populate: { path: "owner", select: { name: 1 } } },
-      ])
-      .sort(createdAtSort(req.query.sort));
+    const { page, limit, skip } = pagination(req.query);
+    const [items, total] = await Promise.all([
+      ProposalModel.find(dbQuery)
+        .populate([
+          { path: "user", select: { name: 1, translations: 1 } },
+          {
+            path: "project",
+            select: { owner: 1, title: 1, translations: 1 },
+            populate: { path: "owner", select: { name: 1, translations: 1 } },
+          },
+        ])
+        .sort(createdAtSort(req.query.sort))
+        .skip(skip)
+        .limit(limit),
+      ProposalModel.countDocuments(dbQuery),
+    ]);
 
-    return sendData(res, HttpStatus.OK, { proposals });
+    return sendData(res, HttpStatus.OK, { items, total, page, limit });
   }
   async getProposalById(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
@@ -81,17 +87,28 @@ class ProposalController extends Controller {
     const project = await findProject(proposal.project);
     assertProjectOwner(project, req.user!);
 
-    await ProposalModel.updateOne(
-      { _id: id },
-      { $set: { status } }
-    );
-
-    const freelancer = status === STATUS.ACCEPTED ? copyObject(proposal).user : null;
-
-    await ProjectModel.updateOne(
-      { _id: project._id },
-      { $set: { freelancer } }
-    );
+    // Safe sequence instead of a transaction: the conditional project update is the atomic step that
+    // lets only one proposal per project win, so a refused accept changes nothing.
+    if (status === STATUS.ACCEPTED) {
+      const claim = await ProjectModel.updateOne(
+        { _id: project._id, freelancer: { $in: [null, proposal.user] } },
+        { $set: { freelancer: proposal.user, status: PROJECT_STATUS.CLOSED } }
+      );
+      if (claim.matchedCount === 0)
+        throw apiError(409, ERROR_CODES.PROPOSAL_ALREADY_ACCEPTED, "پیشنهاد دیگری برای این پروژه قبلا تایید شده است");
+      await ProposalModel.updateOne({ _id: id }, { $set: { status } });
+      await ProposalModel.updateMany(
+        { project: project._id, _id: { $ne: id }, status: STATUS.PENDING },
+        { $set: { status: STATUS.REJECTED } }
+      );
+    } else {
+      await ProposalModel.updateOne({ _id: id }, { $set: { status } });
+      // un-accepting frees the project; its status stays the owner's call
+      await ProjectModel.updateOne(
+        { _id: project._id, freelancer: proposal.user },
+        { $set: { freelancer: null } }
+      );
+    }
 
     let result: { message: string; code: SuccessCode } = { message: "وضعیت پروپوزال تایید شد", code: SUCCESS_CODES.PROPOSAL_ACCEPTED };
     if (status === STATUS.REJECTED)

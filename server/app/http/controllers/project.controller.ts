@@ -6,7 +6,7 @@ import { ProposalModel } from "../../models/proposal";
 import type { UserDocument } from "../../models/user";
 import type { AddProjectBody, ChangeProjectStatusBody } from "../validators/project.schema";
 import { ROLES, PROJECT_STATUS } from "../../../utils/constants";
-import { findByIdOr404, buildProjectQuery } from "../../../utils/functions";
+import { findByIdOr404, buildProjectQuery, pagination } from "../../../utils/functions";
 import { apiError, sendData } from "../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
 
@@ -42,36 +42,54 @@ class ProjectController extends Controller {
   }
   async getListOfProjects(req: Request, res: Response) {
     const { filter, sort } = await buildProjectQuery(req.query);
+    const { page, limit, skip } = pagination(req.query);
 
-    const projects = await ProjectModel.find(filter)
-      .select({
-        freelancer: 0,
-        proposals: 0,
-      })
-      .populate([
-        { path: "category", select: { title: 1, englishTitle: 1 } },
-        { path: "owner", select: { name: 1 } },
-      ])
-      .sort(sort);
+    const [items, total] = await Promise.all([
+      ProjectModel.find(filter)
+        .select({
+          freelancer: 0,
+          proposals: 0,
+        })
+        .populate([
+          { path: "category", select: { title: 1, englishTitle: 1 } },
+          { path: "owner", select: { name: 1, translations: 1 } },
+        ])
+        .sort(sort)
+        .skip(skip)
+        .limit(limit),
+      ProjectModel.countDocuments(filter),
+    ]);
 
-    return sendData(res, HttpStatus.OK, { projects });
+    return sendData(res, HttpStatus.OK, { items, total, page, limit });
   }
   async getListOfOwnerProjects(req: Request, res: Response) {
     const { filter, sort } = await buildProjectQuery(req.query);
+    const { page, limit, skip } = pagination(req.query);
+    const ownFilter = { ...filter, owner: req.user!._id };
 
-    const projects = await ProjectModel.find({ ...filter, owner: req.user!._id })
-      .populate([
-        { path: "category", select: { title: 1, englishTitle: 1 } },
-        { path: "owner", select: { name: 1 } },
-        { path: "freelancer", select: { name: 1 } },
-      ])
-      .sort(sort);
+    const [items, total] = await Promise.all([
+      ProjectModel.find(ownFilter)
+        .populate([
+          { path: "category", select: { title: 1, englishTitle: 1 } },
+          { path: "owner", select: { name: 1, translations: 1 } },
+          { path: "freelancer", select: { name: 1, translations: 1 } },
+        ])
+        .sort(sort)
+        .skip(skip)
+        .limit(limit),
+      ProjectModel.countDocuments(ownFilter),
+    ]);
 
-    return sendData(res, HttpStatus.OK, { projects });
+    return sendData(res, HttpStatus.OK, { items, total, page, limit });
   }
   async getProjectById(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;
-    await this.findOwnProject(id, req.user!);
+    const user = req.user!;
+    // freelancers get a read-only view of any project, with only their own proposal
+    const isFreelancer = user.role === ROLES.FREELANCER;
+    if (isFreelancer)
+      await findByIdOr404(ProjectModel, id, ERROR_CODES.PROJECT_NOT_FOUND, "پروژه یافت نشد.");
+    else await this.findOwnProject(id, user);
     const project = await ProjectModel.findById(id).populate([
       {
         path: "category",
@@ -84,23 +102,24 @@ class ProjectController extends Controller {
       {
         path: "proposals",
         model: "Proposal",
+        match: isFreelancer ? { user: user._id } : {},
         populate: [
           {
             path: "user",
             model: "User",
-            select: { name: 1 },
+            select: { name: 1, translations: 1 },
           },
         ],
       },
       {
         path: "owner",
         model: "User",
-        select: { name: 1 },
+        select: { name: 1, translations: 1 },
       },
       {
         path: "freelancer",
         model: "User",
-        select: { name: 1 },
+        select: { name: 1, translations: 1 },
       },
     ]);
 
@@ -160,6 +179,8 @@ class ProjectController extends Controller {
       { _id: id },
       {
         $set: { title, description, tags, deadline, category, budget },
+        // the edited text is the owner's own; a seeded English version would be stale
+        $unset: { translations: 1 },
       }
     );
     if (updateResult.modifiedCount == 0)

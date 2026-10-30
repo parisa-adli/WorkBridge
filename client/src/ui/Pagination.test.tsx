@@ -8,9 +8,11 @@ function renderAt(page: number, totalPages: number) {
   return onPageChange;
 }
 
-// Page buttons are named by their number ("2", "۲" in fa) inside the pagination nav.
+// Page buttons are named by their number ("2", "۲" in fa); the ends show their labels; a gap reads "…".
 const pageLabels = () =>
-  screen.getAllByRole("listitem").map((li) => li.textContent);
+  screen
+    .getAllByRole("listitem")
+    .map((li) => (li.querySelector("[data-slot=pagination-ellipsis]") ? "…" : li.textContent));
 
 describe("Pagination", () => {
   it("marks the current page", () => {
@@ -28,17 +30,17 @@ describe("Pagination", () => {
 
   it("lists every page when there are up to seven", () => {
     renderAt(1, 7);
-    expect(pageLabels()).toEqual(["", "۱", "۲", "۳", "۴", "۵", "۶", "۷", ""]);
+    expect(pageLabels()).toEqual(["صفحه قبل", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "صفحه بعد"]);
   });
 
   it("collapses long ranges around the current page", () => {
     renderAt(5, 10);
-    expect(pageLabels()).toEqual(["", "۱", "…", "۴", "۵", "۶", "…", "۱۰", ""]);
+    expect(pageLabels()).toEqual(["صفحه قبل", "۱", "…", "۴", "۵", "۶", "…", "۱۰", "صفحه بعد"]);
   });
 
   it("keeps the first pages together at the start of a long range", () => {
     renderAt(2, 10);
-    expect(pageLabels()).toEqual(["", "۱", "۲", "۳", "…", "۱۰", ""]);
+    expect(pageLabels()).toEqual(["صفحه قبل", "۱", "۲", "۳", "…", "۱۰", "صفحه بعد"]);
   });
 
   it("disables previous on the first page and next on the last", () => {

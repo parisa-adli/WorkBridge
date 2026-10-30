@@ -56,6 +56,13 @@ describe("POST /api/proposal/add", () => {
     expect(res.status).toBe(403);
   });
 
+  it("forbids admins", async () => {
+    const admin = await createUser(app, { phoneNumber: "09120000025", role: "ADMIN" });
+    const res = await admin.agent.post("/api/proposal/add").send(proposalBody());
+    expect(res.status).toBe(403);
+    expect(await ProposalModel.countDocuments()).toBe(0);
+  });
+
   it("requires price (400, not a model 500)", async () => {
     const { price, ...body } = proposalBody();
     const res = await freelancer.agent.post("/api/proposal/add").send(body);
@@ -108,24 +115,97 @@ describe("GET /api/proposal/list", () => {
     const res = await freelancer.agent.get("/api/proposal/list");
 
     expect(res.status).toBe(200);
-    expect(res.body.data.proposals.map((p: { _id: string }) => p._id)).toEqual([String(mine._id)]);
-    const [p] = res.body.data.proposals;
+    expect(res.body.data.items.map((p: { _id: string }) => p._id)).toEqual([String(mine._id)]);
+    const [p] = res.body.data.items;
     expect(p.user).toMatchObject({ _id: String(freelancer.user._id), name: freelancer.user.name });
+    expect(p.project).toMatchObject({ _id: String(project._id), title: "Landing page" });
     expect(p.project.owner).toMatchObject({ _id: String(owner.user._id), name: owner.user.name });
   });
 });
 
+describe("GET /api/project/:id as a freelancer", () => {
+  it("reads any project, read-only, with only the freelancer's own proposal", async () => {
+    const mine = await addProposal();
+    await ProposalModel.create({
+      description: "other",
+      price: 1,
+      duration: 1,
+      user: otherOwner.user._id,
+      project: project._id,
+    }).then((p) => ProjectModel.updateOne({ _id: project._id }, { $push: { proposals: p._id } }));
+
+    const res = await freelancer.agent.get(`/api/project/${project._id}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.project.title).toBe("Landing page");
+    expect(res.body.data.project.proposals.map((p: { _id: string }) => p._id)).toEqual([String(mine._id)]);
+    expect((await freelancer.agent.patch(`/api/project/${project._id}`).send({ status: "CLOSED" })).status).toBe(403);
+    expect((await freelancer.agent.delete(`/api/project/${project._id}`)).status).toBe(403);
+  });
+
+  it("returns 404 for a project that does not exist", async () => {
+    const res = await freelancer.agent.get(`/api/project/${new mongoose.Types.ObjectId()}`);
+    expect(res.status).toBe(404);
+  });
+});
+
 describe("PATCH /api/proposal/:id (accept/reject)", () => {
-  it("accepting sets the proposal to 2 and assigns the freelancer to the project", async () => {
+  const otherProposal = (status: 0 | 1 = 1) =>
+    ProposalModel.create({
+      description: "other",
+      price: 1,
+      duration: 1,
+      user: otherOwner.user._id,
+      project: project._id,
+      status,
+    });
+
+  it("accepting assigns the freelancer, closes the project and rejects the other pending proposals", async () => {
     const proposal = await addProposal();
+    const pending = await otherProposal();
     const res = await owner.agent.patch(`/api/proposal/${proposal._id}`).send({ status: 2 });
 
     expect(res.status).toBe(200);
     expect(res.body.data.message).toBe("وضعیت پروپوزال تایید شد");
     expect((await ProposalModel.findById(proposal._id))!.status).toBe(2);
+    expect((await ProposalModel.findById(pending._id))!.status).toBe(0);
     const updated = (await ProjectModel.findById(project._id))!;
     expect(String(updated.freelancer)).toBe(String(freelancer.user._id));
-    expect(updated.status).toBe("OPEN"); // accepting does not close the project
+    expect(updated.status).toBe("CLOSED");
+  });
+
+  it("refuses a second accepted proposal on the same project, changing nothing", async () => {
+    const proposal = await addProposal();
+    const second = await otherProposal(0);
+    await owner.agent.patch(`/api/proposal/${proposal._id}`).send({ status: 2 }).expect(200);
+
+    const res = await owner.agent.patch(`/api/proposal/${second._id}`).send({ status: 2 });
+
+    expect(res.status).toBe(409);
+    expect(res.body.code).toBe("PROPOSAL_ALREADY_ACCEPTED");
+    expect((await ProposalModel.findById(second._id))!.status).toBe(0);
+    expect(String((await ProjectModel.findById(project._id))!.freelancer)).toBe(String(freelancer.user._id));
+  });
+
+  it("un-accepting clears the freelancer and leaves the project status to the owner", async () => {
+    const proposal = await addProposal();
+    await owner.agent.patch(`/api/proposal/${proposal._id}`).send({ status: 2 }).expect(200);
+
+    await owner.agent.patch(`/api/proposal/${proposal._id}`).send({ status: 1 }).expect(200);
+
+    const updated = (await ProjectModel.findById(project._id))!;
+    expect(updated.freelancer).toBeNull();
+    expect(updated.status).toBe("CLOSED");
+  });
+
+  it("rejecting a proposal that was not accepted keeps the assigned freelancer", async () => {
+    const proposal = await addProposal();
+    const other = await otherProposal();
+    await owner.agent.patch(`/api/proposal/${proposal._id}`).send({ status: 2 }).expect(200);
+
+    await owner.agent.patch(`/api/proposal/${other._id}`).send({ status: 0 }).expect(200);
+
+    expect(String((await ProjectModel.findById(project._id))!.freelancer)).toBe(String(freelancer.user._id));
   });
 
   it("rejecting sets the proposal to 0 and clears the project's freelancer", async () => {

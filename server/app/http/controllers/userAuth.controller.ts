@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import fs from "fs/promises";
+import path from "path";
 import type { Request, Response } from "express";
 import { StatusCodes as HttpStatus } from "http-status-codes";
 import Controller from "./controller";
@@ -9,6 +11,8 @@ import {
   verifyRefreshToken,
   cookieOptions,
   verifyPassword,
+  isDemoUser,
+  imageExtension,
 } from "../../../utils/functions";
 import { apiError, sendData } from "../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
@@ -17,12 +21,14 @@ import type {
   CheckOtpBody,
   CompleteProfileBody,
   GetOtpBody,
-  LoginBody,
+  DemoLoginBody,
   UpdateProfileBody,
 } from "../validators/user.schema";
 const CODE_EXPIRES = 90 * 1000; //90 seconds in miliseconds
 
 const showOtp = () => process.env.NODE_ENV !== "production";
+// server/, the folder that holds uploads/ (served at /uploads by app/server.ts)
+const SERVER_ROOT = path.join(__dirname, "..", "..", "..");
 
 class userAuthController extends Controller {
   // The routes validate each body (validate(schema) in router/userAuth.ts) before these handlers run.
@@ -68,12 +74,12 @@ class userAuthController extends Controller {
 
     return sendData(res, HttpStatus.OK, { ...welcome, user });
   }
-  async login(req: Request<object, unknown, LoginBody>, res: Response) {
-    const { email, password } = req.body;
+  async demoLogin(req: Request<object, unknown, DemoLoginBody>, res: Response) {
+    const { username, password } = req.body;
 
-    const user = await UserModel.findOne({ email: email.toLowerCase() });
+    const user = await UserModel.findOne({ username });
     if (!user?.password || !(await verifyPassword(password, user.password)))
-      throw apiError(401, ERROR_CODES.INVALID_CREDENTIALS, "ایمیل یا رمز عبور اشتباه است");
+      throw apiError(401, ERROR_CODES.INVALID_CREDENTIALS, "نام کاربری یا رمز عبور اشتباه است");
 
     await setAccessToken(res, user);
     await setRefreshToken(res, user);
@@ -131,6 +137,10 @@ class userAuthController extends Controller {
     const user = req.user!;
     const { name, email, role } = req.body;
 
+    // complete-profile sets the role
+    if (isDemoUser(user))
+      throw apiError(403, ERROR_CODES.DEMO_ACCOUNT_LOCKED, "حساب نمایشی قابل تغییر نیست");
+
     if (!user.isVerifiedPhoneNumber)
       throw apiError(403, ERROR_CODES.PHONE_NOT_VERIFIED, "شماره موبایل خود را تایید کنید.");
 
@@ -163,7 +173,7 @@ class userAuthController extends Controller {
     const { _id: userId } = req.user!;
     const { name, email, biography, phoneNumber } = req.body;
 
-    // No "nothing changed" check: timestamps bump updatedAt, so modifiedCount is never 0 (known-bugs.md).
+    // No "nothing changed" check: timestamps bump updatedAt, so modifiedCount is never 0.
     await UserModel.updateOne(
       { _id: userId },
       {
@@ -173,6 +183,25 @@ class userAuthController extends Controller {
     return sendData(res, HttpStatus.OK, {
       message: "اطلاعات با موفقیت آپدیت شد",
       code: SUCCESS_CODES.PROFILE_UPDATED,
+    });
+  }
+  async updateAvatar(req: Request, res: Response) {
+    // the route runs verifyAccessToken first, which sets req.user, then reads the image into req.body
+    const { _id: userId, avatar: oldAvatar } = req.user!;
+    const extension = imageExtension(req.body);
+    if (!extension)
+      throw apiError(400, ERROR_CODES.INVALID_AVATAR_TYPE, "فرمت تصویر باید jpg، png یا webp باشد");
+
+    const avatar = `uploads/${userId}-${Date.now()}.${extension}`;
+    await fs.writeFile(path.join(SERVER_ROOT, avatar), req.body);
+    const user = await UserModel.findByIdAndUpdate(userId, { $set: { avatar } }, { returnDocument: "after" });
+    if (oldAvatar) await fs.rm(path.join(SERVER_ROOT, oldAvatar), { force: true });
+
+    return sendData(res, HttpStatus.OK, {
+      message: "تصویر پروفایل با موفقیت آپدیت شد",
+      code: SUCCESS_CODES.AVATAR_UPDATED,
+      // the model's virtual: SERVER_URL + avatar
+      avatarUrl: user!.get("avatarUrl") as string,
     });
   }
   async refreshToken(req: Request, res: Response) {

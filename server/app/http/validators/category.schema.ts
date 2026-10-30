@@ -23,7 +23,7 @@ export const addCategorySchema = z.object({
   englishTitle,
   description,
   type,
-  parent: z
+  parentId: z
     .string(invalidId)
     .refine((value) => value === "" || MongoIDPattern.test(value), invalidId)
     .optional(),

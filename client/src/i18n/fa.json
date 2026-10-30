@@ -7,24 +7,33 @@
     "name": "فریلنسر اپ"
   },
   "common": {
+    "loading": "در حال بارگذاری",
     "cancel": "لغو",
     "confirm": "تایید",
     "status": "وضعیت",
     "changeStatus": "تغییر وضعیت",
+    "pickDate": "انتخاب تاریخ",
+    "select": "انتخاب کنید",
+    "removeTag": "حذف {{tag}}",
     "notFound": "{{name}} یافت نشد.",
+    "loadError": "بارگذاری فهرست انجام نشد. بعدا دوباره امتحان کنید.",
     "confirmDelete": "آیا از حذف {{name}} مطمئن هستید؟",
     "actions": "عملیات",
     "all": "همه",
     "description": "توضیحات",
     "back": "برگشت",
-    "close": "بستن"
+    "close": "بستن",
+    "menu": "منو",
+    "menuDescription": "پیوند صفحه های پنل شما",
+    "darkMode": "تغییر حالت تاریک"
   },
   "nav": {
     "home": "خانه",
     "dashboard": "داشبورد",
     "users": "کاربران",
     "projects": "پروژه ها",
-    "proposals": "درخواست ها"
+    "proposals": "درخواست ها",
+    "categories": "دسته بندی ها"
   },
   "dashboard": {
     "title": "آمار کلی",
@@ -32,12 +41,15 @@
   },
   "roles": {
     "owner": "کارفرما",
-    "freelancer": "فریلنسر"
+    "freelancer": "فریلنسر",
+    "admin": "مدیر"
   },
   "auth": {
-    "emailTab": "ورود با ایمیل",
+    "logout": "خروج",
+    "demoTab": "ورود نمایشی",
     "phoneTab": "ورود با موبایل",
     "email": "ایمیل",
+    "username": "نام کاربری",
     "password": "رمز عبور",
     "login": "ورود",
     "phoneNumber": "شماره موبایل",
@@ -48,7 +60,8 @@
     "enterOtp": "کد تایید را وارد کنید",
     "fullName": "نام و نام خانوادگی",
     "profilePending": "پروفایل شما در انتظار تایید است",
-    "profileNotVerified": "پروفایل شما هنوز تایید نشده است"
+    "profileNotVerified": "پروفایل شما هنوز تایید نشده است",
+    "editPhone": "ویرایش شماره موبایل"
   },
   "status": {
     "rejected": "رد شده",
@@ -85,10 +98,14 @@
     "delete": "حذف {{title}}",
     "list": "لیست پروژه ها",
     "proposalsOf": "لیست درخواست های {{title}}",
+    "loadError": "بارگذاری پروژه انجام نشد. بعدا دوباره امتحان کنید.",
+    "yourProposal": "درخواست شما",
+    "noProposal": "هنوز ارسال نشده",
     "sort": "مرتب سازی",
     "sortLatest": "مرتب سازی (جدید ترین)",
     "sortEarliest": "مرتب سازی (قدیمی ترین)",
-    "allCategories": "دسته بندی (همه)"
+    "allCategories": "دسته بندی (همه)",
+    "view": "مشاهده {{title}}"
   },
   "proposal": {
     "resource": "درخواستی",
@@ -101,12 +118,41 @@
     "changeStatus": "تغییر وضعیت درخواست",
     "list": "لیست پروپوزال ها"
   },
+  "profile": {
+    "title": "پروفایل",
+    "changeAvatar": "تغییر تصویر پروفایل",
+    "avatarHint": "jpg، png یا webp، حداکثر ۲ مگابایت",
+    "biography": "حوزه تخصصی",
+    "save": "ذخیره تغییرات"
+  },
+  "category": {
+    "resource": "دسته بندی",
+    "list": "لیست دسته بندی ها",
+    "title": "عنوان فارسی",
+    "englishTitle": "عنوان انگلیسی",
+    "type": "نوع",
+    "parent": "دسته بندی والد",
+    "noParent": "بدون والد",
+    "add": "افزودن دسته بندی",
+    "addNew": "افزودن دسته بندی جدید",
+    "edit": "ویرایش {{title}}",
+    "delete": "حذف {{title}}",
+    "childrenWarning": "زیر دسته های آن ({{count}}) هم حذف می شوند.",
+    "types": {
+      "project": "پروژه",
+      "post": "پست",
+      "comment": "نظر",
+      "ticket": "تیکت"
+    }
+  },
   "user": {
     "resource": "کاربری",
     "name": "نام",
     "role": "نقش",
     "changeStatus": "تغییر وضعیت کاربر",
-    "list": "لیست کاربران"
+    "list": "لیست کاربران",
+    "createdProjects": "پروژه‌های ایجادشده",
+    "completedProjects": "پروژه‌های انجام‌شده"
   },
   "pages": {
     "notFound": "صفحه‌ای که دنبالش بودید پیدا نشد",
@@ -119,7 +165,8 @@
   "pagination": {
     "label": "صفحه‌بندی",
     "previous": "صفحه قبل",
-    "next": "صفحه بعد"
+    "next": "صفحه بعد",
+    "more": "صفحه‌های بیشتر"
   },
   "validation": {
     "phoneRequired": "شماره موبایل معتبر را وارد کنید",
@@ -129,7 +176,7 @@
     "fullNameRequired": "نام و نام خانوادگی ضروری است",
     "emailRequired": "ایمیل ضروری است",
     "invalidEmail": "ایمیل نامعتبر است",
-    "invalidLoginEmail": "ایمیل وارد شده صحیح نمی باشد",
+    "usernameRequired": "نام کاربری ضروری است",
     "roleRequired": "انتخاب نقش ضروری است",
     "passwordRequired": "رمز عبور ضروری است",
     "titleRequired": "عنوان ضروری است",
@@ -145,13 +192,14 @@
     "durationRequired": "مدت زمان ضروری است",
     "invalidDuration": "مدت زمان مجاز نمی باشد",
     "invalidProposalStatus": "وضعیت پروپوزال صحیح نمی باشد",
-    "invalidUserStatus": "وضعیت کاربر صحیح نمی باشد"
+    "invalidUserStatus": "وضعیت کاربر صحیح نمی باشد",
+    "invalidCategoryType": "نوع دسته بندی صحیح نمی باشد"
   },
   "home": {
     "subtitle": "پلتفرمی برای کارفرما و فریلنسر",
     "intro": "پلتفرمی هوشمند برای اتصال کارفرماها و فریلنسرها در دنیای پرسرعت امروز، ما بستری فراهم کرده‌ایم که کارفرماها بتوانند پروژه‌های خود را با چند کلیک تعریف کنند و فریلنسرهای متخصص، دقیق و متعهد آن‌ها را اجرا کنند. از ثبت درخواست تا تحویل نهایی، همه چیز ساده، شفاف و قابل پیگیری است.",
     "popularCategories": "دسته بندی های محبوب",
-    "skillsCount": "از میان بیش از ۱۳۰۰ مهارت حرفه‌ای انتخاب کن",
+    "skillsCount": "پروژه‌های باز را بر اساس دسته بندی ببین",
     "projectsCount": "{{n}} پروژه",
     "needProjectTitle": "نیاز به اجرای یک پروژه دارم",
     "needProjectText": "پروژه‌ات رو با بودجه دلخواهت به جامعه‌ای خلاق بسپار و نتیجه بگیر",
@@ -162,39 +210,21 @@
     "achievementsText": "ما در فریلنسر اپ، باور داریم که استعداد مرز نمی‌شناسد و فرصت‌ها هم نباید محدود باشند",
     "footerText": "فریلنسر اپ بستری امن و حرفه‌ای برای ارتباط بین کارفرماها و فریلنسرهاست؛ جایی که پروژه‌ها با شفافیت تعریف و با کیفیت اجرا می‌شوند.",
     "copyright": "© {{year}} FreelancerApp تمام حقوق محفوظ است.",
-    "categories": {
-      "development": "برنامه نویسی",
-      "design": "طراحی و خلاقیت",
-      "marketing": "بازاریابی دیجیتال",
-      "writing": "نویسندگی و ترجمه",
-      "music": "موسیقی و ویدئو",
-      "video": "ویدئو و انیمیشن",
-      "architecture": "طراحی معماری",
-      "finance": "مالی و حسابداری"
-    },
     "stats": {
       "freelancers": "فریلنسرها",
-      "postedProjects": "پروژه های ثبت شده",
-      "completedProjects": "پروژه های تکمیل شده",
-      "companies": "شرکت های ثبت شده"
+      "owners": "کارفرماها",
+      "openProjects": "پروژه های باز"
     },
     "footer": {
       "clients": "کارفرماها",
       "postProject": "ثبت پروژه",
-      "findFreelancer": "پیدا کردن فریلنسر",
       "manageProjects": "مدیریت پروژه‌ها",
-      "clientGuide": "راهنمای کارفرما",
       "freelancers": "فریلنسرها",
       "findProject": "پیدا کردن پروژه",
-      "buildProfile": "ساخت پروفایل",
-      "rules": "قوانین همکاری",
-      "freelancerGuide": "راهنمای فریلنسر",
-      "support": "پشتیبانی",
-      "contact": "تماس با ما",
-      "faq": "سؤالات متداول",
-      "terms": "قوانین و مقررات",
-      "privacy": "حریم خصوصی"
-    }
+      "buildProfile": "ساخت پروفایل"
+    },
+    "statsError": "آمار بارگذاری نشد. بعدا دوباره امتحان کنید.",
+    "noCategories": "هنوز دسته بندی‌ای نیست"
   },
   "server": {
     "BAD_REQUEST": "درخواست نامعتبر است",
@@ -218,14 +248,16 @@
     "INVALID_EMAIL": "ایمیل معتبر نیست",
     "INVALID_ROLE": "نقش معتبر نیست",
     "INVALID_BIOGRAPHY": "بیوگرافی معتبر نیست",
+    "INVALID_USERNAME": "نام کاربری صحیح نمی باشد",
     "PASSWORD_REQUIRED": "رمز عبور را وارد کنید",
-    "INVALID_CREDENTIALS": "ایمیل یا رمز عبور اشتباه است",
+    "INVALID_CREDENTIALS": "نام کاربری یا رمز عبور اشتباه است",
     "LOGIN_REQUIRED": "لطفا وارد حساب کاربری خود شوید.",
     "INVALID_TOKEN": "توکن نامعتبر است",
     "ACCOUNT_NOT_FOUND": "حساب کاربری یافت نشد",
     "PROFILE_PENDING": "پروفایل شما در انتظار بررسی است.",
     "PROFILE_REJECTED": "پروفایل شما رد شده است",
     "ACCESS_DENIED": "شما به این قسمت دسترسی ندارید",
+    "DEMO_ACCOUNT_LOCKED": "حساب نمایشی قابل تغییر نیست",
     "INVALID_USER_STATUS": "وضعیت کاربر معتبر نیست",
     "USER_STATUS_NOT_UPDATED": "وضعیت کاربر آپدیت نشد",
     "PROJECT_NOT_FOUND": "پروژه یافت نشد.",
@@ -244,6 +276,7 @@
     "PROPOSAL_NOT_CREATED": "پیشنهاد ثبت نشد",
     "PROJECT_NOT_OPEN": "پروژه بسته است",
     "DUPLICATE_PROPOSAL": "برای این پروژه قبلا پیشنهاد ثبت کرده اید",
+    "PROPOSAL_ALREADY_ACCEPTED": "پیشنهاد دیگری برای این پروژه قبلا تایید شده است",
     "INVALID_DURATION": "مدت زمان معتبر نیست",
     "INVALID_PROJECT_ID": "شناسه پروژه معتبر نیست",
     "INVALID_PROPOSAL_STATUS": "وضعیت درخواست معتبر نیست",
@@ -251,11 +284,14 @@
     "CATEGORY_NOT_CREATED": "دسته بندی ثبت نشد",
     "CATEGORY_NOT_UPDATED": "به روزرسانی انجام نشد",
     "CATEGORY_NOT_DELETED": "حذف دسته بندی انجام نشد",
+    "CATEGORY_IN_USE": "این دسته بندی در پروژه ها استفاده شده و قابل حذف نیست",
     "DUPLICATE_CATEGORY": "دسته بندی با این عنوان وجود دارد.",
     "INVALID_CATEGORY_TITLE": "عنوان دسته بندی معتبر نیست",
     "INVALID_CATEGORY_ENGLISH_TITLE": "عنوان انگلیسی دسته بندی معتبر نیست",
     "INVALID_CATEGORY_DESCRIPTION": "توضیحات دسته بندی معتبر نیست",
     "INVALID_CATEGORY_TYPE": "نوع دسته بندی معتبر نیست",
+    "INVALID_AVATAR_TYPE": "فرمت تصویر باید jpg، png یا webp باشد",
+    "AVATAR_TOO_LARGE": "حجم تصویر نباید بیشتر از ۲ مگابایت باشد",
     "OTP_SENT": "کد تائید برای شماره موبایل {{phoneNumber}} ارسال گردید",
     "OTP_VERIFIED": "کد تایید شد، به سایت freelancer خوش آمدید",
     "OTP_VERIFIED_COMPLETE_PROFILE": "کد تایید شد، لطفا اطلاعات خود را تکمیل کنید",
@@ -277,6 +313,7 @@
     "PROPOSAL_PENDING": "وضعیت پروپوزال در انتظار تایید است",
     "CATEGORY_CREATED": "دسته بندی با موفقیت افزوده شد",
     "CATEGORY_UPDATED": "دسته بندی با موفقیت به روزرسانی شد",
-    "CATEGORY_DELETED": "دسته بندی با موفقیت حذف شد"
+    "CATEGORY_DELETED": "دسته بندی با موفقیت حذف شد",
+    "AVATAR_UPDATED": "تصویر پروفایل با موفقیت آپدیت شد"
   }
 }

@@ -23,7 +23,7 @@ function ToggleProjectStatus({ project }: { project: Project }) {
   return (
     <div className="w-20">
       {isUpdating ? (
-        <Loading height={20} width={50} />
+        <Loading className="size-5" />
       ) : (
         <Toggle
           label={t(PROJECT_STATUS_BADGES[isOpen ? PROJECT_STATUS.OPEN : PROJECT_STATUS.CLOSED].label)}

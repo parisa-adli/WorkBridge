@@ -2,7 +2,7 @@ import { z } from "zod";
 import { LIMITS, PROJECT_STATUS } from "../../../utils/constants";
 import { ERROR_CODES } from "../../../utils/errorCodes";
 import { issue } from "../middlewares/validate";
-import { numeric, objectId, searchQuery, sortQuery } from "./common.schema";
+import { numeric, objectId, pageQuery, searchQuery, sortQuery } from "./common.schema";
 
 const invalidTitle = issue(ERROR_CODES.INVALID_PROJECT_TITLE, "عنوان محصول صحیح نمیباشد");
 const invalidDescription = issue(ERROR_CODES.INVALID_DESCRIPTION, "توضیحات ارسال شده صحیح نمیباشد");
@@ -43,6 +43,7 @@ export const projectListQuerySchema = z.object({
   category: z.string(issue(ERROR_CODES.INVALID_CATEGORY, "دسته بندی مورد نظر صحیح نمی باشد")).optional(),
   status: z.enum(["ALL", ...Object.values(PROJECT_STATUS)], invalidStatus).optional(),
   sort: sortQuery,
+  ...pageQuery,
 });
 
 export type AddProjectBody = z.infer<typeof addProjectSchema>;

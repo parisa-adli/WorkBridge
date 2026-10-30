@@ -7,7 +7,6 @@ import mongoose from "mongoose";
 import createError from "http-errors";
 import path from "path";
 import { allRoutes } from "./router/router";
-import { seedDemoUsers } from "../utils/seedDemoUsers";
 import { apiError, type ApiErrorResponse } from "../utils/apiResponse";
 import { ERROR_CODES, type ErrorCode } from "../utils/errorCodes";
 dotenv.config();
@@ -18,6 +17,7 @@ const REQUIRED_ENV = [
   "REFRESH_TOKEN_SECRET_KEY",
   "COOKIE_PARSER_SECRET_KEY",
   "ALLOW_CORS_ORIGIN",
+  "DEMO_LOGIN_ENABLED",
 ];
 
 class Application {
@@ -35,8 +35,9 @@ class Application {
       const missing = REQUIRED_ENV.filter((name) => !process.env[name]);
       if (missing.length)
         throw new Error(`Missing required env vars: ${missing.join(", ")}`);
+      if (!["true", "false"].includes(process.env.DEMO_LOGIN_ENABLED!))
+        throw new Error("DEMO_LOGIN_ENABLED must be true or false");
       await this.connectToDB();
-      await seedDemoUsers();
       this.createServer();
     } catch (err) {
       console.error("Server failed to start:", (err as Error).message);

@@ -1,5 +1,5 @@
 import http from "./httpService";
-import type { ApiResponse, MessageData, Proposal, Status } from "../types/api";
+import type { ApiResponse, MessageData, Page, Proposal, Status } from "../types/api";
 
 export function changeProposalStatusApi({ id, data }: { id: string; data: { status: Status } }) {
   return http
@@ -7,9 +7,9 @@ export function changeProposalStatusApi({ id, data }: { id: string; data: { stat
     .then(({ data }) => data.data);
 }
 
-export function getProposalsApi() {
+export function getProposalsApi(qs: string) {
   return http
-    .get<ApiResponse<{ proposals: Proposal[] }>>(`/proposal/list`)
+    .get<ApiResponse<Page<Proposal>>>(`/proposal/list${qs}`)
     .then(({ data }) => data.data);
 }
 

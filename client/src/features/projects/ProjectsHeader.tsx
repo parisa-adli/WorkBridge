@@ -1,16 +1,17 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import Modal from "../../ui/Modal";
+import Button from "../../ui/Button";
 import CreateProjectForm from "./CreateProjectForm";
-import { HiOutlinePlus } from "react-icons/hi";
+import { Plus } from "lucide-react";
 
 function ProjectsHeader() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="flex items-center justify-between mb-8">
-      <h1 className="font-black text-secondary-700 text-xl">{t("project.yourProjects")}</h1>
+    <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+      <h1 className="font-black text-xl">{t("project.yourProjects")}</h1>
       <Modal
         title={t("project.addNew")}
         open={open}
@@ -18,13 +19,10 @@ function ProjectsHeader() {
       >
         <CreateProjectForm onClose={() => setOpen(false)} />
       </Modal>
-      <button
-        className="btn btn--primary flex items-center gap-x-2"
-        onClick={() => setOpen(true)}
-      >
-        <HiOutlinePlus />
+      <Button onClick={() => setOpen(true)}>
+        <Plus />
         <span>{t("project.add")}</span>
-      </button>
+      </Button>
     </div>
   );
 }

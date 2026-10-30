@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { HiArrowLeft, HiOutlineLockClosed } from "react-icons/hi";
+import { ArrowLeft, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ROLE_HOME } from "../constants";
 import useUser from "../features/authentication/useUser";
@@ -13,12 +13,12 @@ function NotAccess() {
   const home = user && ROLE_HOME[user.role];
 
   return (
-    <main className="grid min-h-screen place-items-center bg-bg px-4">
+    <main className="grid min-h-screen place-items-center bg-background px-4">
       <EmptyState
         titleAs="h1"
         icon={
-          <span className="grid h-18 w-18 place-items-center rounded-full bg-error-soft text-error">
-            <HiOutlineLockClosed aria-hidden="true" className="h-8 w-8" />
+          <span className="grid h-18 w-18 place-items-center rounded-full bg-accent text-destructive">
+            <Lock aria-hidden="true" className="size-8" />
           </span>
         }
         title={t("pages.notAccess")}
@@ -27,7 +27,7 @@ function NotAccess() {
         {home && (
           <Link to={`${home}/dashboard`} className={buttonClass()}>
             {t("pages.goDashboard")}
-            <HiArrowLeft aria-hidden="true" className="h-5 w-5 ltr:-scale-x-100" />
+            <ArrowLeft aria-hidden="true" className="size-5 ltr:-scale-x-100" />
           </Link>
         )}
         <Link to="/" className={buttonClass({ variant: home ? "ghost" : "primary" })}>
