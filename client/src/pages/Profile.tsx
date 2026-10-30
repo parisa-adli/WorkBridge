@@ -11,7 +11,7 @@ function Profile() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-black text-text text-xl">{t("profile.title")}</h1>
+      <h1 className="font-black text-xl">{t("profile.title")}</h1>
       <ProfileForm user={user} />
     </div>
   );

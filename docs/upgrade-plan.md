@@ -6,7 +6,7 @@ Status: draft, 2026-10-27. Breaks `docs/upgrade-prd.md` into small sequential ph
 
 ## Progress
 
-**52 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e, 39, 40 and 41a). Next: Phase 41b (project detail; check profile, admin user profile, categories).
+**53 of 55 phases done** (Parts A, B, C, D and E; Phases 39a–39e, 39, 40, 41a and 41b). Next: Phase 42 (translation coverage, screenshot and accessibility tests).
 
 `✅` = done (deliverables checked, recorded in the PRD §7 Progress table). `⬜` = not started. When a phase is completed, change its heading's `⬜` to `✅`, tick its checkboxes, update the count above and the Overview's Status column, and mark a Part `✅` once all its phases are done.
 
@@ -40,7 +40,7 @@ A phase is done only when all of these hold. They are not repeated in each phase
 | C. Stack + TypeScript + Zod | 15–25 | Major upgrades, TS strict, Zod, API envelope and error codes. | ✅ 11/11 |
 | D. Design & i18n foundation | 26–29 (27 and 28 split into 27a–b, 28a–b) | i18n, Tailwind 4 tokens, design-system components. | ✅ 6/6 |
 | E. Features | 30–38 | F1 → F2 → F6 → F3 → F4 → F5 → F7 → F8 (PRD order). | ✅ 9/9 |
-| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 8/11 |
+| F. Finish | 39a–43 (39a–39e added; 41 split into 41a–b) | shadcn/ui look (theme, components, icons), re-skin remaining pages, full translation, screenshot tests, final audit. | ⬜ 9/11 |
 
 Deploy is not planned until PRD open question 1 (hosting) is answered.
 
@@ -631,11 +631,11 @@ Files: project/proposal tables and rows, admin users
 
 Verify: screenshots fa/en × light/dark at 360px and desktop; e2e passes.
 
-### Phase 41b: Re-skin project detail; check profile, admin user profile, categories ⬜
+### Phase 41b: Re-skin project detail; check profile, admin user profile, categories ✅
 Files: project detail and its proposals table, freelancer project detail, profile, admin user profile, admin categories
 
-- [ ] Project detail and its proposals table rebuilt with the 41a table behavior; loading, empty and error states.
-- [ ] Profile, admin user profile and admin categories use only shadcn components, with no old color or token left.
+- [x] Project detail and its proposals table rebuilt with the 41a table behavior; loading, empty and error states.
+- [x] Profile, admin user profile and admin categories use only shadcn components, with no old color or token left.
 
 Verify: screenshots; e2e passes.
 

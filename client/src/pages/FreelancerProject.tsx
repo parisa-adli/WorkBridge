@@ -1,9 +1,13 @@
 import { useTranslation } from "react-i18next";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CircleAlert } from "lucide-react";
 import useProject from "../features/project/useProject";
 import useMoveBack from "../hooks/useMoveBack";
+import Button from "../ui/Button";
+import Card from "../ui/Card";
 import Loading from "../ui/Loading";
+import { Badge } from "@/components/ui/badge";
 import Empty from "../ui/Empty";
+import EmptyState from "../ui/EmptyState";
 import StatusBadge from "../ui/StatusBadge";
 import { PROJECT_STATUS_BADGES } from "../constants";
 import type { Proposal, UserRef } from "../types/api";
@@ -15,9 +19,10 @@ import toLocalDateShort from "../utils/toLocalDateShort";
 function FreelancerProject() {
   const { t } = useTranslation();
   const moveBack = useMoveBack();
-  const { isLoading, project } = useProject();
+  const { isLoading, isError, project } = useProject();
 
   if (isLoading) return <Loading />;
+  if (isError) return <EmptyState icon={<CircleAlert className="text-destructive" />} title={t("project.loadError")} />;
   if (!project) return <Empty resourceName={t("project.resource")} />;
 
   const owner = project.owner as UserRef;
@@ -38,29 +43,33 @@ function FreelancerProject() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-x-4">
-        <button onClick={moveBack} aria-label={t("common.back")} className="btn btn--primary">
-          <ArrowRight className="size-6 ltr:-scale-x-100" />
-        </button>
-        <h1 className="font-black text-text text-xl" dir="auto">
+        <Button variant="outline" size="icon" onClick={moveBack} aria-label={t("common.back")}>
+          <ArrowRight className="ltr:-scale-x-100" />
+        </Button>
+        <h1 className="font-black text-xl" dir="auto">
           {localized(project, "title")}
         </h1>
       </div>
-      <p className="text-text-muted whitespace-pre-line" dir="auto">
+      <p className="text-muted-foreground whitespace-pre-line" dir="auto">
         {localized(project, "description")}
       </p>
-      <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-surface rounded-xl p-6">
-        {details.map(([label, value]) => (
-          <div key={label}>
-            <dt className="text-text-muted text-sm">{label}</dt>
-            <dd className="font-bold mt-1">{value}</dd>
-          </div>
-        ))}
-      </dl>
+      <Card>
+        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {details.map(([label, value]) => (
+            <div key={label}>
+              <dt className="text-muted-foreground text-sm">{label}</dt>
+              <dd className="font-bold mt-1">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </Card>
       {tags.length > 0 && (
         <ul className="flex flex-wrap gap-2" aria-label={t("project.tags")}>
           {tags.map((tag) => (
-            <li key={tag} className="badge badge--secondary" dir="auto">
-              {tag}
+            <li key={tag}>
+              <Badge variant="secondary" dir="auto">
+                {tag}
+              </Badge>
             </li>
           ))}
         </ul>

@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "../../../ui/Input";
 import RHFSelect from "../../../ui/RHFSelect";
+import Button from "../../../ui/Button";
 import Loading from "../../../ui/Loading";
 import useCategories from "../../../hooks/useCategories";
 import { CATEGORY_TYPES } from "../../../constants";
@@ -71,9 +72,9 @@ function CategoryForm({ onClose, categoryToEdit }: CategoryFormProps) {
         {isCreating || isEditing ? (
           <Loading />
         ) : (
-          <button type="submit" className="btn btn--primary w-full">
+          <Button type="submit" className="w-full">
             {t("common.confirm")}
-          </button>
+          </Button>
         )}
       </div>
     </form>

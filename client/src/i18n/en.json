@@ -98,6 +98,7 @@
     "delete": "Delete {{title}}",
     "list": "Projects",
     "proposalsOf": "Proposals for {{title}}",
+    "loadError": "Couldn't load the project. Try again later.",
     "yourProposal": "Your proposal",
     "noProposal": "Not sent yet",
     "sort": "Sort",

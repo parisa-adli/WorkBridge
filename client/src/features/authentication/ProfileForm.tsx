@@ -33,7 +33,7 @@ function ProfileForm({ user }: { user: User }) {
           <Button variant="outline" size="sm" disabled={isUploading} onClick={() => fileInput.current?.click()}>
             {t("profile.changeAvatar")}
           </Button>
-          <p className="text-sm text-text-muted">{t("profile.avatarHint")}</p>
+          <p className="text-sm text-muted-foreground">{t("profile.avatarHint")}</p>
           {/* the server checks the type and size again */}
           <input
             ref={fileInput}

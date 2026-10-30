@@ -4,6 +4,7 @@ import Table from "../../ui/Table";
 import { toPersianNumbersWithComma } from "../../utils/toPersianNumber";
 import truncateText from "../../utils/truncateText";
 import Modal from "../../ui/Modal";
+import Button from "../../ui/Button";
 import { ListChecks } from "lucide-react";
 import ChangeProposalStatus from "./ChangeProposalStatus";
 import StatusBadge from "../../ui/StatusBadge";
@@ -42,9 +43,9 @@ function ProposalRow({ proposal, index }: { proposal: Proposal; index: number })
             onClose={() => setOpen(false)}
           />
         </Modal>
-        <button onClick={() => setOpen(true)} aria-label={t("proposal.changeStatus")}>
-          <ListChecks className="size-6 text-primary-800" />
-        </button>
+        <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label={t("proposal.changeStatus")}>
+          <ListChecks />
+        </Button>
       </td>
     </Table.Row>
   );

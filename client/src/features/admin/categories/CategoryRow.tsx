@@ -3,6 +3,7 @@ import { useState } from "react";
 import { PencilLine, Trash2 } from "lucide-react";
 import Modal from "../../../ui/Modal";
 import Table from "../../../ui/Table";
+import Button from "../../../ui/Button";
 import ConfirmDelete from "../../../ui/ConfirmDelete";
 import type { Category } from "../../../types/api";
 import { categoryName } from "../../../utils/localized";
@@ -31,10 +32,10 @@ function CategoryRow({ category, index, parent, childCount }: CategoryRowProps) 
       <td>{t(`category.types.${category.type}`)}</td>
       <td>{parent ? categoryName(parent) : "-"}</td>
       <td>
-        <div className="flex items-center gap-x-4">
-          <button onClick={() => setIsEditOpen(true)} title={t("category.edit", { title: name })}>
-            <PencilLine className="size-5 text-primary-900" />
-          </button>
+        <div className="flex items-center gap-x-2">
+          <Button variant="ghost" size="icon" onClick={() => setIsEditOpen(true)} aria-label={t("category.edit", { title: name })}>
+            <PencilLine />
+          </Button>
           <Modal
             title={t("category.edit", { title: name })}
             open={isEditOpen}
@@ -48,9 +49,9 @@ function CategoryRow({ category, index, parent, childCount }: CategoryRowProps) 
             title={t("category.delete", { title: name })}
             resourceName={name}
             trigger={
-              <button title={t("category.delete", { title: name })}>
-                <Trash2 className="size-5 text-destructive" />
-              </button>
+              <Button variant="ghost" size="icon" aria-label={t("category.delete", { title: name })}>
+                <Trash2 className="text-destructive" />
+              </Button>
             }
             onConfirm={() =>
               removeCategory(category._id, { onSuccess: () => setIsDeleteOpen(false) })

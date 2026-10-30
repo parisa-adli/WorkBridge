@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import StatusSelect from "../../ui/StatusSelect";
 import useChangeProposalStatus from "./useChangeProposalStatus";
+import Button from "../../ui/Button";
 import Loading from "../../ui/Loading";
 import type { Status } from "../../types/api";
 import { proposalStatusSchema, type StatusInput, type StatusValues } from "../../schemas/status";
@@ -33,9 +34,9 @@ function ChangeProposalStatus({ proposalId, onClose, proposalStatus }: ChangePro
           {isUpdating ? (
             <Loading />
           ) : (
-            <button type="submit" className="btn btn--primary w-full">
+            <Button type="submit" className="w-full">
               {t("common.confirm")}
-            </button>
+            </Button>
           )}
         </div>
       </form>

@@ -5,6 +5,7 @@ import useUserProfile from "../features/admin/users/useUserProfile";
 import ChangeUserStatus from "../features/admin/users/ChangeUserStatus";
 import { Avatar } from "../features/authentication/UserAvatar";
 import useMoveBack from "../hooks/useMoveBack";
+import Button from "../ui/Button";
 import Loading from "../ui/Loading";
 import Empty from "../ui/Empty";
 import Card from "../ui/Card";
@@ -56,11 +57,11 @@ function AdminUserProfile() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-x-4">
-        <button onClick={moveBack} aria-label={t("common.back")} className="btn btn--primary">
-          <ArrowRight className="size-6 ltr:-scale-x-100" />
-        </button>
+        <Button variant="outline" size="icon" onClick={moveBack} aria-label={t("common.back")}>
+          <ArrowRight className="ltr:-scale-x-100" />
+        </Button>
         <Avatar user={user} className="size-12 text-base" />
-        <h1 className="font-black text-text text-xl" dir="auto">
+        <h1 className="font-black text-xl" dir="auto">
           {localized(user, "name")}
         </h1>
       </div>
@@ -69,7 +70,7 @@ function AdminUserProfile() {
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {details.map(([label, value]) => (
               <div key={label}>
-                <dt className="text-text-muted text-sm">{label}</dt>
+                <dt className="text-muted-foreground text-sm">{label}</dt>
                 <dd className="font-bold mt-1">{value}</dd>
               </div>
             ))}

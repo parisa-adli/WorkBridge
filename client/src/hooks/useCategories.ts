@@ -3,7 +3,7 @@ import { getCategoryApi } from "../services/categoryService";
 import { categoryName } from "../utils/localized";
 
 export default function useCategories() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategoryApi,
   });
@@ -20,5 +20,5 @@ export default function useCategories() {
     value: item.englishTitle,
   }));
 
-  return { isLoading, rawCategories, categories, transformedCategories };
+  return { isLoading, isError, rawCategories, categories, transformedCategories };
 }

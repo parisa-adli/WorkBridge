@@ -1,7 +1,7 @@
 const { test, expect } = require("@playwright/test");
 const { MongoClient } = require("mongodb");
 
-// Visual baselines of the re-skinned pages; the four list pages also at 360px.
+// Visual baselines of the re-skinned pages; the list and project detail pages also at 360px.
 // Update with `npm run e2e -- screenshots --update-snapshots` only when a visual change is intended.
 const ACCOUNTS = {
   owner: { username: "demo-owner", password: "Owner@1234" },
@@ -21,7 +21,7 @@ const HOME_STATS = {
   ],
 };
 
-// The shared lists (all projects, proposals, users) change with what other specs create, so pin them too.
+// The shared lists (all projects, proposals, users, categories) and the detail pages change with what other specs create, so pin them too.
 const page1 = (items) => ({ statusCode: 200, data: { items, total: items.length, page: 1, limit: 10 } });
 const person = (name, english) => ({ _id: name, name, translations: { en: { name: english } } });
 const category = { _id: "c1", title: "برنامه نویسی", englishTitle: "programming" };
@@ -35,39 +35,73 @@ const LIST_PROJECTS = [
   category,
   owner: person("سارا احمدی", "Sara Ahmadi"),
 }));
-const LISTS = {
+const PROPOSALS = LIST_PROJECTS.map((project, i) => ({
+  _id: `r${i}`,
+  project,
+  user: person("علی رضایی", "Ali Rezaei"),
+  description: "این پروژه را با کیفیت بالا و در زمان تعیین شده انجام می‌دهم.",
+  translations: { en: { description: "I will deliver this project on time and with high quality." } },
+  duration: 10 + i * 5,
+  price: 20000000 + i * 10000000,
+  status: i,
+}));
+const USERS = [
+  { ...person("سارا احمدی", "Sara Ahmadi"), email: "sara@example.com", phoneNumber: "09120000010", role: "OWNER", status: 2 },
+  { ...person("علی رضایی", "Ali Rezaei"), email: "ali@example.com", phoneNumber: "09120000011", role: "FREELANCER", status: 1 },
+];
+const PINNED = {
   "/api/project/list": page1(LIST_PROJECTS),
-  "/api/proposal/list": page1(
-    LIST_PROJECTS.map((project, i) => ({
-      _id: `r${i}`,
-      project,
-      user: person("علی رضایی", "Ali Rezaei"),
-      description: "این پروژه را با کیفیت بالا و در زمان تعیین شده انجام می‌دهم.",
-      translations: { en: { description: "I will deliver this project on time and with high quality." } },
-      duration: 10 + i * 5,
-      price: 20000000 + i * 10000000,
-      status: i,
-    }))
-  ),
-  "/api/admin/user/list": page1(
-    [
-      { ...person("سارا احمدی", "Sara Ahmadi"), email: "sara@example.com", phoneNumber: "09120000010", role: "OWNER", status: 2 },
-      { ...person("علی رضایی", "Ali Rezaei"), email: "ali@example.com", phoneNumber: "09120000011", role: "FREELANCER", status: 1 },
-    ]
-  ),
+  "/api/proposal/list": page1(PROPOSALS),
+  "/api/admin/user/list": page1(USERS),
+  "/api/category/list": {
+    statusCode: 200,
+    data: {
+      categories: [
+        { ...category, type: "project", parentId: null },
+        { _id: "c2", title: "طراحی وب", englishTitle: "web design", type: "project", parentId: "c1" },
+      ],
+    },
+  },
+  // the owner sees every proposal, the freelancer only the first (theirs)
+  "/api/project/p0": {
+    statusCode: 200,
+    data: {
+      project: {
+        ...LIST_PROJECTS[0],
+        description: "یک فروشگاه آنلاین با سبد خرید و پرداخت.",
+        translations: { en: { title: "Online store design", description: "An online store with a cart and checkout." } },
+        tags: ["React", "Node"],
+        proposals: PROPOSALS.map(({ project, ...proposal }) => proposal),
+      },
+    },
+  },
+  "/api/admin/user/profile/u0": {
+    statusCode: 200,
+    data: {
+      user: { ...USERS[1], _id: "u0", biography: "توسعه دهنده وب", translations: { en: { name: "Ali Rezaei", biography: "Web developer" } } },
+      createdProjects: [],
+      completedProjects: [LIST_PROJECTS[1]],
+      proposals: PROPOSALS,
+    },
+  },
 };
 
 const PAGES = [
   { name: "home", path: "/" },
   { name: "auth", path: "/auth" },
   { name: "owner-dashboard", path: "/owner/dashboard", account: "owner" },
-  { name: "owner-projects", path: "/owner/projects", account: "owner", list: true },
-  { name: "freelancer-projects", path: "/freelancer/projects", account: "freelancer", list: true },
-  { name: "freelancer-proposals", path: "/freelancer/proposals", account: "freelancer", list: true },
-  { name: "admin-users", path: "/admin/users", account: "admin", list: true },
+  { name: "owner-projects", path: "/owner/projects", account: "owner", narrow: true },
+  { name: "owner-project", path: "/owner/projects/p0", account: "owner", narrow: true },
+  { name: "owner-profile", path: "/owner/profile", account: "owner" },
+  { name: "freelancer-projects", path: "/freelancer/projects", account: "freelancer", narrow: true },
+  { name: "freelancer-project", path: "/freelancer/projects/p0", account: "freelancer", narrow: true },
+  { name: "freelancer-proposals", path: "/freelancer/proposals", account: "freelancer", narrow: true },
+  { name: "admin-users", path: "/admin/users", account: "admin", narrow: true },
+  { name: "admin-user", path: "/admin/users/u0", account: "admin" },
+  { name: "admin-categories", path: "/admin/categories", account: "admin" },
 ];
-// Each list page is also shot at 360px, the narrowest supported width.
-const SHOTS = PAGES.flatMap((p) => (p.list ? [p, { ...p, name: `${p.name}-360`, mobile: true }] : [p]));
+// The lists and the project detail pages are also shot at 360px, the narrowest supported width.
+const SHOTS = PAGES.flatMap((p) => (p.narrow ? [p, { ...p, name: `${p.name}-360`, mobile: true }] : [p]));
 
 // Fixed data so nothing in the shots depends on today's date or on other specs.
 test.beforeAll(async () => {
@@ -116,7 +150,7 @@ for (const language of ["fa", "en"]) {
         if (account) expect((await page.request.post(`${process.env.E2E_SERVER_URL}/api/user/demo-login`, { data: ACCOUNTS[account] })).ok()).toBe(true);
         // The home counts depend on what other specs created, so pin them.
         await page.route("**/api/stats/public", (route) => route.fulfill({ json: { statusCode: 200, data: HOME_STATS } }));
-        for (const [list, json] of Object.entries(LISTS)) await page.route((u) => u.pathname === list, (route) => route.fulfill({ json }));
+        for (const [api, json] of Object.entries(PINNED)) await page.route((u) => u.pathname === api, (route) => route.fulfill({ json }));
         if (mobile) await page.setViewportSize({ width: 360, height: 740 });
 
         await page.goto(url(path));

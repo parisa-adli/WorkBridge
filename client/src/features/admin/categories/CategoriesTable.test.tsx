@@ -16,6 +16,14 @@ const rawCategories = [
 ];
 
 describe("CategoriesTable", () => {
+  it("shows an error state when the request fails", () => {
+    vi.mocked(useCategories).mockReturnValue({ isLoading: false, isError: true, rawCategories: [] } as unknown as ReturnType<
+      typeof useCategories
+    >);
+    render(<CategoriesTable />);
+    expect(screen.getByText(i18n.t("common.loadError"))).toBeInTheDocument();
+  });
+
   it("lists categories with their parent, warns about children on delete and refetches the list", async () => {
     vi.mocked(useCategories).mockReturnValue({ isLoading: false, rawCategories } as unknown as ReturnType<
       typeof useCategories
@@ -31,7 +39,7 @@ describe("CategoriesTable", () => {
 
     // the child's parent column shows the parent's name
     expect(screen.getAllByText("وب")).toHaveLength(2);
-    fireEvent.click(screen.getByTitle(i18n.t("category.delete", { title: "وب" })));
+    fireEvent.click(screen.getByRole("button", { name: i18n.t("category.delete", { title: "وب" }) }));
     expect(screen.getByText(i18n.t("category.childrenWarning", { count: 1 }))).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: i18n.t("common.confirm") }));
 
