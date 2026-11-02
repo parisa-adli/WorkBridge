@@ -12,7 +12,7 @@ const ProjectSchema = new mongoose.Schema(
       default: PROJECT_STATUS.OPEN,
       enum: Object.values(PROJECT_STATUS),
     },
-    // admin review, STATUS codes. addNewProject sets PENDING; the ACCEPTED default covers projects from before approval existed
+    // admin review, STATUS codes. new projects start ACCEPTED; an admin can reject them or set them to PENDING
     approval: { type: Number, default: STATUS.ACCEPTED, enum: Object.values(STATUS) },
     category: { type: ObjectId, ref: "Category", required: true },
     budget: { type: Number, required: true },

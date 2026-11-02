@@ -41,7 +41,7 @@ class ProjectController extends Controller {
       budget,
       deadline,
       owner: userId,
-      approval: STATUS.PENDING, // an admin approves it before freelancers see it
+      approval: STATUS.ACCEPTED, // visible to freelancers at once; an admin can still reject it or set it back to pending
     });
 
     if (!project?._id)

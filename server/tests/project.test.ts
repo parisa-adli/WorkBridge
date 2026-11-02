@@ -31,8 +31,6 @@ beforeEach(async () => {
 
 const addProject = async (agent = owner.agent, body = projectBody()) =>
   (await agent.post("/api/project/add").send(body).expect(201)).body.data.project;
-// owners' projects start PENDING; freelancers only list approved ones
-const approveAll = () => ProjectModel.updateMany({}, { $set: { approval: 2 } });
 const ids = (res: { body: { data: { items: { _id: string }[] } } }) => res.body.data.items.map((p) => p._id);
 
 describe("POST /api/project/add", () => {
@@ -44,7 +42,7 @@ describe("POST /api/project/add", () => {
     expect(res.body.data.project).toMatchObject({
       title: "Landing page",
       status: "OPEN",
-      approval: 1,
+      approval: 2,
       owner: String(owner.user._id),
       freelancer: null,
       proposals: [],
@@ -93,7 +91,6 @@ describe("GET project lists", () => {
     const open = await addProject();
     const closed = await addProject(otherOwner.agent);
     await otherOwner.agent.patch(`/api/project/${closed._id}`).send({ status: "CLOSED" }).expect(200);
-    await approveAll();
 
     const res = await freelancer.agent.get("/api/project/list?status=OPEN");
 
@@ -109,7 +106,6 @@ describe("GET project lists", () => {
   it("/list?search matches the title, case-insensitively", async () => {
     const match = await addProject();
     await addProject(owner.agent, { ...projectBody(), title: "Mobile app" });
-    await approveAll();
 
     const res = await freelancer.agent.get("/api/project/list?search=LANDING");
 
@@ -120,7 +116,6 @@ describe("GET project lists", () => {
   it("/list?search treats regex characters literally", async () => {
     const match = await addProject(owner.agent, { ...projectBody(), title: "C++ (v2) app" });
     await addProject();
-    await approveAll();
 
     const res = await freelancer.agent.get(`/api/project/list?search=${encodeURIComponent("++ (")}`);
     expect(res.status).toBe(200);
@@ -171,6 +166,7 @@ describe("project approval", () => {
   it("hides projects awaiting approval or rejected from freelancers until an admin approves them", async () => {
     const pending = await addProject();
     const rejected = await addProject();
+    await setApproval(admin.agent, pending._id, 1).expect(200);
     await setApproval(admin.agent, rejected._id, 0).expect(200);
 
     expect(ids(await freelancer.agent.get("/api/project/list"))).toEqual([]);
@@ -199,7 +195,7 @@ describe("project approval", () => {
     const pending = await addProject();
     const approved = await addProject();
     const rejected = await addProject();
-    await setApproval(admin.agent, approved._id, 2).expect(200);
+    await setApproval(admin.agent, pending._id, 1).expect(200);
     await setApproval(admin.agent, rejected._id, 0).expect(200);
     // saved before the approval field existed: counts as approved
     const legacy = await ProjectModel.collection.insertOne({ ...projectBody(), category: category._id, owner: owner.user._id, status: "OPEN", createdAt: new Date() });
@@ -353,7 +349,6 @@ describe("GET and DELETE /api/project/:id", () => {
   it("deletes the project's proposals with it, and no others", async () => {
     const project = await addProject();
     const other = await addProject();
-    await approveAll();
     for (const { _id } of [project, other])
       await freelancer.agent
         .post("/api/proposal/add")
