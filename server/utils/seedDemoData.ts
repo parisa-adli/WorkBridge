@@ -9,6 +9,13 @@ const CATEGORIES = [
   { title: "برنامه نویسی", englishTitle: "development", description: "web and mobile development" },
   { title: "طراحی", englishTitle: "design", description: "ui, ux and graphic design" },
   { title: "ترجمه", englishTitle: "translation", description: "translation and content" },
+  // one per home page icon (client/public/Images/categories)
+  { title: "بازاریابی", englishTitle: "marketing", description: "digital marketing and seo" },
+  { title: "نویسندگی", englishTitle: "writing", description: "copywriting and content writing" },
+  { title: "موسیقی", englishTitle: "music", description: "music production and audio" },
+  { title: "ویدیو", englishTitle: "video", description: "video editing and animation" },
+  { title: "معماری", englishTitle: "architecture", description: "architecture and interior design" },
+  { title: "مالی", englishTitle: "finance", description: "accounting and financial consulting" },
 ];
 
 const DAY = 24 * 60 * 60 * 1000;

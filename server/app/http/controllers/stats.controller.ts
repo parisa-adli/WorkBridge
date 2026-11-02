@@ -8,6 +8,9 @@ import { sendData } from "../../../utils/apiResponse";
 import { PROJECT_STATUS, ROLES } from "../../../utils/constants";
 import { APPROVED_PROJECT } from "../../../utils/functions";
 
+// the home page's popular categories: two rows of its 4-column grid
+const POPULAR_CATEGORIES = 8;
+
 class StatsController extends Controller {
   async getPublicStats(req: Request, res: Response) {
     // only verified accounts, so pending and rejected sign-ups don't inflate the public numbers
@@ -26,7 +29,10 @@ class StatsController extends Controller {
       freelancers,
       owners,
       openProjects,
-      categories: categories.map((c) => ({ ...c, projects: byCategory.get(String(c._id)) ?? 0 })),
+      categories: categories
+        .map((c) => ({ ...c, projects: byCategory.get(String(c._id)) ?? 0 }))
+        .sort((a, b) => b.projects - a.projects)
+        .slice(0, POPULAR_CATEGORIES),
     });
   }
 }

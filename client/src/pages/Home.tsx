@@ -19,8 +19,10 @@ const Linkedin = createLucideIcon("linkedin", [
 
 // Images exist only for these englishTitles; other categories get the generic projects icon.
 const CATEGORY_IMAGES = ["development", "design", "marketing", "writing", "music", "video", "architecture", "finance"];
-const categoryImage = (englishTitle: string) =>
-  CATEGORY_IMAGES.includes(englishTitle) ? `Images/categories/${englishTitle}.svg` : "Images/projects.svg";
+const categoryImage = (englishTitle: string) => {
+  const name = englishTitle.trim().toLowerCase();
+  return CATEGORY_IMAGES.includes(name) ? `Images/categories/${name}.svg` : "Images/projects.svg";
+};
 
 const ACHIEVEMENTS = [
   { key: "freelancers", image_url: "Images/freelancer.svg" },

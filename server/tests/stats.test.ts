@@ -54,6 +54,30 @@ describe("GET /api/stats/public", () => {
     expect(categories.find((c: { _id: string }) => c._id === String(mobile._id)).title).toBe(mobile.title);
   });
 
+  it("lists only the 8 categories with the most projects, most first", async () => {
+    const [owner] = await UserModel.create([{ role: "OWNER", status: 2 }]);
+    const categories = [];
+    for (let i = 0; i < 9; i++) categories.push(await createCategory(`c${i}`));
+    // category ci gets i projects, so c0 (none) drops out
+    await ProjectModel.create(
+      categories.flatMap((c, i) =>
+        Array.from({ length: i }, () => ({
+          title: "project",
+          description: "description",
+          category: c._id,
+          budget: 1000,
+          deadline: new Date(),
+          owner: owner._id,
+        }))
+      )
+    );
+
+    const res = await request(app).get("/api/stats/public");
+    expect(res.body.data.categories.map((c: { englishTitle: string }) => c.englishTitle)).toEqual(
+      ["c8", "c7", "c6", "c5", "c4", "c3", "c2", "c1"]
+    );
+  });
+
   it("answers zeros on an empty database", async () => {
     const res = await request(app).get("/api/stats/public");
     expect(res.body.data).toEqual({ freelancers: 0, owners: 0, openProjects: 0, categories: [] });
