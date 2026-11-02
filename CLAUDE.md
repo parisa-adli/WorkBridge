@@ -9,6 +9,7 @@ WorkBridge: a freelancing platform (owners post projects, freelancers send propo
 Install: `npm install && npm install --prefix client && npm install --prefix server`
 
 - `npm run dev` (root): runs server (`tsx watch`, port 5000) and client (Vite, port 3000 per `client/vite.config.js`) together via `concurrently`
+- `npm run prod` (root): builds the client, then runs the server (`tsx`, no watch) and `vite preview` together
 - `npm run build --prefix client`: production build
 - `npm run lint --prefix client`: flat ESLint config (`client/eslint.config.js`), then `scripts/check-direction.mjs`, which fails on physical direction classes (`ml-`, `pr-`, `left-`, `text-right`, `border-l`, ...): use logical ones (`ms-`, `pe-`, `start-`, `text-start`, `border-e`) so fa (RTL) and en (LTR) mirror. Arrow icons get `ltr:-scale-x-100`.
 - `npm run lint --prefix server`: flat ESLint config (`server/eslint.config.js`).
