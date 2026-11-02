@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar as AvatarRoot, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-// The uploaded avatar, or the name's initials when there is none (or it fails to load). Decorative: the name is always shown next to it.
+// The uploaded avatar, or the name's initials when there is none (or it fails to load). Decorative: the name is shown next to it or labels its button.
 export function Avatar({ user, className = "size-6 text-xs" }: { user: User; className?: string }) {
   return (
     <AvatarRoot aria-hidden="true" className={className}>
@@ -37,10 +37,13 @@ function UserAvatar() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
+        {/* below sm only the avatar shows; sr-only keeps the name as the button's name */}
         <Button variant="ghost" className="px-2">
           <Avatar user={user} />
-          <span dir="auto">{localized(user, "name")}</span>
-          <ChevronDown className="text-muted-foreground" />
+          <span dir="auto" className="sr-only sm:not-sr-only">
+            {localized(user, "name")}
+          </span>
+          <ChevronDown className="hidden text-muted-foreground sm:block" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

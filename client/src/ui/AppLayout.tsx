@@ -1,13 +1,16 @@
 import type { ReactNode } from "react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Sidebar from "./Sidebar";
 import HeaderMenu from "./HeaderMenu";
+import Logo from "./Logo";
 import useUser from "../features/authentication/useUser";
 import { cn } from "@/lib/utils";
 
 // children: the role's sidebar links (CustomNavLink items)
 function AppLayout({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const { isLoading } = useUser();
 
   return (
@@ -22,7 +25,13 @@ function AppLayout({ children }: { children: ReactNode }) {
               isLoading && "opacity-50 blur-xs"
             )}
           >
-            <SidebarTrigger className="lg:hidden" />
+            {/* below lg the sidebar is a drawer, so the logo moves up here */}
+            <div className="flex items-center gap-x-2 lg:hidden">
+              <SidebarTrigger />
+              <Link to="/" aria-label={t("app.name")}>
+                <Logo className="h-8" />
+              </Link>
+            </div>
             <HeaderMenu />
           </div>
         </header>
