@@ -159,7 +159,7 @@ test("owner accepts a proposal, the freelancer sees it accepted", async ({ page 
 test("freelancer filters write the URL params", async ({ page }) => {
   await demoLogin(page, "فریلنسر", "demo-freelancer", "/freelancer");
   await page.goto(url("/freelancer/projects"));
-  await page.getByRole("radio", { name: "باز" }).click();
+  await page.getByRole("tab", { name: "باز" }).click();
   await expect(page).toHaveURL(/status=OPEN/);
   await page.getByRole("combobox", { name: "دسته بندی" }).click();
   await page.getByRole("option", { name: "برنامه نویسی" }).click();

@@ -1,6 +1,8 @@
+import { useId } from "react";
 import { useTranslation } from "react-i18next";
+import { Label } from "@/components/ui/label";
 import { useSearchParams } from "react-router-dom";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type FilterProps = {
   options: { value: string; label: string }[];
@@ -9,32 +11,32 @@ type FilterProps = {
 
 function Filter({ options, filterField }: FilterProps) {
   const { t } = useTranslation();
+  const labelId = useId();
   const [searchParams, setSearchParams] = useSearchParams();
   const currentFilter = searchParams.get(filterField) || options[0].value;
 
   function handleChange(value: string) {
-    if (!value) return; // clicking the active item would clear it; one filter is always on
     searchParams.set(filterField, value);
     searchParams.delete("page"); // a new filter starts on its first page
     setSearchParams(searchParams);
   }
   return (
-    <div className="flex items-center gap-x-2 text-xs">
-      <span>{t("common.status")}</span>
-      <ToggleGroup
-        type="single"
-        variant="outline"
-        value={currentFilter}
-        onValueChange={handleChange}
-        aria-label={t("common.status")}
-      >
+    <Tabs value={currentFilter} onValueChange={handleChange}>
+      <Label id={labelId}>{t("common.status")}</Label>
+      <TabsList aria-labelledby={labelId}>
         {options.map(({ label, value }) => (
-          <ToggleGroupItem key={value} value={value}>
+          // no TabsContent: the list below is the panel, so drop the dangling aria-controls
+          <TabsTrigger
+            key={value}
+            value={value}
+            aria-controls={undefined}
+            className="px-4"
+          >
             {label}
-          </ToggleGroupItem>
+          </TabsTrigger>
         ))}
-      </ToggleGroup>
-    </div>
+      </TabsList>
+    </Tabs>
   );
 }
 export default Filter;

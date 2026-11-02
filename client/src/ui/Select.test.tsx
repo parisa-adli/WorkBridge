@@ -50,17 +50,18 @@ describe("URL filters", () => {
     expect(screen.getByRole("status")).toHaveTextContent("?category=OPEN");
   });
 
-  it("Filter writes the pressed item and keeps it on a second click", () => {
+  it("Filter writes the picked tab and keeps it on a second click", () => {
     render(
       <MemoryRouter initialEntries={["/?page=3"]}>
         <Filter filterField="status" options={options} />
         <Search />
       </MemoryRouter>
     );
-    expect(screen.getByRole("radio", { name: "همه" })).toBeChecked();
-    fireEvent.click(screen.getByRole("radio", { name: "باز" }));
+    expect(screen.getByRole("tab", { name: "همه" })).toHaveAttribute("aria-selected", "true");
+    // Radix tabs activate on mousedown
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "باز" }));
     expect(screen.getByRole("status")).toHaveTextContent("?status=OPEN");
-    fireEvent.click(screen.getByRole("radio", { name: "باز" }));
-    expect(screen.getByRole("radio", { name: "باز" })).toBeChecked();
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "باز" }));
+    expect(screen.getByRole("tab", { name: "باز" })).toHaveAttribute("aria-selected", "true");
   });
 });
