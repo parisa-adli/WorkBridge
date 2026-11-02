@@ -2,11 +2,17 @@ import { useTranslation } from "react-i18next";
 import useCategories from "../../../hooks/useCategories";
 import Filter from "../../../ui/Filter";
 import FilterDropDown from "../../../ui/FilterDropDown";
-import { PROJECT_STATUS_BADGES } from "../../../constants";
+import { PROJECT_STATUS_BADGES, ROLES, STATUS_BADGES } from "../../../constants";
+import useUser from "../../authentication/useUser";
 
 function ProjectsHeader() {
   const { t } = useTranslation();
   const { transformedCategories } = useCategories();
+  const { user } = useUser();
+  const approvalOptions = [
+    { label: t("project.allApprovals"), value: "ALL" },
+    ...Object.entries(STATUS_BADGES).map(([value, { label }]) => ({ label: t(label), value })),
+  ];
   const sortOptions = [
     { label: t("project.sortLatest"), value: "latest" },
     { label: t("project.sortEarliest"), value: "earliest" },
@@ -45,6 +51,12 @@ function ProjectsHeader() {
           ]}
         />
       </div>
+
+      {user?.role === ROLES.ADMIN && (
+        <div>
+          <FilterDropDown filterField="approval" label={t("project.approval")} options={approvalOptions} />
+        </div>
+      )}
     </div>
   );
 }

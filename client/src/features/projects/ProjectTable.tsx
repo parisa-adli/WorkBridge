@@ -23,6 +23,7 @@ function ProjectTable() {
             <th>{t("project.tags")}</th>
             <th>{t("project.freelancer")}</th>
             <th>{t("common.status")}</th>
+            <th>{t("project.approval")}</th>
             <th>{t("common.actions")}</th>
             <th>{t("project.proposals")}</th>
           </Table.Row>

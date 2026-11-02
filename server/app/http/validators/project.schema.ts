@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LIMITS, PROJECT_STATUS } from "../../../utils/constants";
+import { LIMITS, PROJECT_STATUS, STATUS } from "../../../utils/constants";
 import { ERROR_CODES } from "../../../utils/errorCodes";
 import { issue } from "../middlewares/validate";
 import { numeric, objectId, pageQuery, searchQuery, sortQuery } from "./common.schema";
@@ -37,14 +37,22 @@ export const changeProjectStatusSchema = z.object({
   status: z.enum(PROJECT_STATUS, invalidStatus),
 });
 
+const invalidApproval = issue(ERROR_CODES.INVALID_PROJECT_APPROVAL, "وضعیت تایید پروژه صحیح نمی باشد");
+
+export const changeProjectApprovalSchema = z.object({
+  approval: numeric(z.literal(Object.values(STATUS), invalidApproval)),
+});
+
 // Shared by /list and /owner-projects (buildProjectQuery); category is a comma list of englishTitles or ALL.
 export const projectListQuerySchema = z.object({
   search: searchQuery,
   category: z.string(issue(ERROR_CODES.INVALID_CATEGORY, "دسته بندی مورد نظر صحیح نمی باشد")).optional(),
   status: z.enum(["ALL", ...Object.values(PROJECT_STATUS)], invalidStatus).optional(),
+  approval: z.enum(["ALL", ...Object.values(STATUS).map(String)], invalidApproval).optional(),
   sort: sortQuery,
   ...pageQuery,
 });
 
 export type AddProjectBody = z.infer<typeof addProjectSchema>;
 export type ChangeProjectStatusBody = z.infer<typeof changeProjectStatusSchema>;
+export type ChangeProjectApprovalBody = z.infer<typeof changeProjectApprovalSchema>;

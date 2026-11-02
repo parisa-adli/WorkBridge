@@ -1,5 +1,5 @@
 import http from "./httpService";
-import type { ApiResponse, MessageData, Page, Project, ProjectStatus } from "../types/api";
+import type { ApiResponse, MessageData, Page, Project, ProjectStatus, Status } from "../types/api";
 
 export type NewProject = {
   title: string;
@@ -37,6 +37,12 @@ export function editProjectApi({ id, newProject }: { id: string; newProject: New
 export function toggleProjectStatusApi({ id, data }: { id: string; data: { status: ProjectStatus } }) {
   return http
     .patch<ApiResponse<MessageData>>(`/project/${id}`, data)
+    .then(({ data }) => data.data);
+}
+
+export function changeProjectApprovalApi({ id, approval }: { id: string; approval: Status }) {
+  return http
+    .patch<ApiResponse<MessageData>>(`/project/approval/${id}`, { approval })
     .then(({ data }) => data.data);
 }
 

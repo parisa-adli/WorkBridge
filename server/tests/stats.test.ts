@@ -37,6 +37,8 @@ describe("GET /api/stats/public", () => {
       status,
     });
     await ProjectModel.create([project(web._id), project(web._id, "CLOSED"), project(web._id)]);
+    // awaiting approval or rejected: hidden, so not counted
+    await ProjectModel.create([{ ...project(web._id), approval: 1 }, { ...project(mobile._id), approval: 0 }]);
 
     const res = await request(app).get("/api/stats/public");
     expect(res.status).toBe(200);

@@ -4,7 +4,7 @@ import Controller from "./controller";
 import { ProposalModel } from "../../models/proposal";
 import type { AddProposalBody, ChangeProposalStatusBody } from "../validators/proposal.schema";
 import { ProjectModel } from "../../models/project";
-import { assertProjectOwner } from "./project.controller";
+import { assertProjectOwner, findApprovedProject } from "./project.controller";
 import { findByIdOr404, createdAtSort, pagination } from "../../../utils/functions";
 import { ROLES, STATUS, PROJECT_STATUS } from "../../../utils/constants";
 import { apiError, sendData } from "../../../utils/apiResponse";
@@ -21,7 +21,7 @@ class ProposalController extends Controller {
     const userId = req.user!._id;
     const { description, price, duration, projectId } = req.body;
 
-    const project = await findProject(projectId);
+    const project = await findApprovedProject(projectId);
     if (project.status !== PROJECT_STATUS.OPEN)
       throw apiError(400, ERROR_CODES.PROJECT_NOT_OPEN, "پروژه بسته است");
     // shortcut: check-then-create can race on double submit; add a unique {project, user} index if that shows up.

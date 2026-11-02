@@ -25,6 +25,7 @@ function ProjectsTable() {
             <th>{t("project.budget")}</th>
             <th>{t("project.deadline")}</th>
             <th>{t("common.status")}</th>
+            {isAdmin && <th>{t("project.approval")}</th>}
             <th>{t("common.actions")}</th>
           </Table.Row>
         </Table.Header>

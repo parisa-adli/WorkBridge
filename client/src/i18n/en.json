@@ -109,7 +109,11 @@
     "sortLatest": "Sort (newest)",
     "sortEarliest": "Sort (oldest)",
     "allCategories": "Category (all)",
-    "view": "View {{title}}"
+    "view": "View {{title}}",
+    "approval": "Approval",
+    "allApprovals": "All approvals",
+    "approve": "Approve project {{title}}",
+    "reject": "Reject project {{title}}"
   },
   "proposal": {
     "resource": "Proposal",
@@ -330,6 +334,11 @@
     "CATEGORY_DELETED": "Category deleted",
     "AVATAR_UPDATED": "Your profile picture was updated",
     "AVATAR_REMOVED": "Your profile picture was removed",
-    "PASSWORD_UPDATED": "Your password was changed"
+    "PASSWORD_UPDATED": "Your password was changed",
+    "INVALID_PROJECT_APPROVAL": "The project approval value is invalid",
+    "PROJECT_APPROVAL_NOT_UPDATED": "The project approval was not updated",
+    "PROJECT_APPROVED": "The project was approved",
+    "PROJECT_REJECTED": "The project was rejected",
+    "PROJECT_PENDING": "The project is now pending approval"
   }
 }

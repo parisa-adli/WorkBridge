@@ -79,6 +79,9 @@ export const ERROR_CODES = codes([
   // avatar
   "INVALID_AVATAR_TYPE",
   "AVATAR_TOO_LARGE",
+  // project approval
+  "INVALID_PROJECT_APPROVAL",
+  "PROJECT_APPROVAL_NOT_UPDATED",
 ]);
 
 // Codes sent next to a success `message` (the ones the client shows in a toast).
@@ -108,6 +111,9 @@ export const SUCCESS_CODES = codes([
   "AVATAR_UPDATED",
   "PASSWORD_UPDATED",
   "AVATAR_REMOVED",
+  "PROJECT_APPROVED",
+  "PROJECT_REJECTED",
+  "PROJECT_PENDING",
 ]);
 
 export type ErrorCode = keyof typeof ERROR_CODES;

@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 import type { CookieOptions, Request, Response } from "express";
 import { UserModel } from "../app/models/user";
 import { CategoryModel } from "../app/models/category";
-import { DEMO_USERNAMES, LIMITS, PROJECT_STATUS } from "./constants";
+import { DEMO_USERNAMES, LIMITS, PROJECT_STATUS, STATUS } from "./constants";
 
 export function toPersianDigits(n: number | string) {
   const farsiDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
@@ -75,13 +75,19 @@ export function pagination({ page, limit }: { page?: unknown; limit?: unknown })
   return { page: p, limit: l, skip: (p - 1) * l };
 }
 
-type ProjectQuery = { search?: unknown; category?: unknown; sort?: unknown; status?: unknown };
+type ProjectQuery = { search?: unknown; category?: unknown; sort?: unknown; status?: unknown; approval?: unknown };
+
+// approved projects; $nin also matches projects saved before the approval field existed
+export const APPROVED_PROJECT = { approval: { $nin: [STATUS.PENDING, STATUS.REJECTED] } };
 
 // filter and sort for both project list endpoints, built from req.query
-export async function buildProjectQuery({ search, category, sort, status }: ProjectQuery) {
+export async function buildProjectQuery({ search, category, sort, status, approval }: ProjectQuery) {
   const filter: Record<string, unknown> = {};
   if (search) filter.title = new RegExp(escapeRegex(search), "i");
   if ((Object.values(PROJECT_STATUS) as unknown[]).includes(status)) filter.status = { $eq: status };
+  const approvalCode = Number(approval);
+  if (approvalCode === STATUS.ACCEPTED) Object.assign(filter, APPROVED_PROJECT);
+  else if (approvalCode === STATUS.PENDING || approvalCode === STATUS.REJECTED) filter.approval = { $eq: approvalCode };
   if (category) {
     if (typeof category !== "string")
       throw apiError(400, ERROR_CODES.INVALID_CATEGORY, "دسته بندی مورد نظر صحیح نمی باشد");

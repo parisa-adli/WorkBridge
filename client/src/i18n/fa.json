@@ -109,7 +109,11 @@
     "sortLatest": "مرتب سازی (جدید ترین)",
     "sortEarliest": "مرتب سازی (قدیمی ترین)",
     "allCategories": "دسته بندی (همه)",
-    "view": "مشاهده {{title}}"
+    "view": "مشاهده {{title}}",
+    "approval": "تایید مدیر",
+    "allApprovals": "همه (تایید)",
+    "approve": "تایید پروژه {{title}}",
+    "reject": "رد پروژه {{title}}"
   },
   "proposal": {
     "resource": "درخواستی",
@@ -330,6 +334,11 @@
     "CATEGORY_DELETED": "دسته بندی با موفقیت حذف شد",
     "AVATAR_UPDATED": "تصویر پروفایل با موفقیت آپدیت شد",
     "AVATAR_REMOVED": "تصویر پروفایل حذف شد",
-    "PASSWORD_UPDATED": "رمز عبور با موفقیت تغییر کرد"
+    "PASSWORD_UPDATED": "رمز عبور با موفقیت تغییر کرد",
+    "INVALID_PROJECT_APPROVAL": "وضعیت تایید پروژه صحیح نمی باشد",
+    "PROJECT_APPROVAL_NOT_UPDATED": "وضعیت تایید پروژه آپدیت نشد",
+    "PROJECT_APPROVED": "پروژه تایید شد",
+    "PROJECT_REJECTED": "پروژه رد شد",
+    "PROJECT_PENDING": "پروژه به حالت در انتظار تایید تغییر یافت"
   }
 }

@@ -6,6 +6,7 @@ import { ProjectModel } from "../../models/project";
 import { UserModel } from "../../models/user";
 import { sendData } from "../../../utils/apiResponse";
 import { PROJECT_STATUS, ROLES } from "../../../utils/constants";
+import { APPROVED_PROJECT } from "../../../utils/functions";
 
 class StatsController extends Controller {
   async getPublicStats(req: Request, res: Response) {
@@ -13,9 +14,10 @@ class StatsController extends Controller {
     const [freelancers, owners, openProjects, categories, counts] = await Promise.all([
       UserModel.countDocuments({ role: ROLES.FREELANCER, status: 2 }),
       UserModel.countDocuments({ role: ROLES.OWNER, status: 2 }),
-      ProjectModel.countDocuments({ status: PROJECT_STATUS.OPEN }),
+      ProjectModel.countDocuments({ status: PROJECT_STATUS.OPEN, ...APPROVED_PROJECT }),
       CategoryModel.find({ type: "project" }, { title: 1, englishTitle: 1 }).lean(),
       ProjectModel.aggregate<{ _id: unknown; projects: number }>([
+        { $match: APPROVED_PROJECT },
         { $group: { _id: "$category", projects: { $sum: 1 } } },
       ]),
     ]);

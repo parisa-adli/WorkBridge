@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { PROJECT_STATUS } from "../../utils/constants";
+import { PROJECT_STATUS, STATUS } from "../../utils/constants";
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const ProjectSchema = new mongoose.Schema(
@@ -12,6 +12,8 @@ const ProjectSchema = new mongoose.Schema(
       default: PROJECT_STATUS.OPEN,
       enum: Object.values(PROJECT_STATUS),
     },
+    // admin review, STATUS codes. addNewProject sets PENDING; the ACCEPTED default covers projects from before approval existed
+    approval: { type: Number, default: STATUS.ACCEPTED, enum: Object.values(STATUS) },
     category: { type: ObjectId, ref: "Category", required: true },
     budget: { type: Number, required: true },
     tags: [{ type: String }],

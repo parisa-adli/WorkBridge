@@ -13,6 +13,8 @@ import StatusBadge from "../../../ui/StatusBadge";
 import { PROJECT_STATUS_BADGES } from "../../../constants";
 import type { Project, UserRef } from "../../../types/api";
 import localized, { categoryName } from "../../../utils/localized";
+import ToggleProjectStatus from "../../projects/ToggleProjectStatus";
+import ProjectApprovalActions from "../../projects/ProjectApprovalActions";
 
 function ProjectRow({ project, index, isAdmin }: { project: Project; index: number; isAdmin: boolean }) {
   const { t } = useTranslation();
@@ -34,9 +36,23 @@ function ProjectRow({ project, index, isAdmin }: { project: Project; index: numb
       <td>{toPersianNumbersWithComma(budget)}</td>
       <td>{toLocalDateShort(deadline)}</td>
       <td>
-        <StatusBadge status={status} badges={PROJECT_STATUS_BADGES} />
+        {isAdmin ? (
+          <ToggleProjectStatus project={project} />
+        ) : (
+          <StatusBadge status={status} badges={PROJECT_STATUS_BADGES} />
+        )}
       </td>
+      {isAdmin && (
+        <td>
+          <StatusBadge status={project.approval} />
+        </td>
+      )}
       <td>
+        {isAdmin && (
+          <div className="flex items-center gap-x-2">
+            <ProjectApprovalActions project={project} />
+          </div>
+        )}
         {/* the server answers 403 to proposals from admins */}
         {!isAdmin && (
           <>

@@ -70,6 +70,8 @@ export type Project = Timestamps & Translations<{ title: string; description: st
   title: string;
   description: string;
   status: ProjectStatus;
+  // admin review; freelancers only ever get ACCEPTED projects
+  approval: Status;
   category: Pick<Category, "_id" | "title" | "englishTitle">;
   budget: number;
   tags: string[];

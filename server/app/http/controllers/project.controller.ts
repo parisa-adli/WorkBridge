@@ -4,15 +4,27 @@ import Controller from "./controller";
 import { ProjectModel } from "../../models/project";
 import { ProposalModel } from "../../models/proposal";
 import type { UserDocument } from "../../models/user";
-import type { AddProjectBody, ChangeProjectStatusBody } from "../validators/project.schema";
-import { ROLES, PROJECT_STATUS } from "../../../utils/constants";
-import { findByIdOr404, buildProjectQuery, pagination } from "../../../utils/functions";
+import type {
+  AddProjectBody,
+  ChangeProjectApprovalBody,
+  ChangeProjectStatusBody,
+} from "../validators/project.schema";
+import { ROLES, PROJECT_STATUS, STATUS } from "../../../utils/constants";
+import { findByIdOr404, buildProjectQuery, pagination, APPROVED_PROJECT } from "../../../utils/functions";
 import { apiError, sendData } from "../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
 
 export function assertProjectOwner(project: { owner: unknown }, user: UserDocument) {
   if (user.role !== ROLES.ADMIN && String(project.owner) !== String(user._id))
     throw apiError(403, ERROR_CODES.ACCESS_DENIED, "شما به این قسمت دسترسی ندارید");
+}
+
+// a project awaiting approval or rejected is hidden from freelancers, so it answers as missing
+export async function findApprovedProject(id: unknown) {
+  const project = await findByIdOr404(ProjectModel, id, ERROR_CODES.PROJECT_NOT_FOUND, "پروژه یافت نشد.");
+  if (project.approval === STATUS.PENDING || project.approval === STATUS.REJECTED)
+    throw apiError(404, ERROR_CODES.PROJECT_NOT_FOUND, "پروژه یافت نشد.");
+  return project;
 }
 
 // Project routes run after verifyAccessToken, which sets req.user.
@@ -29,6 +41,7 @@ class ProjectController extends Controller {
       budget,
       deadline,
       owner: userId,
+      approval: STATUS.PENDING, // an admin approves it before freelancers see it
     });
 
     if (!project?._id)
@@ -42,6 +55,8 @@ class ProjectController extends Controller {
   }
   async getListOfProjects(req: Request, res: Response) {
     const { filter, sort } = await buildProjectQuery(req.query);
+    // only admins see projects awaiting approval or rejected
+    if (req.user!.role !== ROLES.ADMIN) Object.assign(filter, APPROVED_PROJECT);
     const { page, limit, skip } = pagination(req.query);
 
     const [items, total] = await Promise.all([
@@ -88,7 +103,7 @@ class ProjectController extends Controller {
     // freelancers get a read-only view of any project, with only their own proposal
     const isFreelancer = user.role === ROLES.FREELANCER;
     if (isFreelancer)
-      await findByIdOr404(ProjectModel, id, ERROR_CODES.PROJECT_NOT_FOUND, "پروژه یافت نشد.");
+      await findApprovedProject(id);
     else await this.findOwnProject(id, user);
     const project = await ProjectModel.findById(id).populate([
       {
@@ -154,6 +169,28 @@ class ProjectController extends Controller {
         : { message: "پروژه بسته شد", code: SUCCESS_CODES.PROJECT_CLOSED };
 
     return sendData(res, HttpStatus.OK, result);
+  }
+  async changeProjectApproval(
+    req: Request<{ id: string }, unknown, ChangeProjectApprovalBody>,
+    res: Response
+  ) {
+    const { id } = req.params;
+    const { approval } = req.body;
+    await findByIdOr404(ProjectModel, id, ERROR_CODES.PROJECT_NOT_FOUND, "پروژه یافت نشد.");
+
+    const updateResult = await ProjectModel.updateOne({ _id: id }, { $set: { approval } });
+    if (updateResult.modifiedCount === 0)
+      throw apiError(500, ERROR_CODES.PROJECT_APPROVAL_NOT_UPDATED, "وضعیت تایید پروژه آپدیت نشد");
+
+    const results = {
+      [STATUS.ACCEPTED]: { message: "پروژه تایید شد", code: SUCCESS_CODES.PROJECT_APPROVED },
+      [STATUS.REJECTED]: { message: "پروژه رد شد", code: SUCCESS_CODES.PROJECT_REJECTED },
+      [STATUS.PENDING]: {
+        message: "پروژه به حالت در انتظار تایید تغییر یافت",
+        code: SUCCESS_CODES.PROJECT_PENDING,
+      },
+    };
+    return sendData(res, HttpStatus.OK, results[approval]);
   }
   async deleteProject(req: Request<{ id: string }>, res: Response) {
     const { id } = req.params;

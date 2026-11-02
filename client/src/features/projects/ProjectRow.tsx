@@ -15,6 +15,7 @@ import ToggleProjectStatus from "./ToggleProjectStatus";
 import { Link } from "react-router-dom";
 import type { Project, UserRef } from "../../types/api";
 import localized, { categoryName } from "../../utils/localized";
+import StatusBadge from "../../ui/StatusBadge";
 
 function ProjectRow({ project, index }: { project: Project; index: number }) {
   const { t } = useTranslation();
@@ -46,6 +47,9 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
       <td>{freelancerName ? <span dir="auto">{freelancerName}</span> : "-"}</td>
       <td>
         <ToggleProjectStatus project={project} />
+      </td>
+      <td>
+        <StatusBadge status={project.approval} />
       </td>
       <td>
         <div className="flex items-center gap-x-2">
