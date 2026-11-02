@@ -269,6 +269,7 @@
     "PROFILE_REJECTED": "Your profile was rejected",
     "ACCESS_DENIED": "You do not have access to this section",
     "DEMO_ACCOUNT_LOCKED": "Demo accounts can't be changed",
+    "MAIN_ADMIN_LOCKED": "Only the main admin can change their own status",
     "DUPLICATE_PHONE": "This phone number is already registered",
     "PHONE_LOCKED": "A registered phone number can't be changed",
     "INVALID_PASSWORD": "The password must be 8 to 100 characters",

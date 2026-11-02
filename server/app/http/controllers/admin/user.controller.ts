@@ -51,9 +51,11 @@ class UserController extends Controller {
     const { userId } = req.params;
     const { status } = req.body;
     // demo accounts are shared by every visitor, so nobody may change their status, the demo admin included
-    const target = await UserModel.findById(userId, { username: 1 });
+    const target = await UserModel.findById(userId, { username: 1, isMainAdmin: 1 });
     if (target && isDemoUser(target))
       throw apiError(403, ERROR_CODES.DEMO_ACCOUNT_LOCKED, "حساب نمایشی قابل تغییر نیست");
+    if (target?.isMainAdmin && !target._id.equals(req.user!._id))
+      throw apiError(403, ERROR_CODES.MAIN_ADMIN_LOCKED, "وضعیت ادمین اصلی را فقط خودش می تواند تغییر دهد");
     const updateResult = await UserModel.updateOne(
       { _id: userId },
       { $set: { status } }

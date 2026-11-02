@@ -20,6 +20,25 @@ const setStatus = (status: unknown, agent = admin.agent) =>
   agent.patch(`/api/admin/user/verify/${member.user._id}`).send({ status });
 
 describe("admin user management", () => {
+  it("no admin can change a main admin's isMainAdmin flag", async () => {
+    const main = await createUser(app, { phoneNumber: "09120000033", role: "ADMIN" });
+    await UserModel.updateOne({ _id: main.user._id }, { isMainAdmin: true });
+    await admin.agent.patch(`/api/admin/user/verify/${main.user._id}`).send({ status: 2, isMainAdmin: false });
+    await main.agent.patch("/api/user/update").send({ name: "Main Admin", email: "main@x.com", isMainAdmin: false });
+    expect((await UserModel.findById(main.user._id).lean())!.isMainAdmin).toBe(true);
+  });
+
+  it("no other admin can change a main admin's status", async () => {
+    const main = await createUser(app, { phoneNumber: "09120000033", role: "ADMIN" });
+    await UserModel.updateOne({ _id: main.user._id }, { isMainAdmin: true });
+    const res = await admin.agent.patch(`/api/admin/user/verify/${main.user._id}`).send({ status: 0 });
+    expect(res.status).toBe(403);
+    expect(res.body.code).toBe("MAIN_ADMIN_LOCKED");
+    expect((await UserModel.findById(main.user._id).lean())!.status).toBe(2);
+    const own = await main.agent.patch(`/api/admin/user/verify/${main.user._id}`).send({ status: 1 });
+    expect(own.status).toBe(200);
+  });
+
   it("lists users", async () => {
     const res = await admin.agent.get("/api/admin/user/list");
     expect(res.status).toBe(200);

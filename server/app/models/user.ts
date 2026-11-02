@@ -27,6 +27,8 @@ const UserSchema = new mongoose.Schema(
       enum: Object.values(STATUS),
     },
     role: { type: String, default: ROLES.OWNER },
+    // set only in the database: no route writes it, and Zod strips it from every request body
+    isMainAdmin: { type: Boolean, default: false },
   },
   {
     timestamps: true,
