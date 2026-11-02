@@ -127,7 +127,7 @@ test.beforeAll(async () => {
   const mongo = await MongoClient.connect(process.env.E2E_MONGO_URI);
   try {
     const db = mongo.db();
-    const owner = await db.collection("users").findOne({ username: OWNER.username });
+    const owner = await db.collection("users").findOne({ email: OWNER.email });
     const category = await db.collection("categories").findOne({ englishTitle: "programming" });
     const at = new Date("2026-01-01T00:00:00Z");
     await db.collection("projects").deleteMany({ owner: owner._id });

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ArrowLeft, CircleAlert, createLucideIcon, FolderOpen } from "lucide-react";
 import MainHeader from "../ui/MainHeader";
+import Logo from "../ui/Logo";
 import Skeleton from "../ui/Skeleton";
 import Card from "../ui/Card";
 import EmptyState from "../ui/EmptyState";
@@ -147,7 +148,9 @@ function Home() {
       <footer className="bg-muted mt-16">
         <div className="container xl:max-w-(--breakpoint-lg) px-4 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-2 space-y-4">
-            <h3 className="text-xl font-extrabold">{t("app.name")}</h3>
+            <h3>
+              <Logo variant="full" className="h-8" />
+            </h3>
             <p className="text-sm text-muted-foreground leading-relaxed">{t("home.footerText")}</p>
             <div className="flex items-center gap-3">
               <a

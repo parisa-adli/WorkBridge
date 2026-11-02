@@ -11,6 +11,7 @@ Everything below describes the code **before** the upgrade. It stays as the base
 - §6.1: all twelve security items are closed, each with a regression test in `server/tests/` (see the PRD §7 rows for Phases 8–13b).
 - §6.2–§7: fixed during the upgrade. Every bug the behavior tests pinned (formerly `docs/known-bugs.md`) is fixed and its test flipped. One finding in §6 was wrong: `updateProject`, `changeProjectStatus` and `verifyUser` never returned 500 on unchanged data, because `timestamps: true` bumps `updatedAt`, so `modifiedCount` is never 0 (covered by the "succeeds when ..." tests in `project.test.ts` and `admin.test.ts`).
 - §8: server API tests (Vitest, Supertest, mongodb-memory-server), client tests (Vitest, Testing Library), a Playwright e2e suite with screenshots and axe in fa/en × light/dark, and a GitHub Actions workflow running all of them.
+- Brand: the project is named WorkBridge everywhere (`index.html` title, i18n `app.name` "WorkBridge"/"ورک‌بریج", package names `workbridge`, `workbridge-client`, `workbridge-server`), with a logo (`client/src/ui/Logo.tsx`, `client/public/brand/`) and favicon.
 
 ---
 

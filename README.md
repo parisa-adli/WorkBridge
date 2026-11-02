@@ -1,5 +1,7 @@
 # WorkBridge
 
+<p align="center"><img src="client/public/brand/workbridge-logo.svg" alt="WorkBridge" height="64"></p>
+
 A freelancing platform that connects project owners with freelancers. Owners post projects, freelancers send proposals, and admins manage users and categories. The UI is bilingual: Persian (RTL, default) and English (LTR).
 
 ## Features

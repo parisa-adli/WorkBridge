@@ -4,7 +4,7 @@
     "other": "فا"
   },
   "app": {
-    "name": "Freelancer App"
+    "name": "WorkBridge"
   },
   "common": {
     "loading": "Loading",
@@ -218,9 +218,9 @@
     "findJobText": "Earn, find clients and build your freelance career",
     "view": "View",
     "achievements": "Our achievements",
-    "achievementsText": "At Freelancer App we believe talent knows no borders, and opportunities shouldn't either",
-    "footerText": "Freelancer App is a safe, professional place for clients and freelancers to work together, where projects are defined transparently and delivered with quality.",
-    "copyright": "© {{year}} FreelancerApp. All rights reserved.",
+    "achievementsText": "At WorkBridge we believe talent knows no borders, and opportunities shouldn't either",
+    "footerText": "WorkBridge is a safe, professional place for clients and freelancers to work together, where projects are defined transparently and delivered with quality.",
+    "copyright": "© {{year}} WorkBridge. All rights reserved.",
     "stats": {
       "freelancers": "Freelancers",
       "owners": "Clients",

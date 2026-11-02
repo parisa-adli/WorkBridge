@@ -1,6 +1,6 @@
-# Freelancering App Frontend
+# WorkBridge Frontend
 
-This project is a **Freelancering App** built with **React** and **Vite**. It provides a platform for managing projects, proposals, and users, enabling collaboration between freelancers and project owners. Below is an overview of the tools, patterns, and features used in the project.
+This project is the **WorkBridge** freelancing platform built with **React** and **Vite**. It provides a platform for managing projects, proposals, and users, enabling collaboration between freelancers and project owners. Below is an overview of the tools, patterns, and features used in the project.
 
 ## Tools and Libraries
 
