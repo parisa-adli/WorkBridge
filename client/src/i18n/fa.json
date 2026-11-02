@@ -145,13 +145,10 @@
     "title": "عنوان فارسی",
     "englishTitle": "عنوان انگلیسی",
     "type": "نوع",
-    "parent": "دسته بندی والد",
-    "noParent": "بدون والد",
     "add": "افزودن دسته بندی",
     "addNew": "افزودن دسته بندی جدید",
     "edit": "ویرایش {{title}}",
     "delete": "حذف {{title}}",
-    "childrenWarning": "زیر دسته های آن ({{count}}) هم حذف می شوند.",
     "types": {
       "project": "پروژه",
       "post": "پست",

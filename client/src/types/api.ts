@@ -34,6 +34,7 @@ export type User = Timestamps & Translations<{ name: string; biography: string }
   isActive: boolean;
   status: Status;
   role: Role;
+  isMainAdmin: boolean;
 };
 
 export type Category = Timestamps & {
@@ -42,7 +43,6 @@ export type Category = Timestamps & {
   englishTitle: string;
   description: string;
   type: string;
-  parentId: string | null;
 };
 
 // GET /stats/public

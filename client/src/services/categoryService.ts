@@ -6,7 +6,6 @@ export type NewCategory = {
   englishTitle: string;
   description: string;
   type: string;
-  parentId?: string;
 };
 
 export function getCategoryApi() {

@@ -20,7 +20,7 @@ type SelectProps = FieldProps & {
 } & Pick<ComponentProps<typeof SelectTrigger>, "onBlur" | "ref"> &
   Pick<ComponentProps<typeof ShadcnSelect>, "name" | "disabled">;
 
-// Radix forbids an item with value "", so the empty option (e.g. "no parent") travels under this stand-in.
+// Radix forbids an item with value "", so the empty option (e.g. "all") travels under this stand-in.
 const EMPTY = "__empty__";
 
 export default function Select({

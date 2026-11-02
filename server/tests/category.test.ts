@@ -60,7 +60,7 @@ describe("admin category writes that change nothing", () => {
   });
 
   it("remove returns its own 500 message (was a ReferenceError)", async () => {
-    vi.spyOn(CategoryModel, "deleteMany").mockResolvedValueOnce({ deletedCount: 0 } as mongoose.mongo.DeleteResult);
+    vi.spyOn(CategoryModel, "deleteOne").mockResolvedValueOnce({ deletedCount: 0 } as mongoose.mongo.DeleteResult);
     const res = await admin.delete(`/api/admin/category/remove/${web._id}`);
     expect(res.status).toBe(500);
     expect(res.body.message).toBe("حدف دسته بندی انجام نشد");
@@ -82,30 +82,16 @@ describe("admin category management", () => {
     expect((await CategoryModel.findById(web._id))!.type).toBe("project");
   });
 
-  it("create saves parentId", async () => {
-    const res = await admin.post("/api/admin/category/add").send({ ...fields, type: "project", parentId: String(web._id) });
-    expect(res.status).toBe(201);
-    const child = (await CategoryModel.findOne({ englishTitle: "frontend" }))!;
-    expect(String(child.parentId)).toBe(String(web._id));
+  it("create ignores a parentId", async () => {
+    await admin.post("/api/admin/category/add").send({ ...fields, type: "project", parentId: String(web._id) }).expect(201);
+    expect((await CategoryModel.findOne({ englishTitle: "frontend" }).lean())).not.toHaveProperty("parentId");
   });
 
-  it("create without a parent saves null", async () => {
-    await admin.post("/api/admin/category/add").send({ ...fields, type: "project", parentId: "" }).expect(201);
-    expect((await CategoryModel.findOne({ englishTitle: "frontend" }))!.parentId).toBeNull();
-  });
-
-  it("create rejects an unknown parent with 404", async () => {
-    const res = await admin
-      .post("/api/admin/category/add")
-      .send({ ...fields, type: "project", parentId: "0123456789abcdef01234567" });
-    expect(res.status).toBe(404);
-    expect(res.body.code).toBe(ERROR_CODES.CATEGORY_NOT_FOUND);
-  });
-
-  it("delete removes the category and its children", async () => {
-    await CategoryModel.create({ ...fields, parentId: web._id });
+  it("delete removes only that category", async () => {
+    await CategoryModel.create({ ...fields, type: "project" });
     await admin.delete(`/api/admin/category/remove/${web._id}`).expect(200);
-    expect(await CategoryModel.countDocuments({ englishTitle: { $in: ["web", "frontend"] } })).toBe(0);
+    expect(await CategoryModel.exists({ _id: web._id })).toBeNull();
+    expect(await CategoryModel.exists({ englishTitle: "frontend" })).toBeTruthy();
   });
 
   const createProjectIn = (category: mongoose.Types.ObjectId) =>
@@ -124,14 +110,6 @@ describe("admin category management", () => {
     expect(res.status).toBe(409);
     expect(res.body.code).toBe(ERROR_CODES.CATEGORY_IN_USE);
     expect(await CategoryModel.exists({ _id: web._id })).toBeTruthy();
-  });
-
-  it("delete is blocked when a project uses a child category", async () => {
-    const child = await CategoryModel.create({ ...fields, parentId: web._id });
-    await createProjectIn(child._id);
-    const res = await admin.delete(`/api/admin/category/remove/${web._id}`);
-    expect(res.status).toBe(409);
-    expect(await CategoryModel.countDocuments({ englishTitle: { $in: ["web", "frontend"] } })).toBe(2);
   });
 });
 

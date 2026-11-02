@@ -5,7 +5,6 @@ import Input from "../../../ui/Input";
 import RHFSelect from "../../../ui/RHFSelect";
 import Button from "../../../ui/Button";
 import Loading from "../../../ui/Loading";
-import useCategories from "../../../hooks/useCategories";
 import { CATEGORY_TYPES } from "../../../constants";
 import { categorySchema, type CategoryValues } from "../../../schemas/category";
 import type { Category } from "../../../types/api";
@@ -32,15 +31,13 @@ function CategoryForm({ onClose, categoryToEdit }: CategoryFormProps) {
           description: categoryToEdit.description,
           type: categoryToEdit.type as CategoryValues["type"],
         }
-      : { type: "project", parentId: "" },
+      : { type: "project" },
     resolver: zodResolver(categorySchema),
   });
-  const { categories } = useCategories();
   const { isCreating, createCategory } = useCreateCategory();
   const { isEditing, editCategory } = useEditCategory();
 
   const onSubmit = (data: CategoryValues) => {
-    // the edit form has no parent field, so parentId is undefined there
     if (categoryToEdit) {
       editCategory({ id: categoryToEdit._id, data }, { onSuccess: onClose });
     } else {
@@ -60,14 +57,6 @@ function CategoryForm({ onClose, categoryToEdit }: CategoryFormProps) {
         required
         options={CATEGORY_TYPES.map((type) => ({ value: type, label: t(`category.types.${type}`) }))}
       />
-      {!categoryToEdit && (
-        <RHFSelect
-          label={t("category.parent")}
-          name="parentId"
-          control={control}
-          options={[{ value: "", label: t("category.noParent") }, ...categories]}
-        />
-      )}
       <div className="mt-8!">
         {isCreating || isEditing ? (
           <Loading />

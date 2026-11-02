@@ -145,13 +145,10 @@
     "title": "Persian title",
     "englishTitle": "English title",
     "type": "Type",
-    "parent": "Parent category",
-    "noParent": "None",
     "add": "Add category",
     "addNew": "Add a new category",
     "edit": "Edit {{title}}",
     "delete": "Delete {{title}}",
-    "childrenWarning": "Its subcategories ({{count}}) will be deleted too.",
     "types": {
       "project": "Project",
       "post": "Post",

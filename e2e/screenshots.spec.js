@@ -58,8 +58,8 @@ const PINNED = {
     statusCode: 200,
     data: {
       categories: [
-        { ...category, type: "project", parentId: null },
-        { _id: "c2", title: "طراحی وب", englishTitle: "web design", type: "project", parentId: "c1" },
+        { ...category, type: "project" },
+        { _id: "c2", title: "طراحی وب", englishTitle: "web design", type: "project" },
       ],
     },
   },

@@ -17,19 +17,12 @@ function CategoriesTable() {
             <th>{t("category.title")}</th>
             <th>{t("category.englishTitle")}</th>
             <th>{t("category.type")}</th>
-            <th>{t("category.parent")}</th>
             <th>{t("common.actions")}</th>
           </Table.Row>
         </Table.Header>
         <Table.Body>
           {rawCategories.map((category, index) => (
-            <CategoryRow
-              key={category._id}
-              category={category}
-              index={index}
-              parent={rawCategories.find((c) => c._id === category.parentId)}
-              childCount={rawCategories.filter((c) => c.parentId === category._id).length}
-            />
+            <CategoryRow key={category._id} category={category} index={index} />
           ))}
         </Table.Body>
       </Table>

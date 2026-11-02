@@ -11,8 +11,8 @@ vi.mock("../../../services/categoryService");
 
 const category = { description: "category", type: "project", createdAt: "", updatedAt: "" };
 const rawCategories = [
-  { ...category, _id: "c1", title: "وب", englishTitle: "Web", parentId: null },
-  { ...category, _id: "c2", title: "فرانت", englishTitle: "Frontend", parentId: "c1" },
+  { ...category, _id: "c1", title: "وب", englishTitle: "Web" },
+  { ...category, _id: "c2", title: "فرانت", englishTitle: "Frontend" },
 ];
 
 describe("CategoriesTable", () => {
@@ -24,7 +24,7 @@ describe("CategoriesTable", () => {
     expect(screen.getByText(i18n.t("common.loadError"))).toBeInTheDocument();
   });
 
-  it("lists categories with their parent, warns about children on delete and refetches the list", async () => {
+  it("lists categories, deletes one and refetches the list", async () => {
     vi.mocked(useCategories).mockReturnValue({ isLoading: false, rawCategories } as unknown as ReturnType<
       typeof useCategories
     >);
@@ -37,10 +37,9 @@ describe("CategoriesTable", () => {
       </QueryClientProvider>
     );
 
-    // the child's parent column shows the parent's name
-    expect(screen.getAllByText("وب")).toHaveLength(2);
+    expect(screen.getByText("وب")).toBeInTheDocument();
+    expect(screen.getByText("Frontend")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: i18n.t("category.delete", { title: "وب" }) }));
-    expect(screen.getByText(i18n.t("category.childrenWarning", { count: 1 }))).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: i18n.t("common.confirm") }));
 
     await waitFor(() => expect(invalidate).toHaveBeenCalledWith({ queryKey: ["categories"] }));

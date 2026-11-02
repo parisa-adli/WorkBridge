@@ -13,11 +13,9 @@ import useRemoveCategory from "./useRemoveCategory";
 type CategoryRowProps = {
   category: Category;
   index: number;
-  parent?: Category;
-  childCount: number;
 };
 
-function CategoryRow({ category, index, parent, childCount }: CategoryRowProps) {
+function CategoryRow({ category, index }: CategoryRowProps) {
   const { t } = useTranslation();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -30,7 +28,6 @@ function CategoryRow({ category, index, parent, childCount }: CategoryRowProps) 
       <td>{category.title}</td>
       <td>{category.englishTitle}</td>
       <td>{t(`category.types.${category.type}`)}</td>
-      <td>{parent ? categoryName(parent) : "-"}</td>
       <td>
         <div className="flex items-center gap-x-2">
           <Button variant="ghost" size="icon" onClick={() => setIsEditOpen(true)} aria-label={t("category.edit", { title: name })}>
@@ -57,11 +54,7 @@ function CategoryRow({ category, index, parent, childCount }: CategoryRowProps) 
               removeCategory(category._id, { onSuccess: () => setIsDeleteOpen(false) })
             }
             disabled={isDeleting}
-          >
-            {childCount > 0 && (
-              <p className="text-sm text-destructive">{t("category.childrenWarning", { count: childCount })}</p>
-            )}
-          </ConfirmDelete>
+          />
         </div>
       </td>
     </Table.Row>

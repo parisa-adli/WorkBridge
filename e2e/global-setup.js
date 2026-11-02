@@ -117,7 +117,6 @@ module.exports = async function globalSetup() {
         englishTitle: "programming",
         description: "e2e category",
         type: "project",
-        parentId: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });

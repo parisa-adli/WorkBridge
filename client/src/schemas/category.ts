@@ -14,8 +14,6 @@ export const categorySchema = z.object({
   englishTitle: text(LIMITS.CATEGORY_TITLE_MIN, LIMITS.CATEGORY_TITLE_MAX),
   description: text(LIMITS.CATEGORY_DESCRIPTION_MIN, LIMITS.CATEGORY_DESCRIPTION_MAX),
   type: z.enum(CATEGORY_TYPES, msg("validation.invalidCategoryType")),
-  // "" = no parent; only sent on create (update doesn't take it)
-  parentId: z.string().optional(),
 });
 
 export type CategoryValues = z.infer<typeof categorySchema>;
