@@ -1,5 +1,5 @@
 import useAppMutation from "../../hooks/useAppMutation";
-import { changePasswordApi, updateAvatarApi, updateProfileApi } from "../../services/authService";
+import { changePasswordApi, removeAvatarApi, updateAvatarApi, updateProfileApi } from "../../services/authService";
 
 // The header and the admin users list both show the user's name and avatar.
 const USER_KEYS = [["user"], ["users"]];
@@ -18,4 +18,9 @@ export function useChangePassword() {
 export function useUpdateAvatar() {
   const { isPending: isUploading, mutate: updateAvatar } = useAppMutation(updateAvatarApi, USER_KEYS);
   return { isUploading, updateAvatar };
+}
+
+export function useRemoveAvatar() {
+  const { isPending: isRemoving, mutate: removeAvatar } = useAppMutation(removeAvatarApi, USER_KEYS);
+  return { isRemoving, removeAvatar };
 }

@@ -59,7 +59,7 @@ describe("AuthContainer", () => {
     expect(screen.getByRole("tab", { name: "ورود نمایشی" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByLabelText("کارفرما")).toBeChecked();
     expect(screen.getByLabelText(/ایمیل/)).toHaveValue("owner@workbridge.dev");
-    expect(screen.getByLabelText(/رمز عبور/)).toHaveValue("Owner@1234");
+    expect(screen.getByLabelText(/رمز عبور/, { selector: "input" })).toHaveValue("Owner@1234");
     expect(screen.getByText("owner@workbridge.dev")).toBeInTheDocument();
     expect(screen.getByText("Owner@1234")).toBeInTheDocument();
   });
@@ -75,7 +75,7 @@ describe("AuthContainer", () => {
     renderAuth();
     fireEvent.click(screen.getByLabelText(label));
     expect(screen.getByLabelText(/ایمیل/)).toHaveValue(email);
-    expect(screen.getByLabelText(/رمز عبور/)).toHaveValue(password);
+    expect(screen.getByLabelText(/رمز عبور/, { selector: "input" })).toHaveValue(password);
     expect(screen.getByText(email)).toBeInTheDocument();
     expect(screen.getByText(password)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "ورود" }));

@@ -240,6 +240,17 @@ class userAuthController extends Controller {
       avatarUrl: user!.get("avatarUrl") as string,
     });
   }
+  async removeAvatar(req: Request, res: Response) {
+    // the route runs verifyAccessToken first, which sets req.user
+    const { _id: userId, avatar } = req.user!;
+    await UserModel.updateOne({ _id: userId }, { $unset: { avatar: 1 } });
+    if (avatar) await fs.rm(path.join(SERVER_ROOT, avatar), { force: true });
+
+    return sendData(res, HttpStatus.OK, {
+      message: "تصویر پروفایل حذف شد",
+      code: SUCCESS_CODES.AVATAR_REMOVED,
+    });
+  }
   async refreshToken(req: Request, res: Response) {
     const userId = await verifyRefreshToken(req);
     const user = await UserModel.findById(userId);

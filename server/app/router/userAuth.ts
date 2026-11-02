@@ -66,6 +66,7 @@ router.patch(
 );
 
 router.patch("/avatar", verifyAccessToken, readAvatar, UserAuthController.updateAvatar);
+router.delete("/avatar", verifyAccessToken, UserAuthController.removeAvatar);
 
 router.get("/profile", verifyAccessToken, UserAuthController.getUserProfile);
 

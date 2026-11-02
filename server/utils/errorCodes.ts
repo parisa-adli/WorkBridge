@@ -107,6 +107,7 @@ export const SUCCESS_CODES = codes([
   "CATEGORY_DELETED",
   "AVATAR_UPDATED",
   "PASSWORD_UPDATED",
+  "AVATAR_REMOVED",
 ]);
 
 export type ErrorCode = keyof typeof ERROR_CODES;

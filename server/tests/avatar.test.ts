@@ -89,3 +89,16 @@ describe("PATCH /api/user/avatar", () => {
     expect(res.status).toBe(401);
   });
 });
+
+describe("DELETE /api/user/avatar", () => {
+  it("clears the avatar and deletes its file", async () => {
+    const agent = await login(app, PHONE);
+    const { avatarUrl } = (await agent.patch("/api/user/avatar").set("Content-Type", "image/png").send(PNG)).body.data;
+    saved.push(fileOf(avatarUrl));
+
+    const res = await agent.delete("/api/user/avatar");
+    expect(res.body.data.code).toBe(SUCCESS_CODES.AVATAR_REMOVED);
+    expect(fs.existsSync(fileOf(avatarUrl))).toBe(false);
+    expect((await agent.get("/api/user/profile")).body.data.user.avatarUrl).toBeNull();
+  });
+});

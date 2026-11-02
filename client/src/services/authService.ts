@@ -52,6 +52,12 @@ export function updateAvatarApi(file: File) {
     .then(({ data }) => data.data);
 }
 
+export function removeAvatarApi() {
+  return http
+    .delete<ApiResponse<MessageData>>("/user/avatar")
+    .then(({ data }) => data.data);
+}
+
 export function logoutApi() {
   return http
     .post<ApiResponse<MessageData>>("/user/logout")

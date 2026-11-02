@@ -53,6 +53,8 @@
     "email": "Email",
     "username": "Username",
     "password": "Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "login": "Log in",
     "phoneNumber": "Phone number",
     "sendOtp": "Send verification code",
@@ -123,6 +125,7 @@
   "profile": {
     "title": "Profile",
     "changeAvatar": "Change profile picture",
+    "removeAvatar": "Remove profile picture",
     "avatarHint": "jpg, png or webp, up to 2 MB",
     "biography": "Field of expertise",
     "save": "Save changes",
@@ -326,6 +329,7 @@
     "CATEGORY_UPDATED": "Category updated",
     "CATEGORY_DELETED": "Category deleted",
     "AVATAR_UPDATED": "Your profile picture was updated",
+    "AVATAR_REMOVED": "Your profile picture was removed",
     "PASSWORD_UPDATED": "Your password was changed"
   }
 }

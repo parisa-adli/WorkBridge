@@ -53,6 +53,8 @@
     "email": "ایمیل",
     "username": "نام کاربری",
     "password": "رمز عبور",
+    "showPassword": "نمایش رمز عبور",
+    "hidePassword": "پنهان کردن رمز عبور",
     "login": "ورود",
     "phoneNumber": "شماره موبایل",
     "sendOtp": "ارسال کد تایید",
@@ -123,6 +125,7 @@
   "profile": {
     "title": "پروفایل",
     "changeAvatar": "تغییر تصویر پروفایل",
+    "removeAvatar": "حذف تصویر پروفایل",
     "avatarHint": "jpg، png یا webp، حداکثر ۲ مگابایت",
     "biography": "حوزه تخصصی",
     "save": "ذخیره تغییرات",
@@ -326,6 +329,7 @@
     "CATEGORY_UPDATED": "دسته بندی با موفقیت به روزرسانی شد",
     "CATEGORY_DELETED": "دسته بندی با موفقیت حذف شد",
     "AVATAR_UPDATED": "تصویر پروفایل با موفقیت آپدیت شد",
+    "AVATAR_REMOVED": "تصویر پروفایل حذف شد",
     "PASSWORD_UPDATED": "رمز عبور با موفقیت تغییر کرد"
   }
 }

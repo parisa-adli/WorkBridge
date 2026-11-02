@@ -9,12 +9,14 @@ import Input from "../../ui/Input";
 import Textarea from "../../ui/Textarea";
 import Button from "../../ui/Button";
 import { Avatar } from "./UserAvatar";
-import { useChangePassword, useUpdateAvatar, useUpdateProfile } from "./useUpdateProfile";
+import { X } from "lucide-react";
+import { useChangePassword, useRemoveAvatar, useUpdateAvatar, useUpdateProfile } from "./useUpdateProfile";
 
 function ProfileForm({ user }: { user: User }) {
   const { t } = useTranslation();
   const { isUpdating, updateProfile } = useUpdateProfile();
   const { isUploading, updateAvatar } = useUpdateAvatar();
+  const { isRemoving, removeAvatar } = useRemoveAvatar();
   const fileInput = useRef<HTMLInputElement>(null);
   const {
     register,
@@ -33,7 +35,21 @@ function ProfileForm({ user }: { user: User }) {
   return (
     <div className="max-w-xl space-y-6">
       <Card className="flex-row items-center gap-4">
-        <Avatar user={user} className="size-20 text-2xl" />
+        <div className="relative shrink-0">
+          <Avatar user={user} className="size-20 text-2xl" />
+          {user.avatarUrl && (
+            <button
+              type="button"
+              onClick={() => removeAvatar()}
+              disabled={isRemoving}
+              aria-label={t("profile.removeAvatar")}
+              title={t("profile.removeAvatar")}
+              className="absolute -top-1 -end-1 flex size-6 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-sm hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+            >
+              <X aria-hidden="true" className="size-3.5" />
+            </button>
+          )}
+        </div>
         <div className="space-y-2">
           <Button variant="outline" size="sm" disabled={isUploading} onClick={() => fileInput.current?.click()}>
             {t("profile.changeAvatar")}
