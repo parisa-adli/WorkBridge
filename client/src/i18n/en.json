@@ -112,8 +112,7 @@
     "view": "View {{title}}",
     "approval": "Approval",
     "allApprovals": "All approvals",
-    "approve": "Approve project {{title}}",
-    "reject": "Reject project {{title}}"
+    "changeApproval": "Change approval of {{title}}"
   },
   "proposal": {
     "resource": "Proposal",
@@ -204,6 +203,7 @@
     "invalidDuration": "The duration is not allowed",
     "invalidProposalStatus": "Invalid proposal status",
     "invalidUserStatus": "Invalid user status",
+    "invalidProjectApproval": "Invalid project approval status",
     "invalidCategoryType": "The category type is not valid"
   },
   "home": {

@@ -1,36 +1,50 @@
 import { useTranslation } from "react-i18next";
-import { Check, X } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ListChecks } from "lucide-react";
 import Button from "../../ui/Button";
-import { STATUS } from "../../constants";
+import Modal from "../../ui/Modal";
+import Loading from "../../ui/Loading";
+import StatusSelect from "../../ui/StatusSelect";
 import type { Project } from "../../types/api";
 import localized from "../../utils/localized";
+import { projectApprovalSchema, type StatusInput, type StatusValues } from "../../schemas/status";
 import useChangeProjectApproval from "./useChangeProjectApproval";
 
-// admin only: approve or reject a project (the server answers 403 to anyone else)
+// admin only: set a project's approval to accepted, rejected or pending (the server answers 403 to anyone else)
 function ProjectApprovalActions({ project }: { project: Project }) {
   const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
   const { isUpdating, changeProjectApproval } = useChangeProjectApproval();
-  const title = localized(project, "title");
+  const { control, handleSubmit } = useForm<StatusInput, unknown, StatusValues>({
+    defaultValues: { status: project.approval },
+    resolver: zodResolver(projectApprovalSchema),
+  });
+  const label = t("project.changeApproval", { title: localized(project, "title") });
+
+  const onSubmit = ({ status }: StatusValues) => {
+    changeProjectApproval({ id: project._id, approval: status }, { onSuccess: () => setOpen(false) });
+  };
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="icon"
-        disabled={isUpdating || project.approval === STATUS.ACCEPTED}
-        onClick={() => changeProjectApproval({ id: project._id, approval: STATUS.ACCEPTED })}
-        aria-label={t("project.approve", { title })}
-      >
-        <Check />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        disabled={isUpdating || project.approval === STATUS.REJECTED}
-        onClick={() => changeProjectApproval({ id: project._id, approval: STATUS.REJECTED })}
-        aria-label={t("project.reject", { title })}
-      >
-        <X className="text-destructive" />
+      <Modal title={label} open={open} onClose={() => setOpen(false)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <StatusSelect control={control} />
+          <div className="mt-8!">
+            {isUpdating ? (
+              <Loading />
+            ) : (
+              <Button type="submit" className="w-full">
+                {t("common.confirm")}
+              </Button>
+            )}
+          </div>
+        </form>
+      </Modal>
+      <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label={label}>
+        <ListChecks />
       </Button>
     </>
   );

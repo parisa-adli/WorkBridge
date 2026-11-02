@@ -112,8 +112,7 @@
     "view": "مشاهده {{title}}",
     "approval": "تایید مدیر",
     "allApprovals": "همه (تایید)",
-    "approve": "تایید پروژه {{title}}",
-    "reject": "رد پروژه {{title}}"
+    "changeApproval": "تغییر وضعیت تایید {{title}}"
   },
   "proposal": {
     "resource": "درخواستی",
@@ -204,6 +203,7 @@
     "invalidDuration": "مدت زمان مجاز نمی باشد",
     "invalidProposalStatus": "وضعیت پروپوزال صحیح نمی باشد",
     "invalidUserStatus": "وضعیت کاربر صحیح نمی باشد",
+    "invalidProjectApproval": "وضعیت تایید پروژه صحیح نمی باشد",
     "invalidCategoryType": "نوع دسته بندی صحیح نمی باشد"
   },
   "home": {
