@@ -37,6 +37,7 @@ function App() {
           <Toaster position="top-center" />
           <Routes>
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/admin" element={<Auth admin />} />
             <Route path="/complete-profile" element={<CompleteProfile />} />
             <Route
               path="/owner"

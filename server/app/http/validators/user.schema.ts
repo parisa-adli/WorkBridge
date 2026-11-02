@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DEMO_USERNAMES, LIMITS, PHONE_PATTERN, ROLES, STATUS } from "../../../utils/constants";
+import { LIMITS, PHONE_PATTERN, ROLES, STATUS } from "../../../utils/constants";
 import { ERROR_CODES } from "../../../utils/errorCodes";
 import { issue } from "../middlewares/validate";
 import { numeric, pageQuery, searchQuery } from "./common.schema";
@@ -28,10 +28,18 @@ export const checkOtpSchema = z.object({
 
 const passwordRequired = issue(ERROR_CODES.PASSWORD_REQUIRED, "رمز عبور را وارد کنید");
 
-// only the seeded demo accounts can log in with a password (PRD F1)
-export const demoLoginSchema = z.object({
-  username: z.enum(DEMO_USERNAMES, issue(ERROR_CODES.INVALID_USERNAME, "نام کاربری صحیح نمی باشد")),
+// email + password login, for any account that has set a password (the demo accounts have one)
+export const loginSchema = z.object({
+  email: z.email(invalidEmail),
   password: z.string(passwordRequired).min(1, passwordRequired).max(100, passwordRequired),
+});
+
+const invalidPassword = issue(ERROR_CODES.INVALID_PASSWORD, "رمز عبور باید بین ۸ تا ۱۰۰ کاراکتر باشد");
+
+// currentPassword is required only when the account already has a password (checked in the controller)
+export const changePasswordSchema = z.object({
+  currentPassword: z.string(passwordRequired).max(100, passwordRequired).optional(),
+  newPassword: z.string(invalidPassword).min(LIMITS.PASSWORD_MIN, invalidPassword).max(100, invalidPassword),
 });
 
 export const completeProfileSchema = z.object({
@@ -53,7 +61,8 @@ export const updateProfileSchema = z.object({
 });
 
 export type GetOtpBody = z.infer<typeof getOtpSchema>;
-export type DemoLoginBody = z.infer<typeof demoLoginSchema>;
+export type LoginBody = z.infer<typeof loginSchema>;
+export type ChangePasswordBody = z.infer<typeof changePasswordSchema>;
 export type CheckOtpBody = z.infer<typeof checkOtpSchema>;
 export type CompleteProfileBody = z.infer<typeof completeProfileSchema>;
 export type UpdateProfileBody = z.infer<typeof updateProfileSchema>;

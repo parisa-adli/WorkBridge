@@ -13,9 +13,9 @@ export function checkOtp(data: { phoneNumber: string; otp: string }) {
     .then(({ data }) => data.data);
 }
 
-export function demoLoginApi(data: { username: string; password: string }) {
+export function demoLoginApi(data: { email: string; password: string }) {
   return http
-    .post<ApiResponse<MessageData & { user: User }>>("/user/demo-login", data)
+    .post<ApiResponse<MessageData & { user: User }>>("/user/login", data)
     .then(({ data }) => data.data);
 }
 
@@ -31,9 +31,15 @@ export function getUser() {
     .then(({ data }) => data.data);
 }
 
-export function updateProfileApi(data: { name: string; email: string; biography?: string }) {
+export function updateProfileApi(data: { name: string; email: string; biography?: string; phoneNumber?: string }) {
   return http
     .patch<ApiResponse<MessageData>>("/user/update", data)
+    .then(({ data }) => data.data);
+}
+
+export function changePasswordApi(data: { currentPassword?: string; newPassword: string }) {
+  return http
+    .patch<ApiResponse<MessageData>>("/user/password", data)
     .then(({ data }) => data.data);
 }
 

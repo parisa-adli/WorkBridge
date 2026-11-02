@@ -10,12 +10,15 @@ import RadioInputGroup from "../../ui/RadioInputGroup";
 import Loading from "../../ui/Loading";
 import Button from "../../ui/Button";
 import { demoLoginApi } from "../../services/authService";
-import { DEMO_USERS, ROLES } from "../../constants";
+import { DEMO_USERS } from "../../constants";
 import { demoLoginSchema, type DemoLoginValues } from "../../schemas/auth";
 import type { ApiErrorResponse } from "../../types/api";
 import redirectByRole from "../../utils/redirectByRole";
 
-function DemoLoginForm() {
+type Role = DemoLoginValues["role"];
+
+// Email + password; `roles` are the demo accounts it offers to pre-fill (the role picker shows when there are several).
+function DemoLoginForm({ roles }: { roles: Role[] }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const {
@@ -26,14 +29,14 @@ function DemoLoginForm() {
     formState: { errors },
   } = useForm<DemoLoginValues>({
     resolver: zodResolver(demoLoginSchema),
-    defaultValues: { role: ROLES.OWNER, ...DEMO_USERS[ROLES.OWNER] },
+    defaultValues: { role: roles[0], ...DEMO_USERS[roles[0]] },
   });
 
   const { isPending, mutateAsync } = useMutation({ mutationFn: demoLoginApi });
 
-  const onSubmit = async ({ username, password }: DemoLoginValues) => {
+  const onSubmit = async ({ email, password }: DemoLoginValues) => {
     try {
-      const { user, message } = await mutateAsync({ username, password });
+      const { user, message } = await mutateAsync({ email, password });
       toast.success(message);
       redirectByRole(navigate, user.role);
     } catch (error) {
@@ -43,8 +46,8 @@ function DemoLoginForm() {
 
   // picking a role swaps in that role's demo account
   const fillDemoUser = (role: string) => {
-    const { username, password } = DEMO_USERS[role as DemoLoginValues["role"]];
-    setValue("username", username);
+    const { email, password } = DEMO_USERS[role as Role];
+    setValue("email", email);
     setValue("password", password);
   };
 
@@ -52,22 +55,20 @@ function DemoLoginForm() {
 
   return (
     <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
-      <RadioInputGroup
-        label={t("user.role")}
-        control={control}
-        name="role"
-        onValueChange={fillDemoUser}
-        options={[
-          { value: ROLES.OWNER, label: t("roles.owner") },
-          { value: ROLES.FREELANCER, label: t("roles.freelancer") },
-          { value: ROLES.ADMIN, label: t("roles.admin") },
-        ]}
-      />
-      <Input label={t("auth.username")} required error={errors.username?.message} {...register("username")} />
+      {roles.length > 1 && (
+        <RadioInputGroup
+          label={t("user.role")}
+          control={control}
+          name="role"
+          onValueChange={fillDemoUser}
+          options={roles.map((role) => ({ value: role, label: t(`roles.${role.toLowerCase()}`) }))}
+        />
+      )}
+      <Input label={t("auth.email")} type="email" dir="ltr" required error={errors.email?.message} {...register("email")} />
       <Input label={t("auth.password")} type="password" required error={errors.password?.message} {...register("password")} />
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm text-muted-foreground">
-        <dt>{t("auth.username")}</dt>
-        <dd className="font-mono"><bdi>{shown.username}</bdi></dd>
+        <dt>{t("auth.email")}</dt>
+        <dd className="font-mono"><bdi>{shown.email}</bdi></dd>
         <dt>{t("auth.password")}</dt>
         <dd className="font-mono"><bdi>{shown.password}</bdi></dd>
       </dl>

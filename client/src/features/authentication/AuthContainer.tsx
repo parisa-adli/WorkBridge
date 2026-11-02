@@ -14,8 +14,10 @@ import type { AxiosError } from "axios";
 import type { ApiErrorResponse } from "../../types/api";
 import useUser from "./useUser";
 import { useNavigate } from "react-router-dom";
+import { ROLES } from "../../constants";
 
-function AuthContainer() {
+// `admin`: the /auth/admin page, whose email tab offers only the admin account; the main page leaves admin out.
+function AuthContainer({ admin = false }: { admin?: boolean }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
@@ -82,11 +84,11 @@ function AuthContainer() {
   return (
     <Tabs defaultValue="demo" className="w-full sm:max-w-sm gap-8">
       <TabsList className="w-full">
-        <TabsTrigger value="demo">{t("auth.demoTab")}</TabsTrigger>
+        <TabsTrigger value="demo">{t(admin ? "auth.emailTab" : "auth.demoTab")}</TabsTrigger>
         <TabsTrigger value="phone">{t("auth.phoneTab")}</TabsTrigger>
       </TabsList>
       <TabsContent value="demo">
-        <DemoLoginForm />
+        <DemoLoginForm roles={admin ? [ROLES.ADMIN] : [ROLES.OWNER, ROLES.FREELANCER]} />
       </TabsContent>
       <TabsContent value="phone">{renderStep()}</TabsContent>
     </Tabs>

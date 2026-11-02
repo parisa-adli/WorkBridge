@@ -9,6 +9,7 @@ import path from "path";
 import { allRoutes } from "./router/router";
 import { apiError, type ApiErrorResponse } from "../utils/apiResponse";
 import { ERROR_CODES, type ErrorCode } from "../utils/errorCodes";
+import { seedDemoUsers } from "../utils/seedDemoUsers";
 dotenv.config();
 
 const REQUIRED_ENV = [
@@ -38,6 +39,8 @@ class Application {
       if (!["true", "false"].includes(process.env.DEMO_LOGIN_ENABLED!))
         throw new Error("DEMO_LOGIN_ENABLED must be true or false");
       await this.connectToDB();
+      // the login page pre-fills the demo accounts, so they must exist (idempotent upserts)
+      if (process.env.DEMO_LOGIN_ENABLED === "true") await seedDemoUsers();
       this.createServer();
     } catch (err) {
       console.error("Server failed to start:", (err as Error).message);

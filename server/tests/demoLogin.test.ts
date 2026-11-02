@@ -20,8 +20,8 @@ beforeEach(async () => {
 
 async function demoLogin(role: keyof typeof DEMO_USERS) {
   const agent = request.agent(app);
-  const { username, password } = DEMO_USERS[role];
-  await agent.post("/api/user/demo-login").send({ username, password }).expect(200);
+  const { email, password } = DEMO_USERS[role];
+  await agent.post("/api/user/login").send({ email, password }).expect(200);
   return agent;
 }
 
@@ -35,10 +35,10 @@ const cookieShape = (res: request.Response) =>
       .join("; ")
   );
 
-describe("POST /api/user/demo-login", () => {
-  it.each(Object.entries(DEMO_USERS))("logs in the %s demo account", async (role, { username, password }) => {
+describe("POST /api/user/login", () => {
+  it.each(Object.entries(DEMO_USERS))("logs in the %s demo account", async (role, { username, email, password }) => {
     const agent = request.agent(app);
-    const res = await agent.post("/api/user/demo-login").send({ username, password });
+    const res = await agent.post("/api/user/login").send({ email, password });
 
     expect(res.status).toBe(200);
     expect(res.body.data.code).toBe(SUCCESS_CODES.LOGGED_IN);
@@ -50,64 +50,88 @@ describe("POST /api/user/demo-login", () => {
   });
 
   it("sets the same cookies as OTP login", async () => {
-    const { username, password } = DEMO_USERS.OWNER;
-    const demo = await request(app).post("/api/user/demo-login").send({ username, password });
+    const { email, password } = DEMO_USERS.OWNER;
+    const login = await request(app).post("/api/user/login").send({ email, password });
     await request(app).post("/api/user/get-otp").send({ phoneNumber: "09120000001" });
     const { otp } = (await UserModel.findOne({ phoneNumber: "09120000001" }))!;
     const viaOtp = await request(app)
       .post("/api/user/check-otp")
       .send({ phoneNumber: "09120000001", otp: String(otp!.code) });
 
-    expect(cookieShape(demo)).toEqual(cookieShape(viaOtp));
-    expect(cookieShape(demo).map((c) => c.split("; ")[0])).toEqual(["accessToken", "refreshToken"]);
+    expect(cookieShape(login)).toEqual(cookieShape(viaOtp));
+    expect(cookieShape(login).map((c) => c.split("; ")[0])).toEqual(["accessToken", "refreshToken"]);
   });
 
   it("rejects a wrong password without setting cookies", async () => {
     const res = await request(app)
-      .post("/api/user/demo-login")
-      .send({ username: DEMO_USERS.OWNER.username, password: "wrong" });
+      .post("/api/user/login")
+      .send({ email: DEMO_USERS.OWNER.email, password: "wrong" });
     expect(res.status).toBe(401);
     expect(res.body.code).toBe(ERROR_CODES.INVALID_CREDENTIALS);
     expect(res.headers["set-cookie"]).toBeUndefined();
   });
 
-  it("accepts only the seeded demo usernames", async () => {
-    // even a real user with a username and a password hash is refused
-    await UserModel.create({ username: "someone", password: await hashPassword("Pass@1234"), status: STATUS.ACCEPTED });
-    const other = await request(app).post("/api/user/demo-login").send({ username: "someone", password: "Pass@1234" });
-    expect(other.status).toBe(400);
-    expect(other.body).toMatchObject({ code: ERROR_CODES.INVALID_USERNAME, field: "username" });
-    expect(other.headers["set-cookie"]).toBeUndefined();
+  it("logs in any user who has set a password, and validates the body", async () => {
+    await UserModel.create({ email: "someone@example.com", password: await hashPassword("Pass@1234"), status: STATUS.ACCEPTED });
+    await request(app).post("/api/user/login").send({ email: "someone@example.com", password: "Pass@1234" }).expect(200);
 
-    const noPassword = await request(app).post("/api/user/demo-login").send({ username: DEMO_USERS.OWNER.username });
+    const badEmail = await request(app).post("/api/user/login").send({ email: "nope", password: "x" });
+    expect(badEmail.body).toMatchObject({ code: ERROR_CODES.INVALID_EMAIL, field: "email" });
+    const noPassword = await request(app).post("/api/user/login").send({ email: DEMO_USERS.OWNER.email });
     expect(noPassword.body).toMatchObject({ code: ERROR_CODES.PASSWORD_REQUIRED, field: "password" });
   });
 
-  it("rejects a demo username that was never seeded", async () => {
-    await UserModel.deleteMany({});
-    const { username, password } = DEMO_USERS.OWNER;
-    const res = await request(app).post("/api/user/demo-login").send({ username, password });
+  it("rejects an account without a password", async () => {
+    await UserModel.create({ email: "otp@example.com", phoneNumber: "09120000002" });
+    const res = await request(app).post("/api/user/login").send({ email: "otp@example.com", password: "anything" });
     expect(res.status).toBe(401);
     expect(res.body.code).toBe(ERROR_CODES.INVALID_CREDENTIALS);
   });
 
-  it("is a 404 when DEMO_LOGIN_ENABLED is false", async () => {
+  it("adopts an older account that holds a demo email, so the prefilled login works", async () => {
+    await UserModel.deleteMany({});
+    // an older seed keyed by email: no username, another password
+    await UserModel.create({ email: DEMO_USERS.OWNER.email, password: await hashPassword("Old@12345"), role: ROLES.OWNER });
+    await seedDemoUsers();
+
+    expect(await UserModel.countDocuments({ email: DEMO_USERS.OWNER.email })).toBe(1);
+    const { email, password } = DEMO_USERS.OWNER;
+    await request(app).post("/api/user/login").send({ email, password }).expect(200);
+  });
+
+  it("refuses the demo accounts when DEMO_LOGIN_ENABLED is false", async () => {
     process.env.DEMO_LOGIN_ENABLED = "false";
     try {
-      const { username, password } = DEMO_USERS.OWNER;
-      const res = await request(app).post("/api/user/demo-login").send({ username, password });
-      expect(res.status).toBe(404);
-      expect(res.body.code).toBe(ERROR_CODES.ROUTE_NOT_FOUND);
+      const { email, password } = DEMO_USERS.OWNER;
+      const res = await request(app).post("/api/user/login").send({ email, password });
+      expect(res.status).toBe(401);
+      expect(res.body.code).toBe(ERROR_CODES.INVALID_CREDENTIALS);
       expect(res.headers["set-cookie"]).toBeUndefined();
     } finally {
       process.env.DEMO_LOGIN_ENABLED = "true";
     }
   });
+});
 
-  it("the old email login route is gone", async () => {
-    const { email, password } = DEMO_USERS.OWNER;
-    const res = await request(app).post("/api/user/login").send({ email, password });
-    expect(res.status).toBe(404);
+describe("PATCH /api/user/password", () => {
+  it("sets a first password without the current one, then requires it", async () => {
+    const { agent } = await createUser(app, { phoneNumber: "09120000003", role: "OWNER" });
+    const email = "09120000003@test.com";
+    await agent.patch("/api/user/password").send({ newPassword: "First@1234" }).expect(200);
+
+    const wrong = await agent.patch("/api/user/password").send({ newPassword: "Second@1234" });
+    expect(wrong.body.code).toBe(ERROR_CODES.WRONG_PASSWORD);
+    const res = await agent.patch("/api/user/password").send({ currentPassword: "First@1234", newPassword: "Second@1234" });
+    expect(res.body.data.code).toBe(SUCCESS_CODES.PASSWORD_UPDATED);
+    await request(app).post("/api/user/login").send({ email, password: "Second@1234" }).expect(200);
+  });
+
+  it("rejects a short password and the demo accounts", async () => {
+    const agent = await demoLogin("OWNER");
+    const short = await agent.patch("/api/user/password").send({ newPassword: "short" });
+    expect(short.body).toMatchObject({ code: ERROR_CODES.INVALID_PASSWORD, field: "newPassword" });
+    const locked = await agent.patch("/api/user/password").send({ currentPassword: DEMO_USERS.OWNER.password, newPassword: "Other@1234" });
+    expect(locked.body.code).toBe(ERROR_CODES.DEMO_ACCOUNT_LOCKED);
   });
 });
 

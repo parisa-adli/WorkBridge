@@ -45,15 +45,25 @@ export const profileSchema = z.object({
     .max(LIMITS.PROFILE_NAME_MAX, invalidName),
   email: z.string().min(1, msg("validation.emailRequired")).pipe(z.email(msg("validation.invalidEmail"))),
   biography: z.string().max(LIMITS.BIOGRAPHY_MAX, msg("validation.maxChars", { max: LIMITS.BIOGRAPHY_MAX })),
+  // empty = not added yet; the field is disabled once the user has a number
+  phoneNumber: z.string().trim().regex(PHONE_PATTERN, invalidPhone).or(z.literal("")),
 });
 
 export type ProfileValues = z.infer<typeof profileSchema>;
 
-// The demo tab; the server accepts only the seeded demo usernames.
+// Email + password login (POST /user/login); the role only picks which demo account to pre-fill.
 export const demoLoginSchema = z.object({
   role: z.enum([ROLES.OWNER, ROLES.FREELANCER, ROLES.ADMIN]),
-  username: z.string().min(1, msg("validation.usernameRequired")),
+  email: z.string().min(1, msg("validation.emailRequired")).pipe(z.email(msg("validation.invalidEmail"))),
   password: z.string().min(1, msg("validation.passwordRequired")),
 });
 
 export type DemoLoginValues = z.infer<typeof demoLoginSchema>;
+
+// PATCH /user/password; currentPassword is left empty when the account has no password yet.
+export const passwordSchema = z.object({
+  currentPassword: z.string(),
+  newPassword: z.string().min(LIMITS.PASSWORD_MIN, msg("validation.minChars", { min: LIMITS.PASSWORD_MIN })).max(100),
+});
+
+export type PasswordValues = z.infer<typeof passwordSchema>;

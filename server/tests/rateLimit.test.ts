@@ -15,12 +15,12 @@ beforeAll(async () => {
 });
 afterAll(stopApp);
 
-describe.each(["get-otp", "check-otp", "demo-login"])("POST /api/user/%s rate limit", (route) => {
+describe.each(["get-otp", "check-otp", "login"])("POST /api/user/%s rate limit", (route) => {
   it("returns 429 with a message after the limit", async () => {
     const send = () =>
       request(app)
         .post(`/api/user/${route}`)
-        .send({ phoneNumber: "09120000001", otp: "123456", username: "demo-owner", password: "wrong" });
+        .send({ phoneNumber: "09120000001", otp: "123456", email: "owner@workbridge.dev", password: "wrong" });
     await send();
     await send();
 

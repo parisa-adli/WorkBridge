@@ -44,6 +44,8 @@ UserSchema.virtual("avatarUrl").get(function () {
 UserSchema.methods.toJSON = function () {
   const obj = this.toObject();
   obj.avatarUrl = this.avatarUrl;
+  // only when the password was loaded; the profile page asks for the current one if it is set
+  obj.hasPassword = !!obj.password;
   delete obj.password;
   delete obj.avatar;
   delete obj.otp;

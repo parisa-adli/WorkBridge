@@ -49,6 +49,7 @@ export const LIMITS = Object.freeze({
   PROPOSAL_DURATION_MIN: 1,
   PROPOSAL_DURATION_MAX: 365,
   OTP_MIN: 5,
+  PASSWORD_MIN: 8,
   OTP_MAX: 6,
   NAME_MIN: 5,
   NAME_MAX: 100,

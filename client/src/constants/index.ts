@@ -13,11 +13,11 @@ export const ROLE_HOME = Object.freeze({
   [ROLES.FREELANCER]: "/freelancer",
 });
 
-// Public demo accounts pre-filled in the demo login tab. Mirrors DEMO_USERS in server/utils/constants.ts.
+// Public demo accounts pre-filled in the email login forms. Mirrors DEMO_USERS in server/utils/constants.ts.
 export const DEMO_USERS = Object.freeze({
-  [ROLES.OWNER]: { username: "demo-owner", password: "Owner@1234" },
-  [ROLES.FREELANCER]: { username: "demo-freelancer", password: "Freelancer@1234" },
-  [ROLES.ADMIN]: { username: "demo-admin", password: "Admin@1234" },
+  [ROLES.OWNER]: { email: "owner@workbridge.dev", password: "Owner@1234" },
+  [ROLES.FREELANCER]: { email: "freelancer@workbridge.dev", password: "Freelancer@1234" },
+  [ROLES.ADMIN]: { email: "admin@workbridge.dev", password: "Admin@1234" },
 });
 
 // User verification and proposal review share these codes (ACCEPTED = a verified user).
@@ -55,6 +55,7 @@ export const LIMITS = Object.freeze({
   PROPOSAL_DURATION_MIN: 1,
   PROPOSAL_DURATION_MAX: 365,
   OTP_MIN: 5,
+  PASSWORD_MIN: 8,
   OTP_MAX: 6,
   NAME_MIN: 5,
   NAME_MAX: 100,

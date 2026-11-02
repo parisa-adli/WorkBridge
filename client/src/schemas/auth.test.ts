@@ -47,7 +47,7 @@ describe("auth schemas", () => {
   });
 
   it("profile: name follows NAME_MIN..PROFILE_NAME_MAX, biography up to BIOGRAPHY_MAX", () => {
-    const valid = { name: "a".repeat(LIMITS.NAME_MIN), email: "a@b.com", biography: "" };
+    const valid = { name: "a".repeat(LIMITS.NAME_MIN), email: "a@b.com", biography: "", phoneNumber: "" };
     expect(profileSchema.safeParse(valid).success).toBe(true);
     expect(profileSchema.safeParse({ ...valid, name: "a".repeat(LIMITS.PROFILE_NAME_MAX) }).success).toBe(true);
     expect(firstError(profileSchema, { ...valid, name: "" })).toBe("نام و نام خانوادگی ضروری است");
@@ -58,10 +58,10 @@ describe("auth schemas", () => {
     expect(profileSchema.safeParse({ ...valid, biography: "a".repeat(LIMITS.BIOGRAPHY_MAX + 1) }).success).toBe(false);
   });
 
-  it("demo login: every role, a required username and password", () => {
-    const valid = { role: "ADMIN", username: "demo-admin", password: "Admin@1234" };
+  it("login: every role, a required email and password", () => {
+    const valid = { role: "ADMIN", email: "admin@workbridge.dev", password: "Admin@1234" };
     expect(demoLoginSchema.safeParse(valid).success).toBe(true);
-    expect(firstError(demoLoginSchema, { ...valid, username: "" })).toBe("نام کاربری ضروری است");
+    expect(firstError(demoLoginSchema, { ...valid, email: "" })).toBe("ایمیل ضروری است");
     expect(firstError(demoLoginSchema, { ...valid, password: "" })).toBe("رمز عبور ضروری است");
   });
 });

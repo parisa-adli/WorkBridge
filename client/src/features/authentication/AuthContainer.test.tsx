@@ -58,16 +58,15 @@ describe("AuthContainer", () => {
     renderAuth();
     expect(screen.getByRole("tab", { name: "ورود نمایشی" })).toHaveAttribute("aria-selected", "true");
     expect(screen.getByLabelText("کارفرما")).toBeChecked();
-    expect(screen.getByLabelText(/نام کاربری/)).toHaveValue("demo-owner");
+    expect(screen.getByLabelText(/ایمیل/)).toHaveValue("owner@workbridge.dev");
     expect(screen.getByLabelText(/رمز عبور/)).toHaveValue("Owner@1234");
-    expect(screen.getByText("demo-owner")).toBeInTheDocument();
+    expect(screen.getByText("owner@workbridge.dev")).toBeInTheDocument();
     expect(screen.getByText("Owner@1234")).toBeInTheDocument();
   });
 
   it.each([
-    ["فریلنسر", "FREELANCER", "demo-freelancer", "Freelancer@1234", "/freelancer"],
-    ["مدیر", "ADMIN", "demo-admin", "Admin@1234", "/admin"],
-  ])("picking %s swaps the credentials and logs in with them", async (label, role, username, password, home) => {
+    ["فریلنسر", "FREELANCER", "freelancer@workbridge.dev", "Freelancer@1234", "/freelancer"],
+  ])("picking %s swaps the credentials and logs in with them", async (label, role, email, password, home) => {
     demoLoginApiMock.mockResolvedValue({
       message: "welcome",
       code: "LOGGED_IN",
@@ -75,12 +74,12 @@ describe("AuthContainer", () => {
     });
     renderAuth();
     fireEvent.click(screen.getByLabelText(label));
-    expect(screen.getByLabelText(/نام کاربری/)).toHaveValue(username);
+    expect(screen.getByLabelText(/ایمیل/)).toHaveValue(email);
     expect(screen.getByLabelText(/رمز عبور/)).toHaveValue(password);
-    expect(screen.getByText(username)).toBeInTheDocument();
+    expect(screen.getByText(email)).toBeInTheDocument();
     expect(screen.getByText(password)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "ورود" }));
-    await waitFor(() => expect(demoLoginApiMock.mock.calls[0][0]).toEqual({ username, password }));
+    await waitFor(() => expect(demoLoginApiMock.mock.calls[0][0]).toEqual({ email, password }));
     // the mutation resolves before the redirect renders, so wait for both under load
     await waitFor(() => expect(screen.getByTestId("location")).toHaveTextContent(home));
     expect(toast.success).toHaveBeenCalledWith("welcome");
@@ -168,8 +167,9 @@ describe("AuthContainer", () => {
     await i18n.changeLanguage("en");
     renderAuth();
     expect(screen.getByRole("tab", { name: "Demo login" })).toHaveAttribute("aria-selected", "true");
-    expect(screen.getByLabelText("Admin")).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Username/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Freelancer")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Admin")).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/^Email/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Log in" })).toBeInTheDocument();
   });
 });

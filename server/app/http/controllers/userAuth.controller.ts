@@ -12,6 +12,7 @@ import {
   cookieOptions,
   verifyPassword,
   isDemoUser,
+  hashPassword,
   imageExtension,
 } from "../../../utils/functions";
 import { apiError, sendData } from "../../../utils/apiResponse";
@@ -21,7 +22,8 @@ import type {
   CheckOtpBody,
   CompleteProfileBody,
   GetOtpBody,
-  DemoLoginBody,
+  LoginBody,
+  ChangePasswordBody,
   UpdateProfileBody,
 } from "../validators/user.schema";
 const CODE_EXPIRES = 90 * 1000; //90 seconds in miliseconds
@@ -74,12 +76,14 @@ class userAuthController extends Controller {
 
     return sendData(res, HttpStatus.OK, { ...welcome, user });
   }
-  async demoLogin(req: Request<object, unknown, DemoLoginBody>, res: Response) {
-    const { username, password } = req.body;
+  async login(req: Request<object, unknown, LoginBody>, res: Response) {
+    const { email, password } = req.body;
 
-    const user = await UserModel.findOne({ username });
-    if (!user?.password || !(await verifyPassword(password, user.password)))
-      throw apiError(401, ERROR_CODES.INVALID_CREDENTIALS, "نام کاربری یا رمز عبور اشتباه است");
+    const user = await UserModel.findOne({ email, password: { $exists: true } });
+    // the demo accounts answer like any wrong login when the demo is off
+    const demoOff = user && isDemoUser(user) && process.env.DEMO_LOGIN_ENABLED !== "true";
+    if (!user?.password || demoOff || !(await verifyPassword(password, user.password)))
+      throw apiError(401, ERROR_CODES.INVALID_CREDENTIALS, "ایمیل یا رمز عبور اشتباه است");
 
     await setAccessToken(res, user);
     await setRefreshToken(res, user);
@@ -170,19 +174,51 @@ class userAuthController extends Controller {
   }
   async updateProfile(req: Request<object, unknown, UpdateProfileBody>, res: Response) {
     // the route runs verifyAccessToken first, which sets req.user
-    const { _id: userId } = req.user!;
+    const user = req.user!;
     const { name, email, biography, phoneNumber } = req.body;
+
+    // the demo tab shows each demo account's email, so it can't change
+    if (isDemoUser(user) && email !== user.email)
+      throw apiError(403, ERROR_CODES.DEMO_ACCOUNT_LOCKED, "حساب نمایشی قابل تغییر نیست");
+
+    if (email !== user.email && (await UserModel.exists({ email, _id: { $ne: user._id } })))
+      throw apiError(400, ERROR_CODES.DUPLICATE_EMAIL, "کاربری با این ایمیل قبلا ثبت نام کرده است.");
+
+    // a phone number can be added once, never changed (it is the OTP login)
+    if (phoneNumber && user.phoneNumber && phoneNumber !== user.phoneNumber)
+      throw apiError(403, ERROR_CODES.PHONE_LOCKED, "شماره موبایل ثبت شده قابل تغییر نیست");
+    const addPhone = phoneNumber && !user.phoneNumber;
+    if (addPhone && (await UserModel.exists({ phoneNumber })))
+      throw apiError(400, ERROR_CODES.DUPLICATE_PHONE, "کاربری با این شماره موبایل قبلا ثبت نام کرده است.");
 
     // No "nothing changed" check: timestamps bump updatedAt, so modifiedCount is never 0.
     await UserModel.updateOne(
-      { _id: userId },
+      { _id: user._id },
       {
-        $set: { name, email, biography, phoneNumber },
+        $set: { name, email, biography, ...(addPhone && { phoneNumber, isVerifiedPhoneNumber: false }) },
       }
     );
     return sendData(res, HttpStatus.OK, {
       message: "اطلاعات با موفقیت آپدیت شد",
       code: SUCCESS_CODES.PROFILE_UPDATED,
+    });
+  }
+  async changePassword(req: Request<object, unknown, ChangePasswordBody>, res: Response) {
+    // the route runs verifyAccessToken first, which sets req.user (without the password)
+    if (isDemoUser(req.user!))
+      throw apiError(403, ERROR_CODES.DEMO_ACCOUNT_LOCKED, "حساب نمایشی قابل تغییر نیست");
+    const { currentPassword, newPassword } = req.body;
+    const user = (await UserModel.findById(req.user!._id))!;
+
+    // a user who signed up by OTP sets a first password without one; after that the current one is required
+    if (user.password && !(await verifyPassword(currentPassword ?? "", user.password)))
+      throw apiError(400, ERROR_CODES.WRONG_PASSWORD, "رمز عبور فعلی اشتباه است");
+
+    user.password = await hashPassword(newPassword);
+    await user.save();
+    return sendData(res, HttpStatus.OK, {
+      message: "رمز عبور با موفقیت تغییر کرد",
+      code: SUCCESS_CODES.PASSWORD_UPDATED,
     });
   }
   async updateAvatar(req: Request, res: Response) {

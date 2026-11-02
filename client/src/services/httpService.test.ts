@@ -75,7 +75,7 @@ describe("httpService 401 handling", () => {
 
   it.each([
     ["fa", "نام کاربری یا رمز عبور اشتباه است"],
-    ["en", "Wrong username or password"],
+    ["en", "Wrong email or password"],
   ])("rejects a login 401 with its own error and no refresh (%s)", async (lng, message) => {
     await i18n.changeLanguage(lng);
     adapter.mockImplementationOnce((config) =>
@@ -90,10 +90,10 @@ describe("httpService 401 handling", () => {
       )
     );
 
-    await expect(http.post("/user/demo-login")).rejects.toMatchObject({
+    await expect(http.post("/user/login")).rejects.toMatchObject({
       response: { status: 401, data: { code: "INVALID_CREDENTIALS", message } },
     });
-    expect(calledUrls()).toEqual(["/user/demo-login"]);
+    expect(calledUrls()).toEqual(["/user/login"]);
   });
 
   it("rejects a network error (no response) without trying to refresh", async () => {

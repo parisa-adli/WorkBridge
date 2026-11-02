@@ -9,7 +9,8 @@ import {
   checkOtpSchema,
   completeProfileSchema,
   getOtpSchema,
-  demoLoginSchema,
+  loginSchema,
+  changePasswordSchema,
   updateProfileSchema,
 } from "../http/validators/user.schema";
 
@@ -29,21 +30,8 @@ const otpLimiter = () =>
 
 router.post("/get-otp", otpLimiter(), validate(getOtpSchema), UserAuthController.getOtp);
 router.post("/check-otp", otpLimiter(), validate(checkOtpSchema), UserAuthController.checkOtp);
-// Read per request, so tests can turn it off. Off answers like a route that doesn't exist.
-const demoLoginEnabled: RequestHandler = (req, res, next) =>
-  next(
-    process.env.DEMO_LOGIN_ENABLED === "true"
-      ? undefined
-      : apiError(404, ERROR_CODES.ROUTE_NOT_FOUND, "آدرس مورد نظر یافت نشد")
-  );
-
-router.post(
-  "/demo-login",
-  demoLoginEnabled,
-  otpLimiter(),
-  validate(demoLoginSchema),
-  UserAuthController.demoLogin
-);
+// Email + password. DEMO_LOGIN_ENABLED=false turns off only the demo accounts (checked in the controller).
+router.post("/login", otpLimiter(), validate(loginSchema), UserAuthController.login);
 router.post(
   "/complete-profile",
   verifyAccessToken,
@@ -69,6 +57,13 @@ const readAvatar: RequestHandler = (req, res, next) =>
         : err
     )
   );
+
+router.patch(
+  "/password",
+  verifyAccessToken,
+  validate(changePasswordSchema),
+  UserAuthController.changePassword
+);
 
 router.patch("/avatar", verifyAccessToken, readAvatar, UserAuthController.updateAvatar);
 

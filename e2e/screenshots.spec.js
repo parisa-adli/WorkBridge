@@ -5,9 +5,9 @@ const { default: AxeBuilder } = require("@axe-core/playwright");
 // Every F9 page (docs/design.md §7): a visual baseline and no WCAG 2.2 AA violations; the lists, project detail pages and the app layout (drawer closed and open) also at 360px.
 // Update with `npm run e2e -- screenshots --update-snapshots` only when a visual change is intended.
 const ACCOUNTS = {
-  owner: { username: "demo-owner", password: "Owner@1234" },
-  freelancer: { username: "demo-freelancer", password: "Freelancer@1234" },
-  admin: { username: "demo-admin", password: "Admin@1234" },
+  owner: { email: "owner@workbridge.dev", password: "Owner@1234" },
+  freelancer: { email: "freelancer@workbridge.dev", password: "Freelancer@1234" },
+  admin: { email: "admin@workbridge.dev", password: "Admin@1234" },
 };
 const OWNER = ACCOUNTS.owner;
 const url = (p) => `${process.env.E2E_CLIENT_URL}${p}`;
@@ -166,7 +166,7 @@ for (const language of ["fa", "en"]) {
           { language, dark: theme === "dark" }
         );
         // page.request shares the page's cookie jar, so the session cookies reach the client.
-        if (account) expect((await page.request.post(`${process.env.E2E_SERVER_URL}/api/user/demo-login`, { data: ACCOUNTS[account] })).ok()).toBe(true);
+        if (account) expect((await page.request.post(`${process.env.E2E_SERVER_URL}/api/user/login`, { data: ACCOUNTS[account] })).ok()).toBe(true);
         // The home counts depend on what other specs created, so pin them.
         await page.route("**/api/stats/public", (route) => route.fulfill({ json: { statusCode: 200, data: HOME_STATS } }));
         for (const [api, json] of Object.entries(PINNED)) await page.route((u) => u.pathname === api, (route) => route.fulfill({ json }));

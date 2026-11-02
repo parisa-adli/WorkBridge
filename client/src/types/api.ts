@@ -28,6 +28,8 @@ export type User = Timestamps & Translations<{ name: string; biography: string }
   phoneNumber: string;
   biography: string | null;
   avatarUrl: string | null;
+  // sent only where the server loaded the password (profile, refresh-token, login)
+  hasPassword?: boolean;
   isVerifiedPhoneNumber: boolean;
   isActive: boolean;
   status: Status;

@@ -47,6 +47,8 @@
   "auth": {
     "logout": "خروج",
     "demoTab": "ورود نمایشی",
+    "emailTab": "ورود با ایمیل",
+    "adminLogin": "ورود مدیر",
     "phoneTab": "ورود با موبایل",
     "email": "ایمیل",
     "username": "نام کاربری",
@@ -123,7 +125,12 @@
     "changeAvatar": "تغییر تصویر پروفایل",
     "avatarHint": "jpg، png یا webp، حداکثر ۲ مگابایت",
     "biography": "حوزه تخصصی",
-    "save": "ذخیره تغییرات"
+    "save": "ذخیره تغییرات",
+    "changePassword": "تغییر رمز عبور",
+    "setPassword": "تعیین رمز عبور",
+    "currentPassword": "رمز عبور فعلی",
+    "newPassword": "رمز عبور جدید",
+    "savePassword": "ذخیره رمز عبور"
   },
   "category": {
     "resource": "دسته بندی",
@@ -250,7 +257,7 @@
     "INVALID_BIOGRAPHY": "بیوگرافی معتبر نیست",
     "INVALID_USERNAME": "نام کاربری صحیح نمی باشد",
     "PASSWORD_REQUIRED": "رمز عبور را وارد کنید",
-    "INVALID_CREDENTIALS": "نام کاربری یا رمز عبور اشتباه است",
+    "INVALID_CREDENTIALS": "ایمیل یا رمز عبور اشتباه است",
     "LOGIN_REQUIRED": "لطفا وارد حساب کاربری خود شوید.",
     "INVALID_TOKEN": "توکن نامعتبر است",
     "ACCOUNT_NOT_FOUND": "حساب کاربری یافت نشد",
@@ -258,6 +265,10 @@
     "PROFILE_REJECTED": "پروفایل شما رد شده است",
     "ACCESS_DENIED": "شما به این قسمت دسترسی ندارید",
     "DEMO_ACCOUNT_LOCKED": "حساب نمایشی قابل تغییر نیست",
+    "DUPLICATE_PHONE": "کاربری با این شماره موبایل قبلا ثبت نام کرده است.",
+    "PHONE_LOCKED": "شماره موبایل ثبت شده قابل تغییر نیست",
+    "INVALID_PASSWORD": "رمز عبور باید بین ۸ تا ۱۰۰ کاراکتر باشد",
+    "WRONG_PASSWORD": "رمز عبور فعلی اشتباه است",
     "INVALID_USER_STATUS": "وضعیت کاربر معتبر نیست",
     "USER_STATUS_NOT_UPDATED": "وضعیت کاربر آپدیت نشد",
     "PROJECT_NOT_FOUND": "پروژه یافت نشد.",
@@ -314,6 +325,7 @@
     "CATEGORY_CREATED": "دسته بندی با موفقیت افزوده شد",
     "CATEGORY_UPDATED": "دسته بندی با موفقیت به روزرسانی شد",
     "CATEGORY_DELETED": "دسته بندی با موفقیت حذف شد",
-    "AVATAR_UPDATED": "تصویر پروفایل با موفقیت آپدیت شد"
+    "AVATAR_UPDATED": "تصویر پروفایل با موفقیت آپدیت شد",
+    "PASSWORD_UPDATED": "رمز عبور با موفقیت تغییر کرد"
   }
 }

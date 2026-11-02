@@ -2,14 +2,14 @@ import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { profileSchema, type ProfileValues } from "../../schemas/auth";
+import { passwordSchema, profileSchema, type PasswordValues, type ProfileValues } from "../../schemas/auth";
 import type { User } from "../../types/api";
 import Card from "../../ui/Card";
 import Input from "../../ui/Input";
 import Textarea from "../../ui/Textarea";
 import Button from "../../ui/Button";
 import { Avatar } from "./UserAvatar";
-import { useUpdateAvatar, useUpdateProfile } from "./useUpdateProfile";
+import { useChangePassword, useUpdateAvatar, useUpdateProfile } from "./useUpdateProfile";
 
 function ProfileForm({ user }: { user: User }) {
   const { t } = useTranslation();
@@ -22,7 +22,12 @@ function ProfileForm({ user }: { user: User }) {
     formState: { errors },
   } = useForm<ProfileValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues: { name: user.name ?? "", email: user.email ?? "", biography: user.biography ?? "" },
+    defaultValues: {
+      name: user.name ?? "",
+      email: user.email ?? "",
+      biography: user.biography ?? "",
+      phoneNumber: user.phoneNumber ?? "",
+    },
   });
 
   return (
@@ -49,10 +54,22 @@ function ProfileForm({ user }: { user: User }) {
         </div>
       </Card>
       <Card>
-        <form className="space-y-5" onSubmit={handleSubmit((data) => updateProfile(data))}>
+        <form
+          className="space-y-5"
+          // the server accepts a number only while none is registered
+          onSubmit={handleSubmit(({ phoneNumber, ...data }) =>
+            updateProfile({ ...data, ...(!user.phoneNumber && phoneNumber && { phoneNumber }) })
+          )}
+        >
           <Input label={t("auth.fullName")} required dir="auto" error={errors.name?.message} {...register("name")} />
           <Input label={t("auth.email")} required dir="ltr" error={errors.email?.message} {...register("email")} />
-          <Input label={t("auth.phoneNumber")} dir="ltr" value={user.phoneNumber} readOnly disabled />
+          <Input
+            label={t("auth.phoneNumber")}
+            dir="ltr"
+            disabled={!!user.phoneNumber}
+            error={errors.phoneNumber?.message}
+            {...register("phoneNumber")}
+          />
           <Textarea
             label={t("profile.biography")}
             dir="auto"
@@ -64,7 +81,57 @@ function ProfileForm({ user }: { user: User }) {
           </Button>
         </form>
       </Card>
+      <PasswordForm hasPassword={!!user.hasPassword} />
     </div>
+  );
+}
+
+function PasswordForm({ hasPassword }: { hasPassword: boolean }) {
+  const { t } = useTranslation();
+  const { isChangingPassword, changePassword } = useChangePassword();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<PasswordValues>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: { currentPassword: "", newPassword: "" },
+  });
+
+  return (
+    <Card>
+      <form
+        className="space-y-5"
+        onSubmit={handleSubmit(({ currentPassword, newPassword }) =>
+          changePassword({ newPassword, ...(hasPassword && { currentPassword }) }, { onSuccess: () => reset() })
+        )}
+      >
+        <h2 className="font-bold">{t(hasPassword ? "profile.changePassword" : "profile.setPassword")}</h2>
+        {hasPassword && (
+          <Input
+            label={t("profile.currentPassword")}
+            type="password"
+            dir="ltr"
+            autoComplete="current-password"
+            required
+            {...register("currentPassword")}
+          />
+        )}
+        <Input
+          label={t("profile.newPassword")}
+          type="password"
+          dir="ltr"
+          autoComplete="new-password"
+          required
+          error={errors.newPassword?.message}
+          {...register("newPassword")}
+        />
+        <Button type="submit" disabled={isChangingPassword}>
+          {t("profile.savePassword")}
+        </Button>
+      </form>
+    </Card>
   );
 }
 export default ProfileForm;
