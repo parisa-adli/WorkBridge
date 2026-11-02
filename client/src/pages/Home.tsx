@@ -1,6 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { ArrowLeft, CircleAlert, createLucideIcon, FolderOpen } from "lucide-react";
+import {
+  ArrowLeft,
+  CircleAlert,
+  createLucideIcon,
+  FolderOpen,
+  Send,
+} from "lucide-react";
 import MainHeader from "../ui/MainHeader";
 import Logo from "../ui/Logo";
 import Skeleton from "../ui/Skeleton";
@@ -15,16 +21,79 @@ import { toPersianNumbers } from "../utils/toPersianNumber";
 
 // lucide 1.x dropped brand icons; this is its former Linkedin icon.
 const Linkedin = createLucideIcon("linkedin", [
-  ["path", { d: "M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z", key: "c2jq9f" }],
+  [
+    "path",
+    {
+      d: "M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z",
+      key: "c2jq9f",
+    },
+  ],
   ["rect", { width: "4", height: "12", x: "2", y: "9", key: "mk3on5" }],
   ["circle", { cx: "4", cy: "4", r: "2", key: "bt5ra8" }],
 ]);
 
+// Former lucide Github and Instagram icons; Telegram uses lucide's paper plane (Send).
+const Github = createLucideIcon("github", [
+  [
+    "path",
+    {
+      d: "M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4",
+      key: "tonef",
+    },
+  ],
+  ["path", { d: "M9 18c-4.51 2-5-2-7-2", key: "9comsn" }],
+]);
+const Instagram = createLucideIcon("instagram", [
+  [
+    "rect",
+    {
+      width: "20",
+      height: "20",
+      x: "2",
+      y: "2",
+      rx: "5",
+      ry: "5",
+      key: "2e1cvw",
+    },
+  ],
+  [
+    "path",
+    { d: "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z", key: "9exkf1" },
+  ],
+  ["line", { x1: "17.5", x2: "17.51", y1: "6.5", y2: "6.5", key: "r4j83e" }],
+]);
+
+const SOCIAL_LINKS = [
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/parisa-adli/",
+    Icon: Linkedin,
+  },
+  { label: "GitHub", href: "https://github.com/parisa-adli", Icon: Github },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/parisa.adli.dev",
+    Icon: Instagram,
+  },
+  { label: "Telegram", href: "https://t.me/parisaadlidev", Icon: Send },
+] as const;
+
 // Images exist only for these englishTitles; other categories get the generic projects icon.
-const CATEGORY_IMAGES = ["development", "design", "marketing", "writing", "music", "video", "architecture", "finance"];
+const CATEGORY_IMAGES = [
+  "development",
+  "design",
+  "marketing",
+  "writing",
+  "music",
+  "video",
+  "architecture",
+  "finance",
+];
 const categoryImage = (englishTitle: string) => {
   const name = englishTitle.trim().toLowerCase();
-  return CATEGORY_IMAGES.includes(name) ? `Images/categories/${name}.svg` : "Images/projects.svg";
+  return CATEGORY_IMAGES.includes(name)
+    ? `Images/categories/${name}.svg`
+    : "Images/projects.svg";
 };
 
 const ACHIEVEMENTS = [
@@ -43,7 +112,8 @@ const FOOTER_LINKS = [
   { key: "freelancers", links: ["findProject", "buildProfile"] },
 ] as const;
 
-const CATEGORY_GRID = "grid xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-8 gap-5";
+const CATEGORY_GRID =
+  "grid xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-8 gap-5";
 
 function Home() {
   const { t } = useTranslation();
@@ -62,23 +132,37 @@ function Home() {
         </section>
       );
     if (isError && !stats)
-      return <EmptyState icon={<CircleAlert className="text-destructive" />} title={t("home.statsError")} />;
-    if (!stats?.categories.length) return <EmptyState icon={<FolderOpen />} title={t("home.noCategories")} />;
+      return (
+        <EmptyState
+          icon={<CircleAlert className="text-destructive" />}
+          title={t("home.statsError")}
+        />
+      );
+    if (!stats?.categories.length)
+      return (
+        <EmptyState icon={<FolderOpen />} title={t("home.noCategories")} />
+      );
     return (
       <section className={CATEGORY_GRID}>
         {stats.categories.map((category) => (
           <Link
-            to="/auth"
+            to={projectsLink}
             key={category._id}
             className="grid grid-cols-4 items-center gap-x-2 rounded-xl border bg-card p-3 text-card-foreground shadow-sm transition-colors hover:bg-accent"
           >
             <div className="col-span-1 aspect-square shrink-0 min-w-10">
-              <img className="object-contain w-full h-full" src={categoryImage(category.englishTitle)} alt="" />
+              <img
+                className="object-contain w-full h-full"
+                src={categoryImage(category.englishTitle)}
+                alt=""
+              />
             </div>
             <p className="col-span-3 flex flex-col items-start gap-2 text-nowrap text-sm lg:text-lg">
               {categoryName(category)}
               <span className="flex items-center gap-x-2 text-muted-foreground text-xs">
-                {t("home.projectsCount", { n: toPersianNumbers(category.projects) })}{" "}
+                {t("home.projectsCount", {
+                  n: toPersianNumbers(category.projects),
+                })}{" "}
                 <ArrowLeft className="size-3 ltr:-scale-x-100" />
               </span>
             </p>
@@ -96,12 +180,16 @@ function Home() {
           <div className="p-4 text-xl grid grid-cols-1 md:grid-cols-[1fr_2fr] md:gap-x-8">
             <div className="space-y-4 md:space-y-8 my-4 md:mt-10">
               <div>
-                <h1 className="font-extrabold text-3xl md:text-5xl">{t("app.name")}</h1>
+                <h1 className="font-extrabold text-3xl md:text-5xl">
+                  {t("app.name")}
+                </h1>
                 <h3 className="mt-3 text-xl md:text-3xl font-bold text-muted-foreground sm:text-nowrap">
                   {t("home.subtitle")}
                 </h3>
               </div>
-              <p className="text-justify leading-relaxed text-sm md:text-lg md:leading-7">{t("home.intro")}</p>
+              <p className="text-justify leading-relaxed text-sm md:text-lg md:leading-7">
+                {t("home.intro")}
+              </p>
             </div>
             <div className="max-w-xl mt-8">
               <img src="Images/freelancer.png" alt="" />
@@ -111,29 +199,47 @@ function Home() {
       </div>
       <div className="p-8 mx-auto text-center space-y-2">
         <p className="md:text-2xl font-bold">{t("home.popularCategories")}</p>
-        <p className="text-xs md:text-lg text-muted-foreground">{t("home.skillsCount")}</p>
+        <p className="text-xs md:text-lg text-muted-foreground">
+          {t("home.skillsCount")}
+        </p>
         {renderCategories()}
       </div>
       <div className="p-8 flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:overflow-visible">
         {PROMOS.map(({ key, image_url }) => (
-          <Card key={key} className="snap-start flex-row items-center justify-between p-6">
+          <Card
+            key={key}
+            className="snap-start flex-row items-center justify-between p-6"
+          >
             <div className="space-y-2">
-              <h3 className="text-base md:text-lg font-semibold">{t(`home.${key}Title`)}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{t(`home.${key}Text`)}</p>
+              <h3 className="text-base md:text-lg font-semibold">
+                {t(`home.${key}Title`)}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t(`home.${key}Text`)}
+              </p>
               <Link to={projectsLink} className={buttonClass({ size: "sm" })}>
                 {t("home.view")}
               </Link>
             </div>
             <div className="w-80 h-40 max-w-xs md:max-w-sm aspect-square">
-              <img className="h-full w-full object-contain" src={image_url} alt="" />
+              <img
+                className="h-full w-full object-contain"
+                src={image_url}
+                alt=""
+              />
             </div>
           </Card>
         ))}
       </div>
       <div className="p-8 mx-auto text-center space-y-2">
         <p className="md:text-2xl font-bold">{t("home.achievements")}</p>
-        <p className="text-xs md:text-lg text-muted-foreground">{t("home.achievementsText")}</p>
-        <section aria-busy={isLoading} className="grid xs:grid-cols-2 sm:grid-cols-3 pt-8 gap-5">
+        <p className="text-xs md:text-lg text-muted-foreground">
+          {t("home.achievementsText")}
+        </p>
+        <section
+          aria-busy={isLoading}
+          className="grid xs:grid-cols-2 sm:grid-cols-3 pt-8 gap-5"
+        >
           {ACHIEVEMENTS.map((arch) => (
             <Card key={arch.key} className="items-center gap-2 p-4">
               <div className="aspect-square flex items-center justify-center">
@@ -142,9 +248,15 @@ function Home() {
               {isLoading ? (
                 <Skeleton className="h-6 w-12" />
               ) : (
-                stats && <p className="font-bold">{toPersianNumbers(stats[arch.key] ?? 0)}</p>
+                stats && (
+                  <p className="font-bold">
+                    {toPersianNumbers(stats[arch.key] ?? 0)}
+                  </p>
+                )
               )}
-              <p className="text-nowrap text-sm lg:text-lg text-muted-foreground">{t(`home.stats.${arch.key}`)}</p>
+              <p className="text-nowrap text-sm lg:text-lg text-muted-foreground">
+                {t(`home.stats.${arch.key}`)}
+              </p>
             </Card>
           ))}
         </section>
@@ -156,17 +268,22 @@ function Home() {
             <h3>
               <Logo variant="full" className="h-8" />
             </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{t("home.footerText")}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {t("home.footerText")}
+            </p>
             <div className="flex items-center gap-3">
-              <a
-                className={buttonClass({ variant: "outline", size: "icon" })}
-                href="https://www.linkedin.com/in/parisa-adli/"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="size-4" />
-              </a>
+              {SOCIAL_LINKS.map(({ label, href, Icon }) => (
+                <a
+                  key={label}
+                  className={buttonClass({ variant: "outline", size: "icon" })}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                >
+                  <Icon className="size-4" />
+                </a>
+              ))}
             </div>
           </div>
           {FOOTER_LINKS.map(({ key, links }) => (
@@ -175,7 +292,10 @@ function Home() {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 {links.map((link) => (
                   <li key={link}>
-                    <Link to="/auth" className="hover:text-foreground hover:underline">
+                    <Link
+                      to={projectsLink}
+                      className="hover:text-foreground hover:underline"
+                    >
                       {t(`home.footer.${link}`)}
                     </Link>
                   </li>

@@ -39,7 +39,8 @@ function UserAvatar() {
       <DropdownMenuTrigger asChild>
         {/* below sm only the avatar shows; sr-only keeps the name as the button's name */}
         <Button variant="ghost" className="px-2">
-          <Avatar user={user} />
+          {/* larger circle, same text: leaves room around the initials */}
+          <Avatar user={user} className="size-8 text-xs" />
           <span dir="auto" className="sr-only sm:not-sr-only">
             {localized(user, "name")}
           </span>
