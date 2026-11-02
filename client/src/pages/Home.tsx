@@ -8,6 +8,8 @@ import Card from "../ui/Card";
 import EmptyState from "../ui/EmptyState";
 import { buttonClass } from "../ui/Button";
 import usePublicStats from "../hooks/usePublicStats";
+import useUser from "../features/authentication/useUser";
+import { ROLE_HOME } from "../constants";
 import { categoryName } from "../utils/localized";
 import { toPersianNumbers } from "../utils/toPersianNumber";
 
@@ -46,6 +48,9 @@ const CATEGORY_GRID = "grid xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 pt-8 ga
 function Home() {
   const { t } = useTranslation();
   const { stats, isLoading, isError } = usePublicStats();
+  const { user } = useUser();
+  // signed in: the role's projects page (all three roles have one); otherwise log in first
+  const projectsLink = user ? `${ROLE_HOME[user.role]}/projects` : "/auth";
 
   const renderCategories = () => {
     if (isLoading)
@@ -109,13 +114,13 @@ function Home() {
         <p className="text-xs md:text-lg text-muted-foreground">{t("home.skillsCount")}</p>
         {renderCategories()}
       </div>
-      <div className="lg:p-8 flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:overflow-visible">
+      <div className="p-8 flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 lg:grid lg:grid-cols-2 lg:gap-6 lg:overflow-visible">
         {PROMOS.map(({ key, image_url }) => (
           <Card key={key} className="snap-start flex-row items-center justify-between p-6">
             <div className="space-y-2">
               <h3 className="text-base md:text-lg font-semibold">{t(`home.${key}Title`)}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{t(`home.${key}Text`)}</p>
-              <Link to="/auth" className={buttonClass({ size: "sm" })}>
+              <Link to={projectsLink} className={buttonClass({ size: "sm" })}>
                 {t("home.view")}
               </Link>
             </div>

@@ -3,10 +3,12 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import Home from "./Home";
 import usePublicStats from "../hooks/usePublicStats";
+import useUser from "../features/authentication/useUser";
 import i18n from "../i18n";
 
 vi.mock("../hooks/usePublicStats");
 vi.mock("../ui/MainHeader", () => ({ default: () => null }));
+vi.mock("../features/authentication/useUser", () => ({ default: vi.fn(() => ({ isLoading: false, user: undefined })) }));
 
 const stats = {
   freelancers: 12,
@@ -28,6 +30,18 @@ describe("Home", () => {
     expect(screen.getByRole("link", { name: /برنامه نویسی\s*۵ پروژه/ })).toHaveAttribute("href", "/auth");
     // no hardcoded numbers left
     expect(screen.queryByText("۷۴۲۳")).not.toBeInTheDocument();
+  });
+
+  it("sends the View buttons to login, or to the signed-in user's projects page", () => {
+    mockStats();
+    const { unmount } = render(<Home />, { wrapper: MemoryRouter });
+    for (const link of screen.getAllByRole("link", { name: "مشاهده" })) expect(link).toHaveAttribute("href", "/auth");
+    unmount();
+    vi.mocked(useUser).mockReturnValue({ user: { role: "FREELANCER" } } as ReturnType<typeof useUser>);
+    render(<Home />, { wrapper: MemoryRouter });
+    for (const link of screen.getAllByRole("link", { name: "مشاهده" }))
+      expect(link).toHaveAttribute("href", "/freelancer/projects");
+    vi.mocked(useUser).mockReturnValue({ isLoading: false, user: undefined });
   });
 
   it("shows skeletons while loading", () => {
