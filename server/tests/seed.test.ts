@@ -27,7 +27,7 @@ describe("seedDemoData", () => {
   it("is idempotent", async () => {
     await seedDemoData();
     const first = await counts();
-    expect(first).toEqual({ users: 3, categories: 3, projects: 3, proposals: 3 });
+    expect(first).toEqual({ users: 3, categories: 9, projects: 3, proposals: 3 });
 
     await seedDemoData();
     expect(await counts()).toEqual(first);

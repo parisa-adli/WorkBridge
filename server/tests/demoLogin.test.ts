@@ -183,12 +183,13 @@ describe("seedDemoUsers", () => {
     expect(await UserModel.countDocuments({ username: DEMO_USERS.OWNER.username })).toBe(1);
   });
 
-  it("never takes over a real user who has a demo email", async () => {
+  it("adopts an older account that holds a demo email", async () => {
     await UserModel.deleteMany({});
-    const real = await UserModel.create({ phoneNumber: "09120000007", email: DEMO_USERS.OWNER.email });
+    const old = await UserModel.create({ phoneNumber: "09120000007", email: DEMO_USERS.OWNER.email });
     await seedDemoUsers();
-    const after = (await UserModel.findById(real._id))!;
-    expect(after.username).toBeUndefined();
-    expect(after.password).toBeUndefined();
+    const after = (await UserModel.findById(old._id))!;
+    expect(after.username).toBe(DEMO_USERS.OWNER.username);
+    expect(after.password).toMatch(/^\$2[aby]\$10\$/);
+    expect(await UserModel.countDocuments({ email: DEMO_USERS.OWNER.email })).toBe(1);
   });
 });

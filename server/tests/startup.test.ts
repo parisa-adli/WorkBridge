@@ -44,22 +44,26 @@ describe("Application.start", () => {
     expect(listen).not.toHaveBeenCalled();
   });
 
-  it("listens only after Mongo connects", async () => {
+  it("seeds the demo users and listens only after Mongo connects", async () => {
     const order: string[] = [];
     vi.spyOn(mongoose, "connect").mockImplementationOnce(async () => {
       order.push("connect");
       return mongoose;
     });
-    const seed = vi.spyOn(UserModel, "updateOne");
+    // the test env sets DEMO_LOGIN_ENABLED=true, so startup seeds the demo users between connect and listen
+    const seed = vi.spyOn(UserModel, "updateOne").mockImplementation((() => {
+      order.push("seed");
+      return Promise.resolve({});
+    }) as never);
     listen.mockImplementation(() => {
       order.push("listen");
       return undefined as never;
     });
     await new Application().start();
 
-    expect(order).toEqual(["connect", "listen"]);
+    expect(order).toEqual(["connect", "seed", "seed", "seed", "listen"]);
     expect(exit).not.toHaveBeenCalled();
-    expect(seed).not.toHaveBeenCalled(); // demo users come from `npm run seed`, not startup
+    expect(seed).toHaveBeenCalledTimes(3);
   });
 
   it.each(["", "yes"])("exits when DEMO_LOGIN_ENABLED is %j", async (value) => {
