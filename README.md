@@ -1,32 +1,32 @@
 # WorkBridge
 
-<p align="center"><img src="client/public/brand/workbridge-logo.svg" alt="WorkBridge" height="64"></p>
+A freelancing platform that connects project owners with freelancers. Owners post projects and review proposals, freelancers browse projects and send proposals, and admins manage users and categories. Login is by phone number with a one-time password (OTP). The UI is bilingual (Persian RTL and English) with light and dark themes.
 
-A freelancing platform that connects project owners with freelancers. Owners post projects, freelancers send proposals, and admins manage users and categories. The UI is bilingual: Persian (RTL, default) and English (LTR).
+![WorkBridge home](public/home-page.png)
+![WorkBridge projects](public/projects.png)
 
 ## Features
 
-- Demo login: pick a role (owner, freelancer, admin) and sign in to a seeded account, no phone needed
-- OTP login by phone number, then profile completion with a role. No SMS is sent: outside production the code is shown in the login toast
+- **OTP login** by phone number, then profile completion with a role
 - **Owner**: create, edit, delete and open/close projects; accept or reject proposals
-- **Freelancer**: browse, filter and page through projects; send proposals
-- **Admin**: list users and change their status, view a user's profile, manage categories, view all projects and proposals
-- Profile page with avatar upload for every role; logout
-- Home page with live counts
-- Persian and English, light and dark mode, Persian digits and Jalali dates in Persian
+- **Freelancer**: browse and filter projects, submit proposals, track submitted ones
+- **Admin**: verify or block users, view all projects and proposals, manage categories
+- Role-based dashboards with a sidebar layout per role
+- **Persian and English** (i18next) with RTL/LTR switching, localized numbers and dates
+- Dark mode
+- Security hardening on the API: Helmet, rate limiting, Zod validation, httpOnly JWT cookies with refresh
 
 ## Tech stack
 
-| Part | Stack |
-|------|-------|
-| Client (`client/`) | React 19, TypeScript (strict), Vite 8, Tailwind CSS 4, shadcn/ui (Radix), lucide-react icons, React Router 7, TanStack Query 5, React Hook Form + Zod, react-i18next, Sonner |
-| Server (`server/`) | Node.js, Express 5, TypeScript (strict, run by `tsx`), MongoDB with Mongoose 9, Zod, JWT in httpOnly cookies, helmet, express-rate-limit |
-| Tests | Vitest + Testing Library (client), Vitest + Supertest + mongodb-memory-server (server), Playwright + axe (e2e, screenshots in fa/en × light/dark) |
-| CI | GitHub Actions: lint, translation parity, typecheck, tests, build, e2e |
+| Part               | Stack                                                                                                             |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Client (`client/`) | React 19, Vite, TypeScript, Tailwind CSS 4, React Router 7, TanStack Query, React Hook Form + Zod, i18next, Axios |
+| Server (`server/`) | Node.js, Express 5, TypeScript, MongoDB + Mongoose 9, Zod, JWT, Helmet, express-rate-limit                        |
+| Testing            | Vitest (client and server), Playwright end-to-end, visual and accessibility (axe) tests, GitHub Actions CI        |
 
 ## Getting started
 
-Requirements: Node.js 24 and a MongoDB database.
+Requirements: Node.js 18+ (CI uses 24) and a running MongoDB.
 
 ```bash
 git clone https://github.com/parisa-adli/WorkBridge.git
@@ -34,42 +34,35 @@ cd WorkBridge
 npm install
 npm install --prefix client
 npm install --prefix server
-cp server/.env.example server/.env   # then set the secrets
-npm run seed --prefix server         # demo accounts, categories, projects and proposals
-npm run dev                          # server on :5000, client on :3000
+cp server/.env.example server/.env   # set APP_DB and the secret keys
+npm run dev                          # API on :5000, client on :3000
 ```
 
-The client talks to `http://localhost:5000/api` by default. To use another API, set `VITE_BASE_URL` in `client/.env` (see `client/.env.example`).
+The client calls `http://localhost:5000/api` by default; set `VITE_BASE_URL` in `client/.env` to use another API. In development the OTP code is printed in the server console.
 
-## Commands
+## Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Server (`tsx watch`) and client (Vite) together |
-| `npm run e2e` | Playwright suite; starts its own in-memory MongoDB, server and client |
-| `npm run build --prefix client` | Production build |
-| `npm run lint --prefix client` / `--prefix server` | ESLint (client also checks for physical direction classes) |
-| `npm run typecheck --prefix client` / `--prefix server` | `tsc --noEmit` |
-| `npm test --prefix client` / `--prefix server` | Vitest |
-| `npm run i18n:check --prefix client` | Fails when a key is in only one of `fa.json`/`en.json` |
-| `npm run seed --prefix server` | Seeds the demo data (idempotent) |
+| Where           | Command                              | What it does                                           |
+| --------------- | ------------------------------------ | ------------------------------------------------------ |
+| root            | `npm run dev`                        | Server and client together                             |
+| root            | `npm run e2e`                        | Playwright end-to-end tests                            |
+| client / server | `npm test`                           | Unit and integration tests (Vitest)                    |
+| client / server | `npm run lint` · `npm run typecheck` | ESLint and TypeScript checks                           |
+| client          | `npm run i18n:check`                 | Checks that `fa.json` and `en.json` have the same keys |
 
 ## Project structure
 
 ```
 client/src/
-  components/ui/  # shadcn/ui primitives
-  ui/             # shared building blocks on top of them
-  features/       # domain code (auth, projects, proposals, admin, ...)
-  pages/          # route pages
-  services/       # API calls
-  schemas/        # Zod form schemas
-  i18n/           # fa.json, en.json
+  features/   # auth, projects, proposals, owner, freelancer, admin
+  pages/      # route pages
+  services/   # API calls
+  i18n/       # fa / en translations
+  ui/         # shared components
 server/
-  app/router/        # /user, /category, /stats, /project, /proposal, /admin
-  app/http/          # controllers, middlewares, Zod validators
-  app/models/        # Mongoose models
-  tests/             # API tests
-e2e/                 # Playwright specs and screenshot baselines
-docs/                # upgrade PRD and plan, design system, current-state report
+  app/router/ # /user, /category, /project, /proposal, /admin
+  app/http/   # controllers, middlewares, validators
+  app/models/ # Mongoose models
+  tests/      # Vitest + Supertest suites
+e2e/          # Playwright specs and screenshot baselines
 ```
