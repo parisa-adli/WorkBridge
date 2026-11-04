@@ -1,5 +1,8 @@
+import { useId } from "react";
 import { useTranslation } from "react-i18next";
+import { Label } from "@/components/ui/label";
 import { useSearchParams } from "react-router-dom";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type FilterProps = {
   options: { value: string; label: string }[];
@@ -8,37 +11,32 @@ type FilterProps = {
 
 function Filter({ options, filterField }: FilterProps) {
   const { t } = useTranslation();
+  const labelId = useId();
   const [searchParams, setSearchParams] = useSearchParams();
   const currentFilter = searchParams.get(filterField) || options[0].value;
 
-  function handleClick(value: string) {
+  function handleChange(value: string) {
     searchParams.set(filterField, value);
+    searchParams.delete("page"); // a new filter starts on its first page
     setSearchParams(searchParams);
   }
   return (
-    <div className="flex items-center gap-x-2 text-xs">
-      <span>{t("common.status")}</span>
-      <div className="flex items-center gap-x-2 p-1 border border-secondary-100 bg-secondary-0 rounded-lg">
-        {options.map(({ label, value }) => {
-          const isActive = value === currentFilter;
-          return (
-            <button
-              key={value}
-                  onClick={() => handleClick(value)}
-                  disabled={isActive}
-              className={`whitespace-nowrap rounded-md px-4 py-2 font-bold transition-all decoration-neutral-300
-                ${
-                  isActive
-                    ? "bg-primary-900! text-white"
-                    : "bg-secondary-0 text-secondary-800"
-                }`}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
-    </div>
+    <Tabs value={currentFilter} onValueChange={handleChange}>
+      <Label id={labelId}>{t("common.status")}</Label>
+      <TabsList aria-labelledby={labelId}>
+        {options.map(({ label, value }) => (
+          // no TabsContent: the list below is the panel, so drop the dangling aria-controls
+          <TabsTrigger
+            key={value}
+            value={value}
+            aria-controls={undefined}
+            className="px-4"
+          >
+            {label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   );
 }
 export default Filter;

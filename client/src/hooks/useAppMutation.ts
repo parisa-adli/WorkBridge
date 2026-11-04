@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient, type QueryKey } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import type { ApiErrorResponse, MessageData } from "../types/api";
 
 // Toasts the server's message and invalidates every query key that lists the changed entity.

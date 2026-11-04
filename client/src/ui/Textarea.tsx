@@ -1,14 +1,13 @@
 import type { ComponentProps } from "react";
-import Field, { controlClass, type FieldProps } from "./Field";
+import { Textarea as ShadcnTextarea } from "@/components/ui/textarea";
+import Field, { type FieldProps } from "./Field";
 
 type TextareaProps = ComponentProps<"textarea"> & FieldProps;
 
-function Textarea({ id, label, error, required, className = "", ...props }: TextareaProps) {
+function Textarea({ id, label, error, required, ...props }: TextareaProps) {
   return (
     <Field id={id} label={label} error={error} required={required}>
-      {(control) => (
-        <textarea {...props} {...control} className={`${controlClass} min-h-28 resize-y ${className}`} />
-      )}
+      {(control) => <ShadcnTextarea {...props} {...control} />}
     </Field>
   );
 }

@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SendOTPForm from "./SendOTPForm";
-import EmailLoginForm from "./EmailLoginForm";
+import DemoLoginForm from "./DemoLoginForm";
 import CheckOTPForm from "./CheckOTPForm";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { getOtp } from "../../services/authService";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -13,11 +14,12 @@ import type { AxiosError } from "axios";
 import type { ApiErrorResponse } from "../../types/api";
 import useUser from "./useUser";
 import { useNavigate } from "react-router-dom";
+import { ROLES } from "../../constants";
 
-function AuthContainer() {
+// `admin`: the /auth/admin page, whose email tab offers only the admin account; the main page leaves admin out.
+function AuthContainer({ admin = false }: { admin?: boolean }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [tab, setTab] = useState<"email" | "phone">("email");
   const [step, setStep] = useState(1);
   const {
     handleSubmit,
@@ -79,33 +81,17 @@ function AuthContainer() {
     }
   };
 
-  const tabs = [
-    { id: "email", label: t("auth.emailTab") },
-    { id: "phone", label: t("auth.phoneTab") },
-  ] as const;
-
   return (
-    <div className="w-full sm:max-w-sm">
-      <div role="tablist" className="flex gap-x-2 mb-8 border-b border-secondary-200">
-        {tabs.map(({ id, label }) => (
-          <button
-            key={id}
-            type="button"
-            role="tab"
-            aria-selected={tab === id}
-            onClick={() => setTab(id)}
-            className={`flex-1 py-2 -mb-px border-b-2 ${
-              tab === id
-                ? "border-primary-900 text-primary-900 font-bold"
-                : "border-transparent text-secondary-500"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      {tab === "email" ? <EmailLoginForm /> : renderStep()}
-    </div>
+    <Tabs defaultValue="demo" className="w-full sm:max-w-sm gap-8">
+      <TabsList className="w-full">
+        <TabsTrigger value="demo">{t(admin ? "auth.emailTab" : "auth.demoTab")}</TabsTrigger>
+        <TabsTrigger value="phone">{t("auth.phoneTab")}</TabsTrigger>
+      </TabsList>
+      <TabsContent value="demo">
+        <DemoLoginForm roles={admin ? [ROLES.ADMIN] : [ROLES.OWNER, ROLES.FREELANCER]} />
+      </TabsContent>
+      <TabsContent value="phone">{renderStep()}</TabsContent>
+    </Tabs>
   );
 }
 

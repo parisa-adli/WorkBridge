@@ -1,8 +1,6 @@
 import { z } from "zod";
-import { MongoIDPattern } from "../../../utils/constants";
 import { ERROR_CODES } from "../../../utils/errorCodes";
 import { issue } from "../middlewares/validate";
-import { invalidId } from "./common.schema";
 
 const invalidTitle = issue(ERROR_CODES.INVALID_CATEGORY_TITLE, "عنوان فارسی دسته بندی صحیح نمیباشد");
 const invalidEnglishTitle = issue(
@@ -23,10 +21,6 @@ export const addCategorySchema = z.object({
   englishTitle,
   description,
   type,
-  parent: z
-    .string(invalidId)
-    .refine((value) => value === "" || MongoIDPattern.test(value), invalidId)
-    .optional(),
 });
 
 export const updateCategorySchema = z.object({

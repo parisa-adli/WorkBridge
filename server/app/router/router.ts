@@ -9,12 +9,14 @@ import { adminRoutes } from "./admin/admin.routes";
 import { categoryRoutes } from "./category";
 import { projectRoutes } from "./project";
 import { proposalRoutes } from "./proposal";
+import { statsRoutes } from "./stats";
 import { userAuthRoutes } from "./userAuth";
 
 const router = Router();
 
 router.use("/user", userAuthRoutes);
 router.use("/category", categoryRoutes);
+router.use("/stats", statsRoutes);
 router.use(
   "/project",
   verifyAccessToken,

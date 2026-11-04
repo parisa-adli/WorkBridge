@@ -6,6 +6,7 @@ import { validate } from "../http/middlewares/validate";
 import { idParamSchema } from "../http/validators/common.schema";
 import {
   addProjectSchema,
+  changeProjectApprovalSchema,
   changeProjectStatusSchema,
   projectListQuerySchema,
 } from "../http/validators/project.schema";
@@ -27,7 +28,7 @@ router.post(
 );
 router.get(
   "/:id",
-  authorize(ROLES.ADMIN, ROLES.OWNER),
+  authorize(ROLES.ADMIN, ROLES.OWNER, ROLES.FREELANCER),
   validate(idParamSchema, "params"),
   ProjectController.getProjectById
 );
@@ -37,6 +38,13 @@ router.patch(
   validate(idParamSchema, "params"),
   validate(addProjectSchema),
   ProjectController.updateProject
+);
+router.patch(
+  "/approval/:id",
+  authorize(ROLES.ADMIN),
+  validate(idParamSchema, "params"),
+  validate(changeProjectApprovalSchema),
+  ProjectController.changeProjectApproval
 );
 router.patch(
   "/:id",

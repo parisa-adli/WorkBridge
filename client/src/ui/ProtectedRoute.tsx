@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useAuthorize from "../features/authentication/useAuthorize";
 import { useEffect, type ReactNode } from "react";
 import Loading from "../ui/Loading";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { t } = useTranslation();
 
   // 1. load the authenticated user
@@ -17,19 +18,19 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) {
-      navigate("/auth");
+      navigate(pathname.startsWith("/admin") ? "/auth/admin" : "/auth");
     } else if (!isVerified) {
       toast.error(t("auth.profileNotVerified"));
       navigate("/");
     } else if (!isAuthorized) {
       navigate("/not-access", { replace: true });
     }
-  }, [isLoading, isAuthenticated, isAuthorized, isVerified, navigate, t]);
+  }, [isLoading, isAuthenticated, isAuthorized, isVerified, navigate, pathname, t]);
 
   // 3. while loading => show loading
   if (isLoading)
     return (
-      <div className="flex items-center justify-center h-screen bg-secondary-100">
+      <div className="flex items-center justify-center h-screen bg-muted">
         <Loading />
       </div>
     );

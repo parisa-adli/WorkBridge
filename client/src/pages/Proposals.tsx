@@ -5,7 +5,7 @@ function Proposals() {
   const { t } = useTranslation();
   return (
     <div>
-      <h1 className="font-black text-secondary-700 text-xl mb-8">
+      <h1 className="font-black text-xl mb-8">
         {t("proposal.list")}
       </h1>
       <ProposalTable />

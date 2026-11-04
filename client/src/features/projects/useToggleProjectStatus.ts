@@ -3,6 +3,6 @@ import { toggleProjectStatusApi } from "../../services/projectService";
 
 export default function useToggleProjectStatus() {
   const { isPending: isUpdating, mutate: toggleProjectStatus } =
-    useAppMutation(toggleProjectStatusApi, [["owner-projects"]]);
+    useAppMutation(toggleProjectStatusApi, [["owner-projects"], ["projects"], ["project"]]);
   return { isUpdating, toggleProjectStatus };
 }

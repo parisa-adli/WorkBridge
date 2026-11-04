@@ -4,10 +4,12 @@ import Table from "../../ui/Table";
 import { toPersianNumbersWithComma } from "../../utils/toPersianNumber";
 import truncateText from "../../utils/truncateText";
 import Modal from "../../ui/Modal";
-import { TbChecklist } from "react-icons/tb";
+import Button from "../../ui/Button";
+import { ListChecks } from "lucide-react";
 import ChangeProposalStatus from "./ChangeProposalStatus";
 import StatusBadge from "../../ui/StatusBadge";
 import type { Proposal, UserRef } from "../../types/api";
+import localized from "../../utils/localized";
 
 function ProposalRow({ proposal, index }: { proposal: Proposal; index: number }) {
   const { t } = useTranslation();
@@ -18,9 +20,11 @@ function ProposalRow({ proposal, index }: { proposal: Proposal; index: number })
     <Table.Row>
       <td>{index + 1}</td>
       {/* a single project populates its proposals' users */}
-      <td>{(proposal.user as UserRef).name}</td>
       <td>
-        <p>{truncateText(proposal.description, 50)}</p>
+        <span dir="auto">{localized(proposal.user as UserRef, "name")}</span>
+      </td>
+      <td>
+        <p dir="auto">{truncateText(localized(proposal, "description"), 50)}</p>
       </td>
       <td>{t("proposal.days", { days: proposal.duration })}</td>
       <td>{toPersianNumbersWithComma(proposal.price)}</td>
@@ -39,9 +43,9 @@ function ProposalRow({ proposal, index }: { proposal: Proposal; index: number })
             onClose={() => setOpen(false)}
           />
         </Modal>
-        <button onClick={() => setOpen(true)}>
-          <TbChecklist className="w-6 h-6 text-primary-800" />
-        </button>
+        <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label={t("proposal.changeStatus")}>
+          <ListChecks />
+        </Button>
       </td>
     </Table.Row>
   );

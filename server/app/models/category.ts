@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const CategorySchema = new mongoose.Schema(
   {
@@ -11,11 +10,6 @@ const CategorySchema = new mongoose.Schema(
       enum: ["project", "comment", "post","ticket"],
       default: "project",
       required: true,
-    },
-    parentId: {
-      type: ObjectId,
-      ref: "Category",
-      default: null,
     },
     icon: {
       sm: { type: String, default: null },

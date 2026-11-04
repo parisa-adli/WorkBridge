@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useState } from "react";
 import { describe, expect, it } from "vitest";
 import Modal from "./Modal";
@@ -43,10 +43,11 @@ describe("Modal", () => {
     expect(close).toHaveFocus();
   });
 
-  it("closes on Escape and returns focus to its trigger", () => {
+  it("closes on Escape and returns focus to its trigger", async () => {
     const trigger = openModal();
     fireEvent.keyDown(document.activeElement!, { key: "Escape" });
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(trigger).toHaveFocus();
+    // Radix moves focus back after unmount, on a timeout
+    await waitFor(() => expect(trigger).toHaveFocus());
   });
 });

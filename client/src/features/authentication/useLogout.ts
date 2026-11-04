@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { logoutApi } from "../../services/authService";
 import { useNavigate } from "react-router-dom";
 import type { AxiosError } from "axios";
@@ -12,8 +12,8 @@ export default function useLogout() {
   const { isPending, mutate: logout } = useMutation({
     mutationFn: logoutApi,
     onSuccess: () => {
-      queryClient.removeQueries();
-      navigate("/auth", { replace: true });
+      queryClient.clear();
+      navigate("/", { replace: true });
     },
 
     onError: (err) =>

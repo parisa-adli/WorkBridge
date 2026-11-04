@@ -2,7 +2,7 @@ import { z } from "zod";
 import { LIMITS, STATUS } from "../../../utils/constants";
 import { ERROR_CODES } from "../../../utils/errorCodes";
 import { issue } from "../middlewares/validate";
-import { numeric, objectId, sortQuery } from "./common.schema";
+import { numeric, objectId, pageQuery, sortQuery } from "./common.schema";
 
 const invalidDescription = issue(ERROR_CODES.INVALID_DESCRIPTION, "توضیحات ارسال شده صحیح نمیباشد");
 const invalidPrice = issue(ERROR_CODES.INVALID_PRICE, "قیمت وارد شده صحیح نمیباشد");
@@ -27,7 +27,7 @@ export const changeProposalStatusSchema = z.object({
   status: numeric(z.literal(Object.values(STATUS), invalidStatus)),
 });
 
-export const proposalListQuerySchema = z.object({ sort: sortQuery });
+export const proposalListQuerySchema = z.object({ sort: sortQuery, ...pageQuery });
 
 export type AddProposalBody = z.infer<typeof addProposalSchema>;
 export type ChangeProposalStatusBody = z.infer<typeof changeProposalStatusSchema>;

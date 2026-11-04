@@ -1,20 +1,20 @@
-import type { ChangeEvent } from "react";
 import { useSearchParams } from "react-router-dom";
-import Select from "./Select";
-import type { SelectOption } from "./RHFSelect";
+import Select, { type SelectOption } from "./Select";
 
 type FilterDropDownProps = { options: SelectOption[]; filterField: string; label: string };
 
 function FilterDropDown({ options, filterField, label }: FilterDropDownProps) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const filterValue = searchParams.get(filterField) || "";
+  // no param shows the first option, as the native select did
+  const filterValue = searchParams.get(filterField) || options[0]?.value;
 
-  function handlerChange(e: ChangeEvent<HTMLSelectElement>) {
-    searchParams.set(filterField, e.target.value);
+  function handlerChange(value: string) {
+    searchParams.set(filterField, value);
+    searchParams.delete("page"); // a new filter starts on its first page
     setSearchParams(searchParams);
   }
   return (
-    <Select label={label} options={options} onChange={handlerChange} value={filterValue} />
+    <Select label={label} options={options} onValueChange={handlerChange} value={filterValue} />
   );
 }
 export default FilterDropDown;

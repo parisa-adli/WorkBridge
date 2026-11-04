@@ -6,6 +6,10 @@ const UserSchema = new mongoose.Schema(
     name: { type: String, trim: true },
     avatar: { type: String },
     biography: { type: String, default: null },
+    // optional English version of the Persian base fields (PRD F10)
+    translations: { en: { name: String, biography: String } },
+    // set only on the seeded demo accounts
+    username: { type: String, trim: true, lowercase: true, unique: true, sparse: true },
     email: { type: String, lowercase: true, trim: true },
     phoneNumber: { type: String, trim: true },
     password: { type: String },
@@ -23,6 +27,8 @@ const UserSchema = new mongoose.Schema(
       enum: Object.values(STATUS),
     },
     role: { type: String, default: ROLES.OWNER },
+    // set only in the database: no route writes it, and Zod strips it from every request body
+    isMainAdmin: { type: Boolean, default: false },
   },
   {
     timestamps: true,
@@ -40,6 +46,8 @@ UserSchema.virtual("avatarUrl").get(function () {
 UserSchema.methods.toJSON = function () {
   const obj = this.toObject();
   obj.avatarUrl = this.avatarUrl;
+  // only when the password was loaded; the profile page asks for the current one if it is set
+  obj.hasPassword = !!obj.password;
   delete obj.password;
   delete obj.avatar;
   delete obj.otp;

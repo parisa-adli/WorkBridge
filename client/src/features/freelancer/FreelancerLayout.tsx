@@ -1,26 +1,24 @@
 import { useTranslation } from "react-i18next";
 import AppLayout from "../../ui/AppLayout";
 import CustomNavLink from "../../ui/CustomNavLink";
-import { IoIosApps } from "react-icons/io";
-import { MdOutlinePostAdd } from "react-icons/md";
-import { AiFillDashboard } from "react-icons/ai";
+import { FilePlus, Grip, LayoutDashboard } from "lucide-react";
 
 function FreelancerLayout() {
   const { t } = useTranslation();
   return (
     <AppLayout>
       <CustomNavLink to="dashboard">
-        <AiFillDashboard />
+        <LayoutDashboard />
         <span>{t("nav.dashboard")}</span>
       </CustomNavLink>
 
       <CustomNavLink to="projects">
-        <IoIosApps />
+        <Grip />
         <span>{t("nav.projects")}</span>
       </CustomNavLink>
 
       <CustomNavLink to="proposals">
-        <MdOutlinePostAdd />
+        <FilePlus />
         <span>{t("nav.proposals")}</span>
       </CustomNavLink>
     </AppLayout>

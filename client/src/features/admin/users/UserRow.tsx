@@ -1,12 +1,15 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import Modal from "../../../ui/Modal";
-import { TbChecklist } from "react-icons/tb";
+import Button from "../../../ui/Button";
+import { ListChecks } from "lucide-react";
 import Table from "../../../ui/Table";
 import ChangeUserStatus from "./ChangeUserStatus";
 import StatusBadge from "../../../ui/StatusBadge";
 import type { User } from "../../../types/api";
+import localized from "../../../utils/localized";
 
 function UserRow({ user, index }: { user: User; index: number }) {
   const { t } = useTranslation();
@@ -16,7 +19,11 @@ function UserRow({ user, index }: { user: User; index: number }) {
   return (
     <Table.Row>
       <td>{index + 1}</td>
-      <td>{user.name}</td>
+      <td>
+        <Link to={`/admin/users/${user._id}`} dir="auto" className="text-primary hover:underline">
+          {localized(user, "name") || user.phoneNumber}
+        </Link>
+      </td>
       <td>{user.email}</td>
       <td>{user.phoneNumber}</td>
       <td>{user.role}</td>
@@ -35,9 +42,9 @@ function UserRow({ user, index }: { user: User; index: number }) {
             onClose={() => setOpen(false)}
           />
         </Modal>
-        <button onClick={() => setOpen(true)}>
-          <TbChecklist className="w-6 h-6 text-primary-800" />
-        </button>
+        <Button variant="ghost" size="icon" onClick={() => setOpen(true)} aria-label={t("user.changeStatus")}>
+          <ListChecks />
+        </Button>
       </td>
     </Table.Row>
   );

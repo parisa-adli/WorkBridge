@@ -7,26 +7,34 @@ export type ApiResponse<T> = { statusCode: number; data: T };
 export type ApiErrorResponse = { statusCode: number; code: string; message: string; field?: string };
 // The payload of every mutation that answers with a toast.
 export type MessageData = { message: string; code: string };
+// The payload of the paged list endpoints (project/list, project/owner-projects, proposal/list, admin/user/list).
+export type Page<T> = { items: T[]; total: number; page: number; limit: number };
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];
 export type Status = (typeof STATUS)[keyof typeof STATUS];
 export type ProjectStatus = (typeof PROJECT_STATUS)[keyof typeof PROJECT_STATUS];
 
 type Timestamps = { createdAt: string; updatedAt: string };
+// Optional English version of an entity's Persian text fields (PRD F10); read through utils/localized.
+export type Translations<T> = { translations?: { en?: Partial<T> } };
 // A populated user reference carries only the selected fields.
-export type UserRef = { _id: string; name: string };
+export type UserRef = { _id: string; name: string } & Translations<{ name: string }>;
 
-export type User = Timestamps & {
+export type User = Timestamps & Translations<{ name: string; biography: string }> & {
   _id: string;
+  username?: string;
   name?: string;
   email?: string;
   phoneNumber: string;
   biography: string | null;
   avatarUrl: string | null;
+  // sent only where the server loaded the password (profile, refresh-token, login)
+  hasPassword?: boolean;
   isVerifiedPhoneNumber: boolean;
   isActive: boolean;
   status: Status;
   role: Role;
+  isMainAdmin: boolean;
 };
 
 export type Category = Timestamps & {
@@ -37,23 +45,33 @@ export type Category = Timestamps & {
   type: string;
 };
 
-export type Proposal = Timestamps & {
+// GET /stats/public
+export type PublicStats = {
+  freelancers: number;
+  owners: number;
+  openProjects: number;
+  categories: (Pick<Category, "_id" | "title" | "englishTitle"> & { projects: number })[];
+};
+
+export type Proposal = Timestamps & Translations<{ description: string }> & {
   _id: string;
   price: number;
   duration: number;
   description: string;
   // populated with { _id, name } inside a single project and in the list
   user: string | UserRef;
-  // populated with the project's owner in the list
-  project: string | { _id: string; owner: UserRef };
+  // populated with the project's title and owner in the list
+  project: string | ({ _id: string; title: string; owner: UserRef } & Translations<{ title: string }>);
   status: Status;
 };
 
-export type Project = Timestamps & {
+export type Project = Timestamps & Translations<{ title: string; description: string; tags: string[] }> & {
   _id: string;
   title: string;
   description: string;
   status: ProjectStatus;
+  // admin review; freelancers only ever get ACCEPTED projects
+  approval: Status;
   category: Pick<Category, "_id" | "title" | "englishTitle">;
   budget: number;
   tags: string[];

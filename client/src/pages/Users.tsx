@@ -5,7 +5,7 @@ function Users() {
   const { t } = useTranslation();
   return (
     <div>
-      <h1 className="font-black text-secondary-700 text-xl mb-8">
+      <h1 className="font-black text-xl mb-8">
         {t("user.list")}
       </h1>
       <UsersTable />

@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import fs from "fs/promises";
+import path from "path";
 import type { Request, Response } from "express";
 import { StatusCodes as HttpStatus } from "http-status-codes";
 import Controller from "./controller";
@@ -9,6 +11,9 @@ import {
   verifyRefreshToken,
   cookieOptions,
   verifyPassword,
+  isDemoUser,
+  hashPassword,
+  imageExtension,
 } from "../../../utils/functions";
 import { apiError, sendData } from "../../../utils/apiResponse";
 import { ERROR_CODES, SUCCESS_CODES } from "../../../utils/errorCodes";
@@ -18,11 +23,14 @@ import type {
   CompleteProfileBody,
   GetOtpBody,
   LoginBody,
+  ChangePasswordBody,
   UpdateProfileBody,
 } from "../validators/user.schema";
 const CODE_EXPIRES = 90 * 1000; //90 seconds in miliseconds
 
 const showOtp = () => process.env.NODE_ENV !== "production";
+// server/, the folder that holds uploads/ (served at /uploads by app/server.ts)
+const SERVER_ROOT = path.join(__dirname, "..", "..", "..");
 
 class userAuthController extends Controller {
   // The routes validate each body (validate(schema) in router/userAuth.ts) before these handlers run.
@@ -71,8 +79,10 @@ class userAuthController extends Controller {
   async login(req: Request<object, unknown, LoginBody>, res: Response) {
     const { email, password } = req.body;
 
-    const user = await UserModel.findOne({ email: email.toLowerCase() });
-    if (!user?.password || !(await verifyPassword(password, user.password)))
+    const user = await UserModel.findOne({ email, password: { $exists: true } });
+    // the demo accounts answer like any wrong login when the demo is off
+    const demoOff = user && isDemoUser(user) && process.env.DEMO_LOGIN_ENABLED !== "true";
+    if (!user?.password || demoOff || !(await verifyPassword(password, user.password)))
       throw apiError(401, ERROR_CODES.INVALID_CREDENTIALS, "ایمیل یا رمز عبور اشتباه است");
 
     await setAccessToken(res, user);
@@ -131,6 +141,10 @@ class userAuthController extends Controller {
     const user = req.user!;
     const { name, email, role } = req.body;
 
+    // complete-profile sets the role
+    if (isDemoUser(user))
+      throw apiError(403, ERROR_CODES.DEMO_ACCOUNT_LOCKED, "حساب نمایشی قابل تغییر نیست");
+
     if (!user.isVerifiedPhoneNumber)
       throw apiError(403, ERROR_CODES.PHONE_NOT_VERIFIED, "شماره موبایل خود را تایید کنید.");
 
@@ -160,19 +174,81 @@ class userAuthController extends Controller {
   }
   async updateProfile(req: Request<object, unknown, UpdateProfileBody>, res: Response) {
     // the route runs verifyAccessToken first, which sets req.user
-    const { _id: userId } = req.user!;
+    const user = req.user!;
     const { name, email, biography, phoneNumber } = req.body;
 
-    // No "nothing changed" check: timestamps bump updatedAt, so modifiedCount is never 0 (known-bugs.md).
+    // the demo tab shows each demo account's email, so it can't change
+    if (isDemoUser(user) && email !== user.email)
+      throw apiError(403, ERROR_CODES.DEMO_ACCOUNT_LOCKED, "حساب نمایشی قابل تغییر نیست");
+
+    if (email !== user.email && (await UserModel.exists({ email, _id: { $ne: user._id } })))
+      throw apiError(400, ERROR_CODES.DUPLICATE_EMAIL, "کاربری با این ایمیل قبلا ثبت نام کرده است.");
+
+    // a phone number can be added once, never changed (it is the OTP login)
+    if (phoneNumber && user.phoneNumber && phoneNumber !== user.phoneNumber)
+      throw apiError(403, ERROR_CODES.PHONE_LOCKED, "شماره موبایل ثبت شده قابل تغییر نیست");
+    const addPhone = phoneNumber && !user.phoneNumber;
+    if (addPhone && (await UserModel.exists({ phoneNumber })))
+      throw apiError(400, ERROR_CODES.DUPLICATE_PHONE, "کاربری با این شماره موبایل قبلا ثبت نام کرده است.");
+
+    // No "nothing changed" check: timestamps bump updatedAt, so modifiedCount is never 0.
     await UserModel.updateOne(
-      { _id: userId },
+      { _id: user._id },
       {
-        $set: { name, email, biography, phoneNumber },
+        $set: { name, email, biography, ...(addPhone && { phoneNumber, isVerifiedPhoneNumber: false }) },
       }
     );
     return sendData(res, HttpStatus.OK, {
       message: "اطلاعات با موفقیت آپدیت شد",
       code: SUCCESS_CODES.PROFILE_UPDATED,
+    });
+  }
+  async changePassword(req: Request<object, unknown, ChangePasswordBody>, res: Response) {
+    // the route runs verifyAccessToken first, which sets req.user (without the password)
+    if (isDemoUser(req.user!))
+      throw apiError(403, ERROR_CODES.DEMO_ACCOUNT_LOCKED, "حساب نمایشی قابل تغییر نیست");
+    const { currentPassword, newPassword } = req.body;
+    const user = (await UserModel.findById(req.user!._id))!;
+
+    // a user who signed up by OTP sets a first password without one; after that the current one is required
+    if (user.password && !(await verifyPassword(currentPassword ?? "", user.password)))
+      throw apiError(400, ERROR_CODES.WRONG_PASSWORD, "رمز عبور فعلی اشتباه است");
+
+    user.password = await hashPassword(newPassword);
+    await user.save();
+    return sendData(res, HttpStatus.OK, {
+      message: "رمز عبور با موفقیت تغییر کرد",
+      code: SUCCESS_CODES.PASSWORD_UPDATED,
+    });
+  }
+  async updateAvatar(req: Request, res: Response) {
+    // the route runs verifyAccessToken first, which sets req.user, then reads the image into req.body
+    const { _id: userId, avatar: oldAvatar } = req.user!;
+    const extension = imageExtension(req.body);
+    if (!extension)
+      throw apiError(400, ERROR_CODES.INVALID_AVATAR_TYPE, "فرمت تصویر باید jpg، png یا webp باشد");
+
+    const avatar = `uploads/${userId}-${Date.now()}.${extension}`;
+    await fs.writeFile(path.join(SERVER_ROOT, avatar), req.body);
+    const user = await UserModel.findByIdAndUpdate(userId, { $set: { avatar } }, { returnDocument: "after" });
+    if (oldAvatar) await fs.rm(path.join(SERVER_ROOT, oldAvatar), { force: true });
+
+    return sendData(res, HttpStatus.OK, {
+      message: "تصویر پروفایل با موفقیت آپدیت شد",
+      code: SUCCESS_CODES.AVATAR_UPDATED,
+      // the model's virtual: SERVER_URL + avatar
+      avatarUrl: user!.get("avatarUrl") as string,
+    });
+  }
+  async removeAvatar(req: Request, res: Response) {
+    // the route runs verifyAccessToken first, which sets req.user
+    const { _id: userId, avatar } = req.user!;
+    await UserModel.updateOne({ _id: userId }, { $unset: { avatar: 1 } });
+    if (avatar) await fs.rm(path.join(SERVER_ROOT, avatar), { force: true });
+
+    return sendData(res, HttpStatus.OK, {
+      message: "تصویر پروفایل حذف شد",
+      code: SUCCESS_CODES.AVATAR_REMOVED,
     });
   }
   async refreshToken(req: Request, res: Response) {

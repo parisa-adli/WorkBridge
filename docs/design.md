@@ -1,86 +1,100 @@
 # WorkBridge: Design Direction
 
-Status: **agreed** by the project owner (2026-10-28), after review of the prototype. Closes the Part D gate in `docs/upgrade-plan.md` (PRD R9).
+Status: **agreed** by the project owner (2026-10-28), after review of the prototype. **Revised 2026-10-29** by the project owner: the visual layer follows shadcn/ui (§1, §9); layout and behavior are unchanged. Closes the Part D gate in `docs/upgrade-plan.md` (PRD R9).
 
 This is the fixed target for the Tailwind 4 tokens (Phase 28), the design-system components (Phase 29) and the page re-skins (Part F). Anything not listed here is out of scope for F9.
 
 ## 1. Direction
 
-**Calm and professional.** A neutral slate base, one indigo accent, generous whitespace, soft radii and almost no shadows. Content (projects, budgets, proposals) carries the page; chrome stays quiet.
+**shadcn/ui, as shipped.** Colors, component styles, radius, focus rings and icons come from shadcn/ui's default theme and component source (new-york style, base color `neutral`, lucide icons). The earlier direction (slate base, one indigo accent) is replaced; it is in git history before this revision.
+
+What stays is the page structure (PRD F9): routes, the sidebar + content layout, where each element sits on a page (tables, modals, menus, filters, forms), flow steps, actions and all behavior.
 
 Rules that follow from it:
 
-- One accent color. Status colors (success, warning, error) are used only for status: badges, toasts, field errors.
-- Surfaces are told apart by background tone and a 1px border, not by shadow. A shadow is allowed on overlays only (modal, dropdown, toast).
-- Structure stays the same (PRD F9): routes, the sidebar + content layout, flow steps and actions do not change.
+- Every existing UI element is replaced by its shadcn equivalent where one exists (§9). Use shadcn components and their variants as shipped. Change their classes only for RTL (logical classes) or accessibility, with a one-line comment saying why.
+- Use shadcn's semantic tokens (§2) and no other colors.
+- No old color or style is kept just to match a screenshot. A phase that changes the look reviews the screenshot diff and refreshes the baselines.
 - Every layout uses logical properties (`ms-`, `pe-`, `start-`, `text-start`) so fa (RTL) and en (LTR) mirror without per-language styles.
 
 ## 2. Color tokens
 
-Semantic tokens, defined as `--color-*` in Tailwind 4 `@theme` so they become utilities (`bg-surface`, `text-muted`, `border-strong`, ...). Dark values replace them under the existing `.dark-mode` class on `<html>` (`@custom-variant dark (&:where(.dark-mode, .dark-mode *))`).
+shadcn's semantic variables: light values on `:root`, dark values under the existing `.dark-mode` class on `<html>` (shadcn's docs use `.dark`; `@custom-variant dark (&:where(.dark-mode, .dark-mode *))` stays). `@theme inline` maps each variable to a utility (`bg-background`, `text-muted-foreground`, `border-input`, ...), as shadcn generates it.
 
-| Token | Use | Light | Dark |
-|---|---|---|---|
-| `bg` | page background | `#F8FAFC` | `#0B1120` |
-| `surface` | cards, tables, sidebar, modal | `#FFFFFF` | `#131C2E` |
-| `surface-muted` | input fill, table header, hover row | `#F1F5F9` | `#1E293B` |
-| `border` | dividers, card outlines (decorative) | `#E2E8F0` | `#273449` |
-| `border-strong` | input and control borders | `#7C8798` | `#64748B` |
-| `text` | body text, headings | `#0F172A` | `#F1F5F9` |
-| `text-muted` | secondary text, captions, placeholders | `#475569` | `#A0AEC0` |
-| `primary` | buttons, links, focus ring, active nav | `#4338CA` | `#818CF8` |
-| `primary-hover` | hover/pressed primary | `#3730A3` | `#A5B4FC` |
-| `on-primary` | text on `primary` | `#FFFFFF` | `#0B1120` |
-| `primary-soft` | primary badge, selected row | `#EEF2FF` | `#1E1B4B` |
-| `success` / `success-soft` | accepted, open, verified | `#047857` / `#ECFDF5` | `#34D399` / `#052E25` |
-| `warning` / `warning-soft` | pending | `#B45309` / `#FFFBEB` | `#FBBF24` / `#2D1F05` |
-| `error` / `error-soft` | rejected, closed, field errors, danger button | `#B91C1C` / `#FEF2F2` | `#F87171` / `#3B0D0D` |
-| `backdrop` | modal overlay | `#0F172A` at 50% | `#000000` at 60% |
+| Token | Use |
+|---|---|
+| `background` / `foreground` | page background, body text |
+| `card` / `card-foreground` | cards, tables, modal |
+| `popover` / `popover-foreground` | select lists, menus, popovers |
+| `primary` / `primary-foreground` | default buttons, active nav, primary badge |
+| `secondary` / `secondary-foreground` | secondary buttons and badges |
+| `muted` / `muted-foreground` | muted fills, captions, placeholders |
+| `accent` / `accent-foreground` | hover and selected items |
+| `destructive` | danger buttons, field errors, rejected/closed |
+| `border` / `input` / `ring` | dividers, control borders, focus ring |
+| `chart-1`–`chart-5`, `sidebar-*` | charts and the shadcn Sidebar |
 
-Badges are `{status}` text on `{status}-soft` background. The danger button is `error` outline in its idle state.
+**Values:** shadcn's default theme for base color `neutral` (oklch), copied verbatim from the shadcn theming docs in Phase 39c. No color outside this set.
 
-### Measured contrast (WCAG 2.2)
+**Status:** shadcn has no success or warning token, so status badges use Badge variants and always carry their text:
+
+| Status | Variant |
+|---|---|
+| open, accepted, verified | `default` |
+| pending | `secondary` |
+| rejected, closed | `destructive` |
+
+**Contrast:** WCAG 2.2 AA stays the bar (§6). Phase 39c measures the token pairs in both themes and records them here. A shadcn pair that fails AA is the only allowed deviation from the stock values, recorded with its measurement.
+
+Measured in Phase 39c (oklch → sRGB, alpha blended in sRGB over the surface; WCAG 2.x ratio):
 
 | Pair | Light | Dark | Needs |
 |---|---|---|---|
-| `text` on `bg` / `surface` / `surface-muted` | 17.1 / 17.9 / 16.3 | 17.2 / 15.5 / 13.4 | 4.5 |
-| `text-muted` on `bg` / `surface` / `surface-muted` | 7.2 / 7.6 / 6.9 | 8.4 / 7.6 / 6.5 | 4.5 |
-| `on-primary` on `primary` / `primary-hover` | 7.9 / 9.9 | 6.3 / 9.5 | 4.5 |
-| `primary` on `surface` / `bg` / `primary-soft` | 7.9 / 7.6 / 7.1 | 5.7 / 6.3 / 5.4 | 4.5 |
-| `success` on `success-soft` / `surface` | 5.2 / 5.5 | 7.7 / 8.9 | 4.5 |
-| `warning` on `warning-soft` / `surface` | 4.8 / 5.0 | 9.6 / 10.2 | 4.5 |
-| `error` on `error-soft` / `surface` | 5.9 / 6.5 | 6.1 / 6.2 | 4.5 |
-| `border-strong` on `surface` / `bg` / `surface-muted` | 3.6 / 3.5 / 3.3 | 3.6 / 4.0 / 3.1 | 3 (non-text, 1.4.11) |
+| `foreground` on `background` | 19.79 | 18.96 | 4.5 |
+| `card-foreground` on `card` | 19.79 | 17.16 | 4.5 |
+| `muted-foreground` on `background` / `card` | 4.96 / 4.96 | 7.63 / 6.91 | 4.5 |
+| `muted-foreground` on `muted` | 4.54 | 5.83 | 4.5 |
+| `primary-foreground` on `primary` | 17.16 | 14.22 | 4.5 |
+| `secondary-foreground` on `secondary` (= `accent` pair) | 16.42 | 14.48 | 4.5 |
+| `destructive` on `background` / `card` | 4.76 / 4.76 | 6.84 / 6.19 | 4.5 |
+| white on `destructive` (dark: `destructive/60`, as in Button and Badge) | 4.76 | 6.48 | 4.5 |
+| `input` (control border) on `background` / `card` | 3.11 / 3.11 | 3.02 / 3.12 | 3 |
+| `ring` (focus) on `background` / `card` | 4.73 / 4.73 | 4.18 / 3.79 | 3 |
+| `border` (dividers only, not a control boundary) | 1.26 | 1.25 | n/a |
 
-`border` is decorative only and is never the sole edge of a control. For comparison, today's `primary-900` (`#4A6DFF`) under white button text is 4.3, which fails; the new `primary` fixes that.
+**Deviations** (the stock pairs that failed AA; each value carries an `AA:` comment in `index.css`):
 
-### Migration from today's tokens
+| Variable | Stock | Used | Stock measurement |
+|---|---|---|---|
+| light `--muted-foreground` | `oklch(0.556 0 0)` | `oklch(0.545 0 0)` | 4.34 on `muted` |
+| light `--input` | `oklch(0.922 0 0)` | `oklch(0.66 0 0)` | 1.26 on `background` |
+| light `--ring` | `oklch(0.708 0 0)` | `oklch(0.556 0 0)` | 2.59 on `background` |
+| dark `--input` | `oklch(1 0 0 / 15%)` | `oklch(1 0 0 / 34%)` | 1.47 on `background` |
+| light `--sidebar-ring` | `oklch(0.708 0 0)` | `oklch(0.556 0 0)` | 2.59 on `sidebar` (same fix as `--ring`) |
 
-Phase 28 moves the current `--color-primary-*` / `--color-secondary-*` scale into `@theme` **unchanged**, so its screenshots match `main` (its Verify step). The semantic tokens above are added beside them in the same phase. Components (Phase 29) and re-skinned pages (Part F) use only the semantic tokens. The old scale and the `.btn`/`.badge`/`.textField__input` classes are deleted in Phase 42, once a grep finds no use of them.
+The base layer draws the browser focus outline in full `ring` (shadcn: `ring/50`), so elements without their own shadcn ring keep a 3:1 outline.
 
-As built in Phase 28b: each token is `--color-<token>`, so the utilities are `bg-bg`, `bg-surface`, `text-text`, `text-text-muted`, `border-border-strong`, and so on. `success`, `warning` and `error` share their names with today's tokens and take the new values above (today's `text-error` field errors and icons turn darker). Phase 29 added the radius tokens of section 4 to `@theme`; they replace Tailwind's own `rounded-sm/md/lg` values on every page.
+### Migration from the Phase 28b tokens
+
+- Phase 39c made the Phase 28b tokens (`bg`, `surface`, `surface-muted`, `border-strong`, `text`, `text-muted`, `on-primary`, `primary-soft`, `success`, `warning`, `error`, ...) aliases of the shadcn variables (`backdrop` is deleted: shadcn's Dialog overlay uses `bg-black/50`), so pages not yet re-skinned took the new palette.
+- Re-skinned pages use only the shadcn token utilities.
+- Phase 42 deleted the aliases, the old `primary-*`/`secondary-*` scale, the Tailwind 3 default colors and the `.btn`/`.badge` classes (`.textField__input` went in Phase 39d with its last use); `index.css` now defines only the shadcn variables and their mapping.
 
 ## 3. Spacing
 
-Tailwind 4's default spacing (`--spacing: 0.25rem`, so `p-4` = 16px). No custom scale. The values in use:
+Tailwind 4's default spacing (`--spacing: 0.25rem`, so `p-4` = 16px). Inside components, padding and heights follow shadcn's component source (for example button `h-9 px-4 py-2`, input `h-9 px-3`). Page-level spacing keeps today's layout:
 
 | Purpose | Value |
 |---|---|
-| Inside controls (button, input) | `px-4 py-2.5` (16 / 10px); small: `px-3 py-1.5` |
-| Inside cards, modals, table cells | `p-4` mobile, `p-6` from `md` |
+| Inside cards, modals, table cells | as in the shadcn component |
 | Between fields in a form | `gap-5` (20px) |
 | Between page sections | `gap-8` (32px) |
 | Page gutter | `px-4` mobile, `px-8` from `lg` |
-| Min touch target | 44 × 44px |
+| Min touch target | 24 × 24px (WCAG 2.2 AA, 2.5.8); shadcn's 36px controls meet it |
 
 ## 4. Radius
 
-| Token | Value | Use |
-|---|---|---|
-| `--radius-sm` | 6px | badge, checkbox, tag |
-| `--radius-md` | 10px | button, input, select, textarea |
-| `--radius-lg` | 16px | card, table wrapper, modal |
-| `--radius-full` | 9999px | avatar, pill, toggle |
+shadcn's `--radius` (0.625rem) and the `--radius-sm/md/lg/xl` it derives in `@theme inline`. They replace the 6/10/16px tokens in Phase 39c. Components keep the radius shadcn gives them.
 
 ## 5. Typography
 
@@ -95,9 +109,11 @@ Tailwind 4's default spacing (`--spacing: 0.25rem`, so `p-4` = 16px). No custom 
 - Weights: 400 body, 500 labels and table headers, 700 headings and buttons. `font-black` (900, used in 4 headers today) becomes 700.
 - Numbers in tables and stats use `tabular-nums`.
 
+shadcn sets no font, so these fonts stay: Persian text needs Vazirmatn.
+
 ### Type scale
 
-Persian needs taller lines than Latin; the line heights below suit both.
+Text inside shadcn components keeps shadcn's sizes and weights. The scale below is for page text (headings, body, stats). Persian needs taller lines than Latin; the line heights below suit both.
 
 | Token | Size / line height | Use |
 |---|---|---|
@@ -115,44 +131,93 @@ Persian needs taller lines than Latin; the line heights below suit both.
 **WCAG 2.2 AA in both themes and both languages.** Concretely:
 
 - Contrast: 4.5:1 for text, 3:1 for large text, control borders, focus rings and icons that carry meaning (section 2 shows the token pairs meet it).
-- Focus: every interactive element shows a 2px `primary` ring with a 2px offset on `:focus-visible`.
+- Focus: every interactive element shows shadcn's focus ring on `:focus-visible` (`ring-ring/50`, 3px, plus `border-ring` on controls). It replaces the global 2px outline in Phase 39c and must stay visible in both themes.
 - Keyboard: modals trap focus, close on Escape and return focus to their trigger; menus and the mobile drawer open, move and close by keyboard.
 - Forms: every field has a visible `<label>`; errors are linked with `aria-describedby` and announced.
 - Status is never color-only: badges always carry text.
 - Motion: transitions respect `prefers-reduced-motion`.
-- Checked by an axe run per page in CI (Phase 42) and on the reference page (Phase 29).
+- Checked by an axe run on every F9 page in fa/en × light/dark in CI (`e2e/screenshots.spec.js`, Phase 42) and on the reference pages (Phase 29).
 
 ## 7. F9 page list and re-skin order
 
-From PRD F9. Every page is redesigned on the Phase 29 components, in fa/en × light/dark, responsive from 360px, with loading, empty and error states for each list.
+From PRD F9. Every page is redesigned on the shadcn components (§9) with its current layout, in fa/en × light/dark, responsive from 360px, with loading, empty and error states for each list.
 
 | Order | Phase | Page | Route(s) |
 |---|---|---|---|
 | 0 | 29 | 404 and not-access (reference page) | `*`, `/not-access` |
 | 1 | 39 | Home | `/` |
-| 2 | 39 | Auth (OTP tab and demo email tab) | `/auth` |
+| 2 | 39 | Auth (OTP tab and demo login tab) | `/auth` |
 | 3 | 39 | Complete profile | `/complete-profile` |
 | 4 | 40 | App layout: sidebar (drawer on mobile) and dashboard header | all role routes |
 | 5 | 40 | Owner dashboard | `/owner/dashboard` |
 | 6 | 40 | Freelancer dashboard | `/freelancer/dashboard` |
 | 7 | 40 | Admin dashboard | `/admin/dashboard` |
-| 8 | 41 | Owner projects table | `/owner/projects` |
-| 9 | 41 | Project detail with its proposals table | `/owner/projects/:id` |
-| 10 | 41 | Projects list (freelancer and admin) | `/freelancer/projects`, `/admin/projects` |
-| 11 | 41 | Proposals table (freelancer and admin) | `/freelancer/proposals`, `/admin/proposals` |
-| 12 | 41 | Admin users | `/admin/users` |
-| 13 | 41 | Profile (built in Phase 34, F3) | added in Phase 34 |
-| 14 | 41 | Admin user profile (built in Phase 36, F5) | added in Phase 36 |
-| 15 | 41 | Admin categories (built in Phase 35, F4) | added in Phase 35 |
+| 8 | 41a | Owner projects table | `/owner/projects` |
+| 9 | 41b | Project detail with its proposals table | `/owner/projects/:id` |
+| 10 | 41a | Projects list (freelancer and admin) | `/freelancer/projects`, `/admin/projects` |
+| 11 | 41a | Proposals table (freelancer and admin) | `/freelancer/proposals`, `/admin/proposals` |
+| 12 | 41a | Admin users | `/admin/users` |
+| 13 | 41b | Profile (built in Phase 34, F3) | added in Phase 34 |
+| 14 | 41b | Admin user profile (built in Phase 36, F5) | added in Phase 36 |
+| 15 | 41b | Admin categories (built in Phase 35, F4) | added in Phase 35 |
 
-Pages 13–15 are created in Part E already on the new components; Phase 41 only checks them against this document. Phase 42 adds screenshot tests for every row.
+Pages 13–15 were created in Part E on the Phase 29 components; Phase 41b moves them onto shadcn and checks them against this document. Phase 42 adds screenshot tests and an axe check for every row (`e2e/screenshots.spec.js`; row 2 with both tabs, row 4 through the three dashboards and the owner dashboard at 360px with the drawer closed and open).
 
 ## 8. Agreement
 
 - [x] Direction, tokens, fonts, page list and accessibility target agreed by the project owner.
+- [x] Revised direction (shadcn/ui look, §1, §2, §9) set by the project owner, 2026-10-29.
 
 ## 9. Components and reference page
 
 Phase 29 built the components in `client/src/ui/`: `Button` (and `buttonClass` for links), `Input`, `Select`, `Textarea` (all three through `Field`: visible label, `aria-describedby` error), `Badge`, `Table`, `Pagination`, `Modal` (focus trap, Escape, focus back to the trigger), `Card`, `EmptyState` and `Skeleton`. `pages/NotFound.tsx` and `pages/NotAccess.tsx` are the reference re-skin for Part F; `e2e/reference-pages.spec.js` runs axe on them in fa/en × light/dark.
 
 The standalone prototype that this direction was agreed on (`client/prototype/design.html`) was deleted in Phase 29; it is in git history before that commit.
+
+### shadcn/ui (Phase 39a, revised)
+
+Decision (2026-10-29): from Part F the components are shadcn/ui (copied source on Radix primitives, `cva`, `cn`) with lucide icons. `client/components.json` configures the CLI (`@/` alias; new primitives land in `src/components/ui/`, and the `src/ui/` components wrap them with their current props).
+
+The first version of this decision kept the indigo design exactly. Phase 39a was built that way: shadcn's variables point at the Phase 28b tokens, Modal is on Dialog, Toggle on Switch, `@headlessui/react` removed, Select a native `<select>`.
+
+The same day the project owner revised it: the look follows shadcn as shipped (§1), and every UI element moves to its shadcn equivalent:
+
+| Today | shadcn | Phase |
+|---|---|---|
+| `react-icons` | lucide-react | 39b |
+| Theme tokens, radius, focus ring | shadcn default theme (`neutral`) | 39c |
+| Button, Input, Textarea, Badge, Card, Table, Skeleton, Modal (Dialog), Toggle (Switch), Field's label (Label) | stock shadcn source and classes | 39c |
+| `Select`, `RHFSelect`, `StatusSelect`, `FilterDropDown` (native `<select>`) | Select, wired to React Hook Form through `Controller` | 39d |
+| `RadioInput`, `RadioInputGroup` | RadioGroup | 39d |
+| `Filter` (button row) | ToggleGroup | 39d |
+| `Textfield` | Input | 39d |
+| `DatePickerField` (react-multi-date-picker, Jalali) | Calendar + Popover, if react-day-picker's Persian calendar keeps Jalali input; else restyled with the tokens, reason recorded here | 39d |
+| Tag input (react-tag-input-component) | no shadcn equivalent: restyled with Input and Badge styles | 39d |
+| `ConfirmDelete` | AlertDialog | 39e |
+| `Pagination` | Pagination | 39e |
+| `Loading` (react-loader-spinner) | Spinner | 39e |
+| `react-hot-toast` | Sonner | 39e |
+| `Empty`, `EmptyState` | Empty | 39e |
+| `UserAvatar` | Avatar (initials fallback) | 39e |
+| Auth OTP/demo switch | Tabs | 39 |
+| OTP field (react-otp-input) | InputOTP | 39 |
+| `Sidebar` and its mobile drawer | Sidebar (Sheet below `lg`) | 40 |
+| `HeaderMenu`; dark-mode and language toggles | DropdownMenu; ghost icon Button | 40 |
+| `Stat` | Card | 40 |
+| Tables on mobile | Table, one mobile approach | 41a |
+
+A replaced library is uninstalled in the phase that replaces it.
+
+Phase 39c: the primitives in `src/components/ui/` are the CLI's stock source (`npx shadcn add`), changed only where a comment says RTL, i18n or a11y; `tw-animate-css` provides their animations. `src/ui/` wraps them with the Phase 29 props (`Button` maps `primary`/`danger`/`md` to `default`/`destructive`/`default`). The unused Phase 29 `Badge` wrapper is gone: `StatusBadge` renders the shadcn Badge with the variant from `constants/`.
+
+Phase 39d: every select is the shadcn Select (`ui/Select` renders it through `Field`; `RHFSelect` and `StatusSelect` join the form through `Controller`; `FilterDropDown` writes the same query params). Radix forbids an item with value `""`, so `ui/Select` carries the empty option under a stand-in value and hands `""` back. A select without an empty option and no value shows a placeholder: the native select silently took its first option, so a new project's category is now picked explicitly (validation unchanged). The radios are RadioGroup, `Filter` is a ToggleGroup (`outline`; clicking the active item keeps it), and `Textfield` is gone (forms use `ui/Input`). `LanguageProvider` wraps the app in Radix's `DirectionProvider`, so arrow keys and popper sides follow fa/en. Date picker decision: shadcn Calendar + Popover. react-day-picker 10 moved its Persian calendar to the `@daypicker/persian` add-on; in fa the Calendar gets its `faIR` locale (Persian labels), `date-fns-jalali` as the date library, `arabext` digits and `rtl`, so days are picked in Jalali months; en keeps the Gregorian calendar. The trigger shows the date through `toLocalDateShort` (Jalali in fa), and the form still saves `date.toISOString()`; the picked day keeps the time of the pick, as the old picker did. `react-multi-date-picker` is uninstalled. The tag input has no shadcn equivalent: `ui/TagInput` is an Input that adds a tag on Enter (trimmed, no duplicates, Backspace removes the last) and shows tags as secondary Badges with a remove button; `react-tag-input-component` is uninstalled, as is `@tailwindcss/forms` (its `form-radio` was the last use).
+
+Phase 39e: `ConfirmDelete` is an AlertDialog whose trigger is the row's delete button (Radix returns focus to it); Confirm keeps it open until the delete succeeds, as the Modal did, and the category warning sits under the question. `Pagination` is the shadcn Pagination with its page items as `<button>`s (an `<a>` without href is not focusable and cannot be disabled; the URL is still written by `TablePagination`), the active page stock `outline`, digits through `toPersianNumbers`. `Loading` is the Spinner (`className` replaces the old width/height), `Empty`/`EmptyState` are the Empty (EmptyState keeps its heading level inside EmptyTitle), `Avatar` is the shadcn Avatar (initials also when the image fails to load). Toasts come from Sonner (`top-center` as before, theme from `DarkModeContext` instead of `next-themes`, `dir` from the language). `react-hot-toast` and `react-loader-spinner` are uninstalled.
+
+Phase 39: the auth page's demo/phone switch is the stock Tabs (Radix: arrow keys move between tabs, Home/End too, and the tab activates on focus); the OTP field is InputOTP, one `InputOTPGroup` of `LIMITS.OTP_MAX` slots inside a `dir="ltr"` wrapper so the code reads left to right in fa as before, labelled through `Field` ("Enter the verification code") and red on a validation error. Home's cards are `Card`s (the achievement cards lose their colored top borders), the CTAs and the LinkedIn link are `buttonClass` links, the category cards are links with Card's classes (`bg-card`, `border`, `shadow-sm`, `hover:bg-accent`), and the categories section shows an Empty for no categories and for a failed stats request (the achievement numbers are then left out). `react-otp-input` is uninstalled.
+
+Phase 40: `AppLayout` is the shadcn `SidebarProvider` + `Sidebar` + `SidebarInset`. The sidebar sits on the start side (`side="left"` is logical, so right in fa) and is fixed from `lg`; below `lg` it is the Sheet drawer, opened by the header's `SidebarTrigger`, which reports `aria-expanded` and gets focus back when the drawer closes (it is not a `Dialog.Trigger`, so `sidebar.tsx` returns focus itself). The stock Ctrl/Cmd+B shortcut is removed: it hid the desktop sidebar with no visible way back. Nav links are `SidebarMenuButton`s around `NavLink`; the current page is styled from `aria-current`, and picking a link closes the drawer. In the header, the avatar and name open a DropdownMenu (Profile, Logout); dark mode and language are ghost icon Buttons, and logged out a ghost icon login link. The three role dashboards are one `ui/Dashboard` that takes `stats` (title, value, icon) from each role's `features/<role>/use<Role>DashboardStats` hook; each stat is a Card (description, value, icon in `CardAction`).
+
+Phase 41a: tables on mobile scroll horizontally inside the shadcn Table's own `overflow-x-auto` container (one approach for every table; the columns and their order stay). `SidebarInset` gets `min-w-0`, so beside the fixed sidebar (`lg`+) a wide table scrolls in its container instead of widening the page. The paged lists render through `ui/ListState`: a busy skeleton (`role="status"`, five row bars) while loading, an Empty with an alert icon when the request fails and nothing is cached (`common.loadError`), the existing "not found" Empty with no rows, and the table with its pagination otherwise. Row actions are ghost icon Buttons (the view link uses `buttonClass`), project tags secondary Badges.
+
+Phase 41b: the owner and freelancer project detail pages, profile, admin user profile and admin categories keep their layout. The back button on the detail pages is an outline icon Button. The proposals table follows 41a (scrolls in its container, ghost icon row action); both detail pages show a spinner while loading, the "not found" Empty when the request answers 4xx (missing, bad id, not yours), an Empty with an alert icon (`project.loadError`) on a server or network failure, and the owner page the proposals Empty with none. The freelancer detail's facts sit in a Card, its tags are secondary Badges. Admin categories render through `ui/ListState`; its row actions are ghost icon Buttons named by `aria-label` (was `title`). The submit buttons of `CategoryForm` and `ChangeProposalStatus` are `ui/Button`.

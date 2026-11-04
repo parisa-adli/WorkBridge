@@ -2,7 +2,7 @@ import { z } from "zod";
 import { LIMITS, PHONE_PATTERN, ROLES, STATUS } from "../../../utils/constants";
 import { ERROR_CODES } from "../../../utils/errorCodes";
 import { issue } from "../middlewares/validate";
-import { numeric, searchQuery } from "./common.schema";
+import { numeric, pageQuery, searchQuery } from "./common.schema";
 
 const invalidPhone = issue(ERROR_CODES.INVALID_PHONE, "شماره موبایل وارد شده صحیح نمیباشد");
 const invalidOtp = issue(ERROR_CODES.INVALID_OTP, "کد ارسال شده صحیح نمیباشد");
@@ -28,9 +28,18 @@ export const checkOtpSchema = z.object({
 
 const passwordRequired = issue(ERROR_CODES.PASSWORD_REQUIRED, "رمز عبور را وارد کنید");
 
+// email + password login, for any account that has set a password (the demo accounts have one)
 export const loginSchema = z.object({
   email: z.email(invalidEmail),
   password: z.string(passwordRequired).min(1, passwordRequired).max(100, passwordRequired),
+});
+
+const invalidPassword = issue(ERROR_CODES.INVALID_PASSWORD, "رمز عبور باید بین ۸ تا ۱۰۰ کاراکتر باشد");
+
+// currentPassword is required only when the account already has a password (checked in the controller)
+export const changePasswordSchema = z.object({
+  currentPassword: z.string(passwordRequired).max(100, passwordRequired).optional(),
+  newPassword: z.string(invalidPassword).min(LIMITS.PASSWORD_MIN, invalidPassword).max(100, invalidPassword),
 });
 
 export const completeProfileSchema = z.object({
@@ -53,6 +62,7 @@ export const updateProfileSchema = z.object({
 
 export type GetOtpBody = z.infer<typeof getOtpSchema>;
 export type LoginBody = z.infer<typeof loginSchema>;
+export type ChangePasswordBody = z.infer<typeof changePasswordSchema>;
 export type CheckOtpBody = z.infer<typeof checkOtpSchema>;
 export type CompleteProfileBody = z.infer<typeof completeProfileSchema>;
 export type UpdateProfileBody = z.infer<typeof updateProfileSchema>;
@@ -63,10 +73,6 @@ export const verifyUserSchema = z.object({
   ),
 });
 
-const invalidPage = issue(ERROR_CODES.INVALID_PAGINATION, "صفحه بندی صحیح نمی باشد");
-// a positive integer, as the query string sends it
-const pageNumber = z.string(invalidPage).regex(/^[1-9]\d*$/, invalidPage).optional();
-
-export const userListQuerySchema = z.object({ search: searchQuery, page: pageNumber, limit: pageNumber });
+export const userListQuerySchema = z.object({ search: searchQuery, ...pageQuery });
 
 export type VerifyUserBody = z.infer<typeof verifyUserSchema>;

@@ -1,15 +1,11 @@
-import { ThreeDots } from "react-loader-spinner";
+import { Spinner } from "@/components/ui/spinner";
+import { cn } from "@/lib/utils";
 
-function Loading({ width = "75", height = "40" }: { width?: string | number; height?: string | number }) {
+function Loading({ className }: { className?: string }) {
   return (
-    <ThreeDots
-      width={width}
-      height={height}
-      radius={6}
-      color="var(--color-primary-900)"
-      wrapperClass="flex justify-center"
-      visible={true}
-    />
+    <div className="flex justify-center">
+      <Spinner className={cn("size-6", className)} />
+    </div>
   );
 }
 

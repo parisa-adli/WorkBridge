@@ -1,4 +1,5 @@
 import { createContext, Fragment, useContext, useEffect, type ReactNode } from "react";
+import { Direction } from "radix-ui";
 import useLocalStorageState from "../hooks/useLocalStorageState";
 import i18n, { type Language } from "../i18n";
 
@@ -21,15 +22,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLanguage(next);
   };
 
+  const dir = language === "fa" ? "rtl" : "ltr";
+
   useEffect(() => {
     document.documentElement.lang = language;
-    document.documentElement.dir = language === "fa" ? "rtl" : "ltr";
-  }, [language]);
+    document.documentElement.dir = dir;
+  }, [language, dir]);
 
   return (
     <LanguageContext.Provider value={{ language, toggleLanguage }}>
       {/* shortcut: remounts the tree so formatter call sites re-render (form state is lost on switch); drop once Phase 27b leaves every component subscribed via useTranslation */}
-      <Fragment key={language}>{children}</Fragment>
+      {/* Radix reads the direction from context, not from <html dir> (arrow keys in radio and toggle groups, menu sides) */}
+      <Direction.Provider dir={dir}>
+        <Fragment key={language}>{children}</Fragment>
+      </Direction.Provider>
     </LanguageContext.Provider>
   );
 }

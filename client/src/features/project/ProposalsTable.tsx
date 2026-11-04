@@ -11,7 +11,7 @@ function ProposalsTable({ proposals }: { proposals: Proposal[] }) {
   return (
     <Table>
       <Table.Header>
-        <tr className="title-row">
+        <Table.Row>
           <th>#</th>
           <th>{t("project.freelancer")}</th>
           <th>{t("common.description")}</th>
@@ -19,7 +19,7 @@ function ProposalsTable({ proposals }: { proposals: Proposal[] }) {
           <th>{t("proposal.cost")}</th>
           <th>{t("common.status")}</th>
           <th>{t("common.actions")}</th>
-        </tr>
+        </Table.Row>
       </Table.Header>
       <Table.Body>
         {proposals.map((proposal, index) => (

@@ -74,14 +74,14 @@ describe("httpService 401 handling", () => {
   });
 
   it.each([
-    ["fa", "ایمیل یا رمز عبور اشتباه است"],
+    ["fa", "نام کاربری یا رمز عبور اشتباه است"],
     ["en", "Wrong email or password"],
   ])("rejects a login 401 with its own error and no refresh (%s)", async (lng, message) => {
     await i18n.changeLanguage(lng);
     adapter.mockImplementationOnce((config) =>
       Promise.reject(
         new AxiosError("Unauthorized", "ERR_BAD_REQUEST", config, null, {
-          data: { statusCode: 401, code: "INVALID_CREDENTIALS", message: "ایمیل یا رمز عبور اشتباه است" },
+          data: { statusCode: 401, code: "INVALID_CREDENTIALS", message: "نام کاربری یا رمز عبور اشتباه است" },
           status: 401,
           statusText: "Unauthorized",
           headers: {},

@@ -31,6 +31,7 @@ beforeEach(async () => {
 
 const addProject = async (agent = owner.agent, body = projectBody()) =>
   (await agent.post("/api/project/add").send(body).expect(201)).body.data.project;
+const ids = (res: { body: { data: { items: { _id: string }[] } } }) => res.body.data.items.map((p) => p._id);
 
 describe("POST /api/project/add", () => {
   it("creates an OPEN project owned by the caller", async () => {
@@ -41,6 +42,7 @@ describe("POST /api/project/add", () => {
     expect(res.body.data.project).toMatchObject({
       title: "Landing page",
       status: "OPEN",
+      approval: 2,
       owner: String(owner.user._id),
       freelancer: null,
       proposals: [],
@@ -93,8 +95,8 @@ describe("GET project lists", () => {
     const res = await freelancer.agent.get("/api/project/list?status=OPEN");
 
     expect(res.status).toBe(200);
-    expect(res.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([open._id]);
-    const [p] = res.body.data.projects;
+    expect(res.body.data.items.map((p: { _id: string }) => p._id)).toEqual([open._id]);
+    const [p] = res.body.data.items;
     expect(p.owner).toMatchObject({ _id: String(owner.user._id), name: owner.user.name });
     expect(p.freelancer).toBeUndefined();
     expect(p.proposals).toBeUndefined();
@@ -108,7 +110,7 @@ describe("GET project lists", () => {
     const res = await freelancer.agent.get("/api/project/list?search=LANDING");
 
     expect(res.status).toBe(200);
-    expect(res.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([match._id]);
+    expect(res.body.data.items.map((p: { _id: string }) => p._id)).toEqual([match._id]);
   });
 
   it("/list?search treats regex characters literally", async () => {
@@ -117,10 +119,10 @@ describe("GET project lists", () => {
 
     const res = await freelancer.agent.get(`/api/project/list?search=${encodeURIComponent("++ (")}`);
     expect(res.status).toBe(200);
-    expect(res.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([match._id]);
+    expect(res.body.data.items.map((p: { _id: string }) => p._id)).toEqual([match._id]);
 
     const dot = await freelancer.agent.get("/api/project/list?search=.*");
-    expect(dot.body.data.projects).toEqual([]);
+    expect(dot.body.data.items).toEqual([]);
   });
 
   it("/owner-projects returns only the caller's projects", async () => {
@@ -130,8 +132,8 @@ describe("GET project lists", () => {
     const res = await owner.agent.get("/api/project/owner-projects");
 
     expect(res.status).toBe(200);
-    expect(res.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([mine._id]);
-    expect(res.body.data.projects[0].owner.name).toBe("user 09120000011");
+    expect(res.body.data.items.map((p: { _id: string }) => p._id)).toEqual([mine._id]);
+    expect(res.body.data.items[0].owner.name).toBe("user 09120000011");
   });
 
   it("/owner-projects shares the /list filters and sorts", async () => {
@@ -140,11 +142,11 @@ describe("GET project lists", () => {
     // raw driver write: mongoose timestamps would ignore a createdAt update
     await ProjectModel.collection.updateOne({ _id: new ProjectModel.base.Types.ObjectId(first._id) }, { $set: { createdAt: new Date("2020-01-01") } });
     const latest = await owner.agent.get("/api/project/owner-projects?sort=latest&category=web");
-    expect(latest.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([second._id, first._id]);
+    expect(latest.body.data.items.map((p: { _id: string }) => p._id)).toEqual([second._id, first._id]);
 
     // sort=popular is gone: it falls back to oldest first
     const popular = await owner.agent.get("/api/project/owner-projects?sort=popular");
-    expect(popular.body.data.projects.map((p: { _id: string }) => p._id)).toEqual([first._id, second._id]);
+    expect(popular.body.data.items.map((p: { _id: string }) => p._id)).toEqual([first._id, second._id]);
 
   });
 
@@ -155,6 +157,67 @@ describe("GET project lists", () => {
       expect(res.status).toBe(400);
     }
   );
+});
+
+describe("project approval", () => {
+  const setApproval = (agent: TestUser["agent"], id: string, approval: unknown) =>
+    agent.patch(`/api/project/approval/${id}`).send({ approval });
+
+  it("hides projects awaiting approval or rejected from freelancers until an admin approves them", async () => {
+    const pending = await addProject();
+    const rejected = await addProject();
+    await setApproval(admin.agent, pending._id, 1).expect(200);
+    await setApproval(admin.agent, rejected._id, 0).expect(200);
+
+    expect(ids(await freelancer.agent.get("/api/project/list"))).toEqual([]);
+    expect((await freelancer.agent.get(`/api/project/${pending._id}`)).status).toBe(404);
+    const proposal = { description: "I can do it", price: 500000, duration: 10, projectId: pending._id };
+    expect((await freelancer.agent.post("/api/proposal/add").send(proposal)).status).toBe(404);
+    // the owner still sees and manages their own
+    expect(ids(await owner.agent.get("/api/project/owner-projects")).sort()).toEqual([pending._id, rejected._id].sort());
+
+    const res = await setApproval(admin.agent, pending._id, "2");
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual({ message: "پروژه تایید شد", code: "PROJECT_APPROVED" });
+    expect(ids(await freelancer.agent.get("/api/project/list"))).toEqual([pending._id]);
+    expect((await freelancer.agent.get(`/api/project/${pending._id}`)).status).toBe(200);
+    expect((await freelancer.agent.post("/api/proposal/add").send(proposal)).status).toBe(201);
+  });
+
+  it("answers each approval value with its own message", async () => {
+    const project = await addProject();
+    expect((await setApproval(admin.agent, project._id, 0)).body.data.code).toBe("PROJECT_REJECTED");
+    expect((await setApproval(admin.agent, project._id, 1)).body.data.code).toBe("PROJECT_PENDING");
+    expect((await ProjectModel.findById(project._id))!.approval).toBe(1);
+  });
+
+  it("lets admins list every project and filter by approval", async () => {
+    const pending = await addProject();
+    const approved = await addProject();
+    const rejected = await addProject();
+    await setApproval(admin.agent, pending._id, 1).expect(200);
+    await setApproval(admin.agent, rejected._id, 0).expect(200);
+    // saved before the approval field existed: counts as approved
+    const legacy = await ProjectModel.collection.insertOne({ ...projectBody(), category: category._id, owner: owner.user._id, status: "OPEN", createdAt: new Date() });
+
+    expect(ids(await admin.agent.get("/api/project/list"))).toHaveLength(4);
+    expect(ids(await admin.agent.get("/api/project/list?approval=1"))).toEqual([pending._id]);
+    expect(ids(await admin.agent.get("/api/project/list?approval=0"))).toEqual([rejected._id]);
+    expect(ids(await admin.agent.get("/api/project/list?approval=2")).sort()).toEqual([approved._id, String(legacy.insertedId)].sort());
+    // freelancers can't ask for hidden ones
+    expect(ids(await freelancer.agent.get("/api/project/list?approval=1")).sort()).toEqual([approved._id, String(legacy.insertedId)].sort());
+    expect((await admin.agent.get("/api/project/list?approval=5")).body.code).toBe("INVALID_PROJECT_APPROVAL");
+  });
+
+  it("forbids owners and freelancers, and rejects bad values and unknown projects", async () => {
+    const project = await addProject();
+    expect((await setApproval(owner.agent, project._id, 2)).status).toBe(403);
+    expect((await setApproval(freelancer.agent, project._id, 2)).status).toBe(403);
+    const bad = await setApproval(admin.agent, project._id, 7);
+    expect(bad.status).toBe(400);
+    expect(bad.body.code).toBe("INVALID_PROJECT_APPROVAL");
+    expect((await setApproval(admin.agent, String(new ProjectModel.base.Types.ObjectId()), 2)).status).toBe(404);
+  });
 });
 
 describe("PATCH /api/project/update/:id", () => {

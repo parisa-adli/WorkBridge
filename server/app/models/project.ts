@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { PROJECT_STATUS } from "../../utils/constants";
+import { PROJECT_STATUS, STATUS } from "../../utils/constants";
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const ProjectSchema = new mongoose.Schema(
@@ -12,9 +12,15 @@ const ProjectSchema = new mongoose.Schema(
       default: PROJECT_STATUS.OPEN,
       enum: Object.values(PROJECT_STATUS),
     },
+    // admin review, STATUS codes. new projects start ACCEPTED; an admin can reject them or set them to PENDING
+    approval: { type: Number, default: STATUS.ACCEPTED, enum: Object.values(STATUS) },
     category: { type: ObjectId, ref: "Category", required: true },
     budget: { type: Number, required: true },
     tags: [{ type: String }],
+    // optional English version of the Persian base fields (PRD F10)
+    translations: {
+      en: { title: String, description: String, tags: { type: [String], default: undefined } },
+    },
     proposals: { type: [ObjectId], ref: "Proposal", default: [] },
     deadline: { type: Date, required: true },
     owner: { type: ObjectId, required: true, ref: "User" },
